@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ReservationStatus;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
@@ -26,7 +27,31 @@ class ReservationFactory extends Factory
             'product_id' => Product::factory(),
             'start_time' => $startTime,
             'end_time' => (clone $startTime)->modify('+2 hours'),
-            'status' => fake()->randomElement(['confirmed', 'active', 'completed', 'cancelled']),
+            'status' => ReservationStatus::Pending,
+            'reserved_quantity' => fake()->numberBetween(1, 3),
+            'extra_wishes' => fake()->optional(0.7)->sentence(),
         ];
+    }
+
+    /**
+     * State for reserved reservations.
+     */
+    public function reserved(): static
+    {
+        return $this->state([
+            'status' => ReservationStatus::Reserved,
+        ]);
+    }
+
+    /**
+     * State for returned reservations.
+     */
+    public function returned(): static
+    {
+        return $this->state([
+            'status' => ReservationStatus::Returned,
+            'returned_at' => fake()->dateTime(),
+            'returned_by' => User::factory(),
+        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ReservationStatus;
 use App\Models\Reservation;
 use Carbon\CarbonInterface;
 
@@ -11,7 +12,7 @@ class AvailabilityService
     {
         $hasOverlap = Reservation::query()
             ->where('product_id', $productId)
-            ->whereIn('status', ['confirmed', 'active'])
+            ->whereIn('status', [ReservationStatus::Reserved, ReservationStatus::Pending])
             ->where('start_time', '<', $endTime)
             ->where('end_time', '>', $startTime)
             ->exists();

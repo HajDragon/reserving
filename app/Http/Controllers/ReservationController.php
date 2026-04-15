@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ReservationStatus;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\Product;
 use App\Models\Reservation;
@@ -54,7 +55,7 @@ class ReservationController extends Controller
                 'product_id' => $product->id,
                 'start_time' => $validated['start_time'],
                 'end_time' => $validated['end_time'],
-                'status' => 'confirmed',
+                'status' => ReservationStatus::Reserved,
             ]);
         }, attempts: 5);
 

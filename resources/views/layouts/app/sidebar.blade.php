@@ -16,6 +16,10 @@
                         {{ __('products') }}
                     </flux:sidebar.item>
 
+                    <flux:sidebar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate>
+                        {{ __('Carts') }}
+                    </flux:sidebar.item>
+
                     <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate>
                         {{ __('My Reservations') }}
                     </flux:sidebar.item>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ReservationStatus;
 use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,11 @@ class Reservation extends Model
         'start_time',
         'end_time',
         'status',
+        'reserved_quantity',
+        'extra_wishes',
+        'reservation_order_id',
+        'returned_at',
+        'returned_by',
     ];
 
     /**
@@ -31,6 +37,9 @@ class Reservation extends Model
         return [
             'start_time' => 'datetime',
             'end_time' => 'datetime',
+            'status' => ReservationStatus::class,
+            'returned_at' => 'datetime',
+            'reserved_quantity' => 'integer',
         ];
     }
 
@@ -42,5 +51,29 @@ class Reservation extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function returnedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'returned_by');
+    }
+
+    public function reservationOrder(): BelongsTo
+    {
+        return $this->belongsTo(ReservationOrder::class);
+    }
+
+    /**
+     * Safely transition the reservation status.
+     */
+    public function transitionTo(ReservationStatus $newStatus): bool
+    {
+        if ($this->status->canTransitionTo($newStatus)) {
+            $this->status = $newStatus;
+
+            return true;
+        }
+
+        return false;
     }
 }

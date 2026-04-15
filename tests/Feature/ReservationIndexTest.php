@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ReservationStatus;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
@@ -28,13 +29,13 @@ test('user sees only their own reservations on index page', function () {
     Reservation::factory()->create([
         'user_id' => $currentUser->id,
         'product_id' => $currentUserProduct->id,
-        'status' => 'confirmed',
+        'status' => ReservationStatus::Reserved,
     ]);
 
     Reservation::factory()->create([
         'user_id' => $otherUser->id,
         'product_id' => $otherUserProduct->id,
-        'status' => 'confirmed',
+        'status' => ReservationStatus::Reserved,
     ]);
 
     $response = $this

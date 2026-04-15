@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ReservationStatus;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\User;
@@ -8,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
-test('authenticated user can create a confirmed reservation', function () {
+test('authenticated user can create a reserved reservation', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
@@ -25,14 +26,14 @@ test('authenticated user can create a confirmed reservation', function () {
 
     $response
         ->assertCreated()
-        ->assertJsonPath('reservation.status', 'confirmed')
+        ->assertJsonPath('reservation.status', ReservationStatus::Reserved->value)
         ->assertJsonPath('reservation.product_id', $product->id);
 
     expect(Reservation::count())->toBe(1)
-        ->and(Reservation::first()->status)->toBe('confirmed');
+        ->and(Reservation::first()->status)->toBe(ReservationStatus::Reserved);
 });
 
-test('reservation fails when overlapping a confirmed reservation', function () {
+test('reservation fails when overlapping a reserved reservation', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
@@ -44,7 +45,7 @@ test('reservation fails when overlapping a confirmed reservation', function () {
         'product_id' => $product->id,
         'start_time' => $existingStart,
         'end_time' => $existingEnd,
-        'status' => 'confirmed',
+        'status' => ReservationStatus::Reserved,
     ]);
 
     $overlapStart = (clone $existingStart)->addHour();
@@ -77,7 +78,7 @@ test('reservation can overlap a cancelled reservation', function () {
         'product_id' => $product->id,
         'start_time' => $existingStart,
         'end_time' => $existingEnd,
-        'status' => 'cancelled',
+        'status' => ReservationStatus::Cancelled,
     ]);
 
     $response = $this
