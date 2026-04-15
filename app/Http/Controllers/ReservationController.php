@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AdminReservationStatus;
 use App\Enums\ReservationStatus;
+use App\Events\ReservationReturned;
 use App\Http\Requests\StoreReservationRequest;
 use App\Models\Product;
 use App\Models\Reservation;
-use App\Models\ReservationLog;
 use App\Models\ReservationOrder;
 use App\Services\AvailabilityService;
 use Illuminate\Contracts\View\View;
@@ -51,7 +52,7 @@ class ReservationController extends Controller
                 requestedQuantity: $requestedQuantity,
             );
 
-            if (! $isAvailable) {
+            if (! $isAvailable || $requestedQuantity > $product->available_quantity) {
                 throw ValidationException::withMessages([
                     'reserved_quantity' => ['The selected time window does not have enough available units for this product.'],
                 ]);
@@ -85,6 +86,7 @@ class ReservationController extends Controller
     {
         $updatedReservation = DB::transaction(function () use ($request, $reservation) {
             $lockedReservation = Reservation::query()
+                ->with('product')
                 ->whereKey($reservation->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
@@ -95,22 +97,13 @@ class ReservationController extends Controller
                 ]);
             }
 
-            $lockedProduct = Product::query()
-                ->whereKey($lockedReservation->product_id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
             $lockedReservation->forceFill([
                 'status' => ReservationStatus::Returned,
                 'returned_at' => now(),
                 'returned_by' => $request->user()->id,
             ])->save();
 
-            $this->availabilityService->syncProductAvailability(
-                product: $lockedProduct,
-                startTime: $lockedReservation->start_time,
-                endTime: $lockedReservation->end_time,
-            );
+            event(new ReservationReturned($lockedReservation, $request->user()->id));
 
             return $lockedReservation->fresh();
         }, attempts: 5);
@@ -140,55 +133,15 @@ class ReservationController extends Controller
                 ]);
             }
 
-            $now = now();
-
             foreach ($lockedReservations as $lockedReservation) {
-                if ($lockedReservation->status === ReservationStatus::Returned) {
-                    throw ValidationException::withMessages([
-                        'order' => ['Returned orders cannot be confirmed again.'],
-                    ]);
-                }
-            }
-
-            $lockedProducts = Product::query()
-                ->whereIn('id', $lockedReservations->pluck('product_id')->unique()->sort()->values())
-                ->orderBy('id')
-                ->lockForUpdate()
-                ->get()
-                ->keyBy('id');
-
-            foreach ($lockedReservations as $lockedReservation) {
-                ReservationLog::query()->create([
-                    'reservation_id' => $lockedReservation->id,
-                    'reservation_order_id' => $lockedReservation->reservation_order_id,
-                    'user_id' => $lockedReservation->user_id,
-                    'product_id' => $lockedReservation->product_id,
-                    'product_name' => $lockedReservation->product?->name ?? 'N/A',
-                    'reserved_quantity' => $lockedReservation->reserved_quantity,
-                    'start_time' => $lockedReservation->start_time,
-                    'end_time' => $lockedReservation->end_time,
-                    'extra_wishes' => $lockedReservation->extra_wishes,
+                $lockedReservation->forceFill([
                     'status' => ReservationStatus::Returned,
-                    'returned_at' => $now,
+                    'returned_at' => now(),
                     'returned_by' => $request->user()->id,
-                ]);
+                ])->save();
 
-                $product = $lockedProducts->get($lockedReservation->product_id);
-
-                if ($product instanceof Product) {
-                    $this->availabilityService->syncProductAvailability(
-                        product: $product,
-                        startTime: $lockedReservation->start_time,
-                        endTime: $lockedReservation->end_time,
-                    );
-                }
+                event(new ReservationReturned($lockedReservation, $request->user()->id));
             }
-
-            Reservation::query()
-                ->where('reservation_order_id', $reservationOrder->id)
-                ->delete();
-
-            $reservationOrder->delete();
 
             return [
                 'id' => $reservationOrder->id,
@@ -210,27 +163,23 @@ class ReservationController extends Controller
     {
         $validated = $request->validate([
             'status' => ['required', Rule::in(array_map(
-                static fn (ReservationStatus $status): string => $status->value,
-                ReservationStatus::cases(),
+                static fn (AdminReservationStatus $status): string => $status->value,
+                AdminReservationStatus::cases(),
             ))],
         ]);
 
         $updatedReservation = DB::transaction(function () use ($request, $reservation, $validated) {
             $lockedReservation = Reservation::query()
+                ->with('product')
                 ->whereKey($reservation->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $newStatus = ReservationStatus::from($validated['status']);
+            $adminStatus = AdminReservationStatus::from($validated['status']);
+            $newStatus = $adminStatus->toReservationStatus();
 
             if ($lockedReservation->status === $newStatus) {
                 return $lockedReservation->fresh();
-            }
-
-            if (! $lockedReservation->status->canTransitionTo($newStatus)) {
-                throw ValidationException::withMessages([
-                    'status' => ['Invalid reservation status transition.'],
-                ]);
             }
 
             $lockedReservation->forceFill([
@@ -238,6 +187,12 @@ class ReservationController extends Controller
                 'returned_at' => $newStatus === ReservationStatus::Returned ? now() : null,
                 'returned_by' => $newStatus === ReservationStatus::Returned ? $request->user()->id : null,
             ])->save();
+
+            if ($newStatus === ReservationStatus::Returned) {
+                event(new ReservationReturned($lockedReservation, $request->user()->id));
+
+                return $lockedReservation->fresh();
+            }
 
             $lockedProduct = Product::query()
                 ->whereKey($lockedReservation->product_id)

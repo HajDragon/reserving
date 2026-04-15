@@ -15,12 +15,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
 
-    Route::get('carts', [CartController::class, 'index'])->name('carts.index');
+    Route::resource('carts', CartController::class)->only(['index']);
     Route::post('carts/items', [CartController::class, 'store'])->name('carts.items.store');
     Route::patch('carts/items/{cartItem}', [CartController::class, 'update'])->name('carts.items.update');
     Route::delete('carts/items/{cartItem}', [CartController::class, 'destroy'])->name('carts.items.destroy');
     Route::post('carts/checkout', [CartController::class, 'checkout'])->name('carts.checkout');
-
 
     Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
@@ -33,7 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('reservation-orders/{reservationOrder}/confirm-returned', [ReservationController::class, 'confirmOrderReturned'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reservation-orders.confirm-returned');
-        
 
     Route::get('reserving', [ReservingController::class, 'index'])
         ->middleware('can:access-reserving-dashboard')

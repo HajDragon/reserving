@@ -29,24 +29,16 @@
                 </label>
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
-                    <span>{{ __('Start Weekday') }}</span>
-                    <select name="start_weekday" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <span>{{ __('Return Weekday') }}</span>
+                    <select name="returned_weekday" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="">{{ __('All') }}</option>
                         @foreach ($weekdays as $weekdayValue => $weekdayLabel)
-                            <option value="{{ $weekdayValue }}" @selected((int) $filters['start_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>
+                            <option value="{{ $weekdayValue }}" @selected((int) $filters['returned_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>
                         @endforeach
                     </select>
                 </label>
 
-                <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
-                    <span>{{ __('Return Weekday') }}</span>
-                    <select name="return_weekday" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
-                        <option value="">{{ __('All') }}</option>
-                        @foreach ($weekdays as $weekdayValue => $weekdayLabel)
-                            <option value="{{ $weekdayValue }}" @selected((int) $filters['return_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>
-                        @endforeach
-                    </select>
-                </label>
+                <div class="h-10"></div>
 
                 <div class="md:col-span-4 flex items-center gap-3">
                     <flux:button type="submit" variant="primary">{{ __('Apply Filters') }}</flux:button>
@@ -79,11 +71,11 @@
                                 <tr>
                                     <td class="px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100">{{ $log->product_name }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->user?->name ?? __('N/A') }}</td>
-                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->reserved_quantity }}</td>
-                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->start_time->format('Y-m-d H:i') }}</td>
-                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->end_time->format('Y-m-d H:i') }}</td>
+                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->quantity }}</td>
+                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->reservation_start_time?->format('Y-m-d H:i') ?? __('N/A') }}</td>
+                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->reservation_end_time?->format('Y-m-d H:i') ?? __('N/A') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->returned_at->format('Y-m-d H:i') }}</td>
-                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->status->label() }}</td>
+                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ __('Returned') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

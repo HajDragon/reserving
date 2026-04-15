@@ -1,7 +1,6 @@
 <?php
 
-use App\Enums\ReservationStatus;
-use App\Models\ReservationLog;
+use App\Models\ReturnedReservationLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -21,14 +20,14 @@ test('non admin cannot access reservation logs panel', function () {
 test('admin can search returned logs by product name', function () {
     $admin = User::factory()->admin()->create();
 
-    ReservationLog::factory()->create([
+    ReturnedReservationLog::factory()->create([
         'product_name' => 'Sony Lens Kit',
-        'status' => ReservationStatus::Returned,
+        'returned_at' => Carbon::parse('2026-04-15 09:00:00'),
     ]);
 
-    ReservationLog::factory()->create([
+    ReturnedReservationLog::factory()->create([
         'product_name' => 'Tripod Pro',
-        'status' => ReservationStatus::Returned,
+        'returned_at' => Carbon::parse('2026-04-16 09:00:00'),
     ]);
 
     $response = $this
@@ -43,28 +42,23 @@ test('admin can search returned logs by product name', function () {
         ->assertDontSeeText('Tripod Pro');
 });
 
-test('admin can filter returned logs by weekdays', function () {
+test('admin can filter returned logs by return weekday', function () {
     $admin = User::factory()->admin()->create();
 
-    ReservationLog::factory()->create([
+    ReturnedReservationLog::factory()->create([
         'product_name' => 'Monday Return Device',
-        'start_time' => Carbon::parse('2026-04-20 09:00:00'),
-        'end_time' => Carbon::parse('2026-04-24 10:00:00'),
-        'status' => ReservationStatus::Returned,
+        'returned_at' => Carbon::parse('2026-04-20 10:00:00'),
     ]);
 
-    ReservationLog::factory()->create([
+    ReturnedReservationLog::factory()->create([
         'product_name' => 'Tuesday Return Device',
-        'start_time' => Carbon::parse('2026-04-21 09:00:00'),
-        'end_time' => Carbon::parse('2026-04-25 10:00:00'),
-        'status' => ReservationStatus::Returned,
+        'returned_at' => Carbon::parse('2026-04-21 10:00:00'),
     ]);
 
     $response = $this
         ->actingAs($admin)
         ->get(route('cms.reservation-logs.index', [
-            'start_weekday' => 1,
-            'return_weekday' => 5,
+            'returned_weekday' => 1,
         ]));
 
     $response

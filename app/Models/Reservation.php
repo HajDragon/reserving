@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use App\Actions\Reservations\AdjustProductInventoryAction;
 use App\Enums\ReservationStatus;
 use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
 {
     /** @use HasFactory<ReservationFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * @var list<string>
@@ -41,6 +43,13 @@ class Reservation extends Model
             'returned_at' => 'datetime',
             'reserved_quantity' => 'integer',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (Reservation $reservation): void {
+            app(AdjustProductInventoryAction::class)->deductForReservation($reservation);
+        });
     }
 
     public function user(): BelongsTo

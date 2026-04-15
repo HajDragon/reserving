@@ -3,8 +3,8 @@
 use App\Enums\ReservationStatus;
 use App\Models\Product;
 use App\Models\Reservation;
-use App\Models\ReservationLog;
 use App\Models\ReservationOrder;
+use App\Models\ReturnedReservationLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -31,11 +31,13 @@ test('admin can confirm single reservation as returned', function () {
         ->assertOk()
         ->assertJsonPath('reservation.status', ReservationStatus::Returned->value);
 
-    $reservation->refresh();
+    $returnedReservation = Reservation::withTrashed()->findOrFail($reservation->id);
 
-    expect($reservation->status)->toBe(ReservationStatus::Returned)
-        ->and($reservation->returned_at)->not->toBeNull()
-        ->and($reservation->returned_by)->toBe($admin->id)
+    expect($returnedReservation->status)->toBe(ReservationStatus::Returned)
+        ->and($returnedReservation->returned_at)->not->toBeNull()
+        ->and($returnedReservation->returned_by)->toBe($admin->id)
+        ->and($returnedReservation->trashed())->toBeTrue()
+        ->and(ReturnedReservationLog::query()->where('reservation_id', $reservation->id)->exists())->toBeTrue()
         ->and($product->refresh()->is_active)->toBeTrue();
 });
 
@@ -101,8 +103,9 @@ test('admin can confirm all reservations in an order as returned', function () {
         ->assertJsonPath('reservation_order.returned_count', 2);
 
     expect(Reservation::query()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(0)
-        ->and(ReservationLog::query()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(2)
-        ->and(ReservationOrder::query()->whereKey($reservationOrder->id)->exists())->toBeFalse()
+        ->and(Reservation::withTrashed()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(2)
+        ->and(ReturnedReservationLog::query()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(2)
+        ->and(ReservationOrder::query()->whereKey($reservationOrder->id)->exists())->toBeTrue()
         ->and($productA->refresh()->is_active)->toBeTrue()
         ->and($productB->refresh()->is_active)->toBeTrue();
 
@@ -114,6 +117,40 @@ test('admin can confirm all reservations in an order as returned', function () {
         ->assertOk()
         ->assertDontSeeText((string) $productA->name)
         ->assertDontSeeText((string) $productB->name);
+});
+
+test('marking full order returned re-enables product with quantity one', function () {
+    $admin = User::factory()->admin()->create();
+    $orderOwner = User::factory()->create();
+
+    $product = Product::factory()->create([
+        'quantity' => 1,
+        'is_active' => false,
+    ]);
+
+    $reservationOrder = ReservationOrder::factory()->create([
+        'user_id' => $orderOwner->id,
+    ]);
+
+    Reservation::factory()->create([
+        'reservation_order_id' => $reservationOrder->id,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Reserved,
+        'reserved_quantity' => 1,
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->post(route('reservation-orders.confirm-returned', $reservationOrder));
+
+    $response
+        ->assertRedirect()
+        ->assertSessionHas('status', 'Reservation order return confirmed successfully.');
+
+    expect($product->refresh()->is_active)->toBeTrue()
+        ->and(ReservationOrder::query()->whereKey($reservationOrder->id)->exists())->toBeTrue()
+        ->and(Reservation::query()->where('reservation_order_id', $reservationOrder->id)->exists())->toBeFalse()
+        ->and(ReturnedReservationLog::query()->where('reservation_order_id', $reservationOrder->id)->exists())->toBeTrue();
 });
 
 test('non admin cannot confirm order return', function () {
@@ -132,13 +169,25 @@ test('non admin cannot confirm order return', function () {
     $response->assertForbidden();
 });
 
-test('confirm order return fails when an order has non reserved reservation', function () {
+test('confirm order return processes mixed statuses and archives the order', function () {
     $admin = User::factory()->admin()->create();
     $reservationOrder = ReservationOrder::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 2,
+        'is_active' => false,
+    ]);
 
     Reservation::factory()->create([
         'reservation_order_id' => $reservationOrder->id,
+        'product_id' => $product->id,
         'status' => ReservationStatus::Returned,
+        'returned_at' => now()->subHour(),
+    ]);
+
+    Reservation::factory()->create([
+        'reservation_order_id' => $reservationOrder->id,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Reserved,
     ]);
 
     $response = $this
@@ -146,8 +195,12 @@ test('confirm order return fails when an order has non reserved reservation', fu
         ->postJson(route('reservation-orders.confirm-returned', $reservationOrder));
 
     $response
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('order');
+        ->assertOk()
+        ->assertJsonPath('reservation_order.returned_count', 2);
+
+    expect(Reservation::query()->where('reservation_order_id', $reservationOrder->id)->exists())->toBeFalse()
+        ->and(ReservationOrder::query()->whereKey($reservationOrder->id)->exists())->toBeTrue()
+        ->and(ReturnedReservationLog::query()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(2);
 });
 
 test('admin can update reservation status from dashboard flow', function () {
@@ -162,7 +215,7 @@ test('admin can update reservation status from dashboard flow', function () {
     $response = $this
         ->actingAs($admin)
         ->patchJson(route('reservations.update-status', $reservation), [
-            'status' => ReservationStatus::Cancelled->value,
+            'status' => 'rejected',
         ]);
 
     $response
@@ -172,14 +225,33 @@ test('admin can update reservation status from dashboard flow', function () {
     expect($reservation->refresh()->status)->toBe(ReservationStatus::Cancelled);
 });
 
-test('status update rejects invalid reservation transition', function () {
+test('admin can update reservation status from web form to pending', function () {
+    $admin = User::factory()->admin()->create();
+    $reservation = Reservation::factory()->create([
+        'status' => ReservationStatus::Reserved,
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->patch(route('reservations.update-status', $reservation), [
+            'status' => 'pending',
+        ]);
+
+    $response
+        ->assertRedirect()
+        ->assertSessionHas('status', 'Reservation status updated successfully.');
+
+    expect($reservation->refresh()->status)->toBe(ReservationStatus::Pending);
+});
+
+test('status update rejects unknown status value', function () {
     $admin = User::factory()->admin()->create();
     $reservation = Reservation::factory()->returned()->create();
 
     $response = $this
         ->actingAs($admin)
         ->patchJson(route('reservations.update-status', $reservation), [
-            'status' => ReservationStatus::Reserved->value,
+            'status' => 'invalid-status',
         ]);
 
     $response

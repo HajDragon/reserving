@@ -98,10 +98,10 @@
                                         name="status"
                                         class="h-10 flex-1 rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
                                     >
-                                        <option value="pending" @selected($reservation->status->value === 'pending')>{{ __('Pending') }}</option>
-                                        <option value="reserved" @selected($reservation->status->value === 'reserved')>{{ __('Reserved') }}</option>
-                                        <option value="returned" @selected($reservation->status->value === 'returned')>{{ __('Returned') }}</option>
-                                        <option value="cancelled" @selected($reservation->status->value === 'cancelled')>{{ __('Cancelled') }}</option>
+                                        <option value="pending" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'pending')>{{ __('Pending') }}</option>
+                                        <option value="approved" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'approved')>{{ __('Approved') }}</option>
+                                        <option value="rejected" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'rejected')>{{ __('Rejected') }}</option>
+                                        <option value="returned" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'returned')>{{ __('Returned') }}</option>
                                     </select>
                                     <flux:button type="submit" size="sm">{{ __('Update') }}</flux:button>
                                 </form>

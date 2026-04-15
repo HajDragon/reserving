@@ -153,6 +153,12 @@ class CartController extends Controller
                     ]);
                 }
 
+                if ($cartItem->requested_quantity > $product->available_quantity) {
+                    throw ValidationException::withMessages([
+                        "items.{$cartItem->id}" => ['The requested quantity exceeds current available inventory.'],
+                    ]);
+                }
+
                 $isAvailable = $this->availabilityService->checkAvailability(
                     product: $product,
                     startTime: $cartItem->start_time,

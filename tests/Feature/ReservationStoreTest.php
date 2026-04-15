@@ -11,7 +11,10 @@ uses(RefreshDatabase::class);
 
 test('authenticated user can create a reserved reservation', function () {
     $user = User::factory()->create();
-    $product = Product::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 5,
+        'available_quantity' => 5,
+    ]);
 
     $start = Carbon::now()->addDay()->startOfHour();
     $end = (clone $start)->addHours(2);
@@ -30,7 +33,8 @@ test('authenticated user can create a reserved reservation', function () {
         ->assertJsonPath('reservation.product_id', $product->id);
 
     expect(Reservation::count())->toBe(1)
-        ->and(Reservation::first()->status)->toBe(ReservationStatus::Reserved);
+        ->and(Reservation::first()->status)->toBe(ReservationStatus::Reserved)
+        ->and($product->refresh()->available_quantity)->toBe(4);
 });
 
 test('reservation fails when overlapping a reserved reservation', function () {

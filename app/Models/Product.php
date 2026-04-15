@@ -22,6 +22,7 @@ class Product extends Model
         'description',
         'type',
         'quantity',
+        'available_quantity',
         'is_active',
         'photo_path',
     ];
@@ -31,6 +32,7 @@ class Product extends Model
      */
     protected $attributes = [
         'quantity' => 1,
+        'available_quantity' => 1,
         'is_active' => true,
     ];
 
@@ -41,6 +43,7 @@ class Product extends Model
     {
         return [
             'quantity' => 'integer',
+            'available_quantity' => 'integer',
             'is_active' => 'boolean',
             'deleted_at' => 'datetime',
         ];
