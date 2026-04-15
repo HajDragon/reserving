@@ -1,14 +1,18 @@
 <?php
 
+use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReservingController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
+
+    Route::get('products', [ProductController::class, 'index'])->name('products.index');
 
     Route::get('carts', [CartController::class, 'index'])->name('carts.index');
     Route::post('carts/items', [CartController::class, 'store'])->name('carts.items.store');
@@ -17,10 +21,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('carts/checkout', [CartController::class, 'checkout'])->name('carts.checkout');
     Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::post('reservations/{reservation}/confirm-returned', [ReservationController::class, 'confirmReturned'])
+        ->middleware('can:access-reserving-dashboard')
+        ->name('reservations.confirm-returned');
+    Route::post('reservation-orders/{reservationOrder}/confirm-returned', [ReservationController::class, 'confirmOrderReturned'])
+        ->middleware('can:access-reserving-dashboard')
+        ->name('reservation-orders.confirm-returned');
 
-    Route::softDeletableResources([
-        'products' => ProductController::class,
-    ]);
+    Route::get('reserving', [ReservingController::class, 'index'])
+        ->middleware('can:access-reserving-dashboard')
+        ->name('reserving.index');
+
+    Route::middleware('can:access-reserving-dashboard')->prefix('cms')->name('cms.')->group(function () {
+        Route::resource('products', ProductManagementController::class);
+    });
 });
 
 require __DIR__.'/settings.php';

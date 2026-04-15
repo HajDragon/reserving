@@ -12,7 +12,7 @@
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Menu !')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products')" wire:navigate>
+                    <flux:sidebar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate>
                         {{ __('products') }}
                     </flux:sidebar.item>
 
@@ -23,6 +23,16 @@
                     <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate>
                         {{ __('My Reservations') }}
                     </flux:sidebar.item>
+
+                    @can('access-reserving-dashboard')
+                        <flux:sidebar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate>
+                            {{ __('Reserving Admin') }}
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate>
+                            {{ __('Product CMS') }}
+                        </flux:sidebar.item>
+                    @endcan
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

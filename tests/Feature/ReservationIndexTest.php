@@ -30,6 +30,7 @@ test('user sees only their own reservations on index page', function () {
         'user_id' => $currentUser->id,
         'product_id' => $currentUserProduct->id,
         'status' => ReservationStatus::Reserved,
+        'reserved_quantity' => 3,
     ]);
 
     Reservation::factory()->create([
@@ -45,5 +46,6 @@ test('user sees only their own reservations on index page', function () {
     $response
         ->assertOk()
         ->assertSeeText('Current User Laptop')
+        ->assertSeeText('3')
         ->assertDontSeeText('Other User Projector');
 });
