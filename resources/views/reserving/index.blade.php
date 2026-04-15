@@ -8,10 +8,18 @@
         </div>
 
         <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-            <form method="GET" action="{{ route('reserving.index') }}" class="grid gap-4 md:grid-cols-5">
+            <form method="GET" action="{{ route('reserving.index') }}" class="grid gap-4 md:grid-cols-4">
+                <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+                    <span>{{ __('View') }}</span>
+                    <select name="view" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                        <option value="cards" @selected($filters['view'] === 'cards')>{{ __('Cards') }}</option>
+                        <option value="calendar" @selected($filters['view'] === 'calendar')>{{ __('Calendar') }}</option>
+                    </select>
+                </label>
+
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Status') }}</span>
-                    <select name="status" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="status" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="">{{ __('All') }}</option>
                         <option value="pending" @selected($filters['status'] === 'pending')>{{ __('Pending') }}</option>
                         <option value="reserved" @selected($filters['status'] === 'reserved')>{{ __('Reserved') }}</option>
@@ -22,36 +30,41 @@
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Start from') }}</span>
-                    <input type="date" name="start_from" value="{{ $filters['start_from'] }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <input type="date" name="start_from" value="{{ $filters['start_from'] }}" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                 </label>
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
-                    <span>{{ __('Start to') }}</span>
-                    <input type="date" name="start_to" value="{{ $filters['start_to'] }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <span>{{ __('Start weekday') }}</span>
+                    <select name="start_weekday" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                        <option value="">{{ __('All') }}</option>
+                        @foreach ($weekdays as $weekdayValue => $weekdayLabel)
+                            <option value="{{ $weekdayValue }}" @selected((int) $filters['start_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>
+                        @endforeach
+                    </select>
                 </label>
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
-                    <span>{{ __('Return from') }}</span>
-                    <input type="date" name="return_from" value="{{ $filters['return_from'] }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <span>{{ __('Return weekday') }}</span>
+                    <select name="return_weekday" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                        <option value="">{{ __('All') }}</option>
+                        @foreach ($weekdays as $weekdayValue => $weekdayLabel)
+                            <option value="{{ $weekdayValue }}" @selected((int) $filters['return_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>
+                        @endforeach
+                    </select>
                 </label>
 
-                <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
-                    <span>{{ __('Return to') }}</span>
-                    <input type="date" name="return_to" value="{{ $filters['return_to'] }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
-                </label>
-
-                <div class="md:col-span-5 flex items-center gap-3">
+                <div class="md:col-span-4 flex items-center gap-3">
                     <flux:button type="submit" variant="primary">{{ __('Apply Filters') }}</flux:button>
                     <a href="{{ route('reserving.index') }}" class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Clear') }}</a>
                 </div>
             </form>
         </div>
 
-        @if ($reservations->isEmpty())
+        @if ($filters['view'] === 'cards' && $reservations->isEmpty())
             <div class="rounded-xl border border-zinc-200 bg-white p-6 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
                 {{ __('No reservations match the current filters.') }}
             </div>
-        @else
+        @elseif ($filters['view'] === 'cards')
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 @foreach ($reservations as $reservation)
                     <flux:card class="border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
@@ -76,6 +89,38 @@
                                 <p>{{ __('Order #:') }} {{ $reservation->reservation_order_id ?? __('N/A') }}</p>
                                 <p>{{ __('Reservation #:') }} {{ $reservation->id }}</p>
                             </div>
+
+                            <div class="space-y-2 border-t border-zinc-200 pt-3 dark:border-zinc-700">
+                                <form method="POST" action="{{ route('reservations.update-status', $reservation) }}" class="flex items-center gap-2">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select
+                                        name="status"
+                                        class="h-10 flex-1 rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                    >
+                                        <option value="pending" @selected($reservation->status->value === 'pending')>{{ __('Pending') }}</option>
+                                        <option value="reserved" @selected($reservation->status->value === 'reserved')>{{ __('Reserved') }}</option>
+                                        <option value="returned" @selected($reservation->status->value === 'returned')>{{ __('Returned') }}</option>
+                                        <option value="cancelled" @selected($reservation->status->value === 'cancelled')>{{ __('Cancelled') }}</option>
+                                    </select>
+                                    <flux:button type="submit" size="sm">{{ __('Update') }}</flux:button>
+                                </form>
+
+                                @if ($reservation->reservation_order_id)
+                                    <form method="POST" action="{{ route('reservation-orders.confirm-returned', $reservation->reservation_order_id) }}">
+                                        @csrf
+                                        <flux:button
+                                            type="submit"
+                                            size="sm"
+                                            variant="danger"
+                                            class="w-full"
+                                            onclick="return confirm('{{ __('Confirm full order returned? This removes it from user history and keeps it in admin logs.') }}');"
+                                        >
+                                            {{ __('Mark Full Order Returned') }}
+                                        </flux:button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                     </flux:card>
                 @endforeach
@@ -83,6 +128,48 @@
 
             <div class="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
                 {{ $reservations->links() }}
+            </div>
+        @else
+            <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Calendar View') }}</h2>
+                    <p class="text-sm text-zinc-600 dark:text-zinc-300">{{ $calendar_month->format('F Y') }}</p>
+                </div>
+
+                <div class="mb-3 grid grid-cols-7 gap-2 text-center text-xs font-medium uppercase tracking-wide text-zinc-500">
+                    @foreach ($weekdays as $weekdayLabel)
+                        <div class="rounded-md bg-zinc-100 px-2 py-2 dark:bg-zinc-800 dark:text-zinc-300">{{ __($weekdayLabel) }}</div>
+                    @endforeach
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
+                    @foreach ($calendar_days as $day)
+                        <div class="min-h-36 rounded-lg border p-3 {{ $day['in_month'] ? 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900' : 'border-zinc-100 bg-zinc-50/40 dark:border-zinc-800 dark:bg-zinc-900/40' }}">
+                            <div class="mb-2 flex items-center justify-between">
+                                <span class="text-sm font-semibold {{ $day['in_month'] ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500' }}">{{ $day['date']->format('d') }}</span>
+                                <span class="rounded-full bg-zinc-200 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
+                                    {{ $day['reservations']->count() }}
+                                </span>
+                            </div>
+
+                            <div class="space-y-2">
+                                @forelse ($day['reservations']->take(3) as $reservation)
+                                    <div class="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                                        <p class="font-medium">{{ $reservation->product->name ?? __('N/A') }}</p>
+                                        <p>{{ $reservation->user->name ?? __('N/A') }} • {{ $reservation->reserved_quantity }}</p>
+                                        <p>{{ $reservation->start_time->format('H:i') }} - {{ $reservation->end_time->format('H:i') }}</p>
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('No reservations') }}</p>
+                                @endforelse
+
+                                @if ($day['reservations']->count() > 3)
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('+ :count more', ['count' => $day['reservations']->count() - 3]) }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         @endif
     </div>

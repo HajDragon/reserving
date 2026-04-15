@@ -32,6 +32,10 @@
                         <flux:sidebar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate>
                             {{ __('Product CMS') }}
                         </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate>
+                            {{ __('Reservation Logs') }}
+                        </flux:sidebar.item>
                     @endcan
                 </flux:sidebar.group>
             </flux:sidebar.nav>

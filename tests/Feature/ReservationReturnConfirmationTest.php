@@ -3,6 +3,7 @@
 use App\Enums\ReservationStatus;
 use App\Models\Product;
 use App\Models\Reservation;
+use App\Models\ReservationLog;
 use App\Models\ReservationOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -95,16 +96,24 @@ test('admin can confirm all reservations in an order as returned', function () {
         ->actingAs($admin)
         ->postJson(route('reservation-orders.confirm-returned', $reservationOrder));
 
-    $response->assertOk();
+    $response
+        ->assertOk()
+        ->assertJsonPath('reservation_order.returned_count', 2);
 
-    expect(
-        Reservation::query()
-            ->where('reservation_order_id', $reservationOrder->id)
-            ->where('status', ReservationStatus::Returned)
-            ->count()
-    )->toBe(2)
+    expect(Reservation::query()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(0)
+        ->and(ReservationLog::query()->where('reservation_order_id', $reservationOrder->id)->count())->toBe(2)
+        ->and(ReservationOrder::query()->whereKey($reservationOrder->id)->exists())->toBeFalse()
         ->and($productA->refresh()->is_active)->toBeTrue()
         ->and($productB->refresh()->is_active)->toBeTrue();
+
+    $historyResponse = $this
+        ->actingAs($orderOwner)
+        ->get(route('reservations.index'));
+
+    $historyResponse
+        ->assertOk()
+        ->assertDontSeeText((string) $productA->name)
+        ->assertDontSeeText((string) $productB->name);
 });
 
 test('non admin cannot confirm order return', function () {
@@ -139,4 +148,41 @@ test('confirm order return fails when an order has non reserved reservation', fu
     $response
         ->assertUnprocessable()
         ->assertJsonValidationErrors('order');
+});
+
+test('admin can update reservation status from dashboard flow', function () {
+    $admin = User::factory()->admin()->create();
+    $product = Product::factory()->create();
+
+    $reservation = Reservation::factory()->create([
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Reserved,
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->patchJson(route('reservations.update-status', $reservation), [
+            'status' => ReservationStatus::Cancelled->value,
+        ]);
+
+    $response
+        ->assertOk()
+        ->assertJsonPath('reservation.status', ReservationStatus::Cancelled->value);
+
+    expect($reservation->refresh()->status)->toBe(ReservationStatus::Cancelled);
+});
+
+test('status update rejects invalid reservation transition', function () {
+    $admin = User::factory()->admin()->create();
+    $reservation = Reservation::factory()->returned()->create();
+
+    $response = $this
+        ->actingAs($admin)
+        ->patchJson(route('reservations.update-status', $reservation), [
+            'status' => ReservationStatus::Reserved->value,
+        ]);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
 });

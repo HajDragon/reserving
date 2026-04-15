@@ -7,7 +7,7 @@
             type="text"
             name="asset_tag"
             value="{{ old('asset_tag', $current?->asset_tag) }}"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('asset_tag')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -19,7 +19,7 @@
             type="text"
             name="name"
             value="{{ old('name', $current?->name) }}"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('name')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -31,7 +31,7 @@
             type="text"
             name="type"
             value="{{ old('type', $current?->type) }}"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('type')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -44,7 +44,7 @@
             min="1"
             name="quantity"
             value="{{ old('quantity', $current?->quantity ?? 1) }}"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('quantity')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -56,7 +56,7 @@
             type="text"
             name="photo_path"
             value="{{ old('photo_path', $current?->photo_path) }}"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             placeholder="https://example.com/image.jpg"
         >
         @error('photo_path')<p class="text-xs text-red-600">{{ $message }}</p>@enderror

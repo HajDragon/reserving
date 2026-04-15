@@ -156,3 +156,50 @@ test('authenticated user can update and remove their cart item', function () {
 
     expect(CartItem::count())->toBe(0);
 });
+
+test('browser form cart update and delete redirect back to cart page', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 4,
+    ]);
+
+    $cartItem = CartItem::factory()->create([
+        'cart_id' => $user->cart()->create()->id,
+        'product_id' => $product->id,
+        'requested_quantity' => 1,
+        'start_time' => Carbon::now()->addDay()->startOfHour(),
+        'end_time' => Carbon::now()->addDay()->startOfHour()->addHours(2),
+    ]);
+
+    $updatedStart = Carbon::now()->addDays(4)->startOfHour();
+    $updatedEnd = (clone $updatedStart)->addHours(3);
+
+    $updateResponse = $this
+        ->actingAs($user)
+        ->patch(route('carts.items.update', $cartItem), [
+            'product_id' => $product->id,
+            'start_time' => $updatedStart->toDateTimeString(),
+            'end_time' => $updatedEnd->toDateTimeString(),
+            'requested_quantity' => 2,
+            'extra_wishes' => 'Please include charger',
+        ]);
+
+    $updateResponse
+        ->assertRedirect(route('carts.index'))
+        ->assertSessionHas('status', 'Cart item updated successfully.');
+
+    $cartItem->refresh();
+
+    expect($cartItem->requested_quantity)->toBe(2)
+        ->and($cartItem->extra_wishes)->toBe('Please include charger');
+
+    $deleteResponse = $this
+        ->actingAs($user)
+        ->delete(route('carts.items.destroy', $cartItem));
+
+    $deleteResponse
+        ->assertRedirect(route('carts.index'))
+        ->assertSessionHas('status', 'Cart item removed successfully.');
+
+    expect(CartItem::query()->whereKey($cartItem->id)->exists())->toBeFalse();
+});

@@ -64,7 +64,7 @@ class CartController extends Controller
         ], 201);
     }
 
-    public function update(UpdateCartItemRequest $request, CartItem $cartItem): JsonResponse
+    public function update(UpdateCartItemRequest $request, CartItem $cartItem): JsonResponse|RedirectResponse
     {
         $validated = $request->validated();
         $ownedCartItem = $this->currentUserCart($request->user())->items()->findOrFail($cartItem->getKey());
@@ -77,16 +77,28 @@ class CartController extends Controller
             'extra_wishes' => $validated['extra_wishes'] ?? null,
         ]);
 
+        if (! $request->expectsJson()) {
+            return redirect()
+                ->route('carts.index')
+                ->with('status', 'Cart item updated successfully.');
+        }
+
         return response()->json([
             'message' => 'Cart item updated successfully.',
             'cart_item' => $ownedCartItem->fresh()->load('product'),
         ]);
     }
 
-    public function destroy(Request $request, CartItem $cartItem): JsonResponse
+    public function destroy(Request $request, CartItem $cartItem): JsonResponse|RedirectResponse
     {
         $ownedCartItem = $this->currentUserCart($request->user())->items()->findOrFail($cartItem->getKey());
         $ownedCartItem->delete();
+
+        if (! $request->expectsJson()) {
+            return redirect()
+                ->route('carts.index')
+                ->with('status', 'Cart item removed successfully.');
+        }
 
         return response()->json([
             'message' => 'Cart item removed successfully.',

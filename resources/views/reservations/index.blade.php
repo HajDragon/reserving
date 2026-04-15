@@ -21,8 +21,10 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Asset Tag') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Start') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('End') }}</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Returned At') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Status') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Quantity') }}</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Extra Wishes') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
@@ -32,8 +34,10 @@
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->product->asset_tag ?? __('N/A') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->start_time->format('Y-m-d H:i') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->end_time->format('Y-m-d H:i') }}</td>
+                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->returned_at?->format('Y-m-d H:i') ?? __('Not returned yet') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->status->label() }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->reserved_quantity }}</td>
+                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->extra_wishes ?? __('None') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
