@@ -26,11 +26,23 @@
                             <p class="mb-4 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
                                 {{ $product->description ?: 'No description available for this product.' }}
                             </p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-lg font-bold text-neutral-900 dark:text-white">Qty: {{ $product->quantity }}</span>
 
-                                    <x-spotlight-button class="w-1/3 max-w-xs hover:scale-110"> Add to Cart </x-spotlight-button>
-                            </div>
+                            <form method="POST" action="{{ route('carts.items.store') }}" class="space-y-3">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-lg font-bold text-neutral-900 dark:text-white">Qty: {{ $product->quantity }}</span>
+
+                                    @if ($product->is_active)
+                                        <x-spotlight-button type="submit" class="w-1/3 max-w-xs hover:scale-110"> Add to Cart </x-spotlight-button>
+                                    @else
+                                        <button type="button" disabled class="w-1/3 max-w-xs rounded-lg bg-zinc-300 px-4 py-2 text-sm font-medium text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400">
+                                            {{ __('Unavailable') }}
+                                        </button>
+                                    @endif
+                                </div>
+                            </form>
                         </div>
 
                     </div>

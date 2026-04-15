@@ -11,6 +11,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 
     Route::get('carts', [CartController::class, 'index'])->name('carts.index');
+    Route::post('carts/items', [CartController::class, 'store'])->name('carts.items.store');
+    Route::patch('carts/items/{cartItem}', [CartController::class, 'update'])->name('carts.items.update');
+    Route::delete('carts/items/{cartItem}', [CartController::class, 'destroy'])->name('carts.items.destroy');
+    Route::post('carts/checkout', [CartController::class, 'checkout'])->name('carts.checkout');
     Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
 

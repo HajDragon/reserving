@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\CartItem;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,6 +30,16 @@ class CartIndexTest extends TestCase
             'email' => 'other@example.com',
         ]);
 
+        $product = Product::factory()->create([
+            'name' => 'Current User Camera',
+        ]);
+
+        CartItem::factory()->create([
+            'cart_id' => $currentUser->cart()->create()->id,
+            'product_id' => $product->id,
+            'requested_quantity' => 1,
+        ]);
+
         $response = $this
             ->actingAs($currentUser)
             ->get(route('carts.index'));
@@ -37,6 +49,7 @@ class CartIndexTest extends TestCase
             ->assertSeeText('My Cart')
             ->assertSeeText('Current User')
             ->assertSeeText('current@example.com')
+            ->assertSeeText('Current User Camera')
             ->assertDontSeeText('Other User')
             ->assertDontSeeText('other@example.com');
     }

@@ -34,6 +34,11 @@ test('products index renders the styled product card content', function () {
         ->assertSeeText('Qty: '.$product->quantity)
         ->assertSeeText('No description available for this product.')
         ->assertSeeText('No image available')
+        ->assertSeeText('Add to Cart')
+        ->assertDontSeeText('Start time')
+        ->assertDontSeeText('End time')
+        ->assertDontSeeText('Quantity')
+        ->assertDontSeeText('Extra wishes')
         ->assertSee('card-snake-border')
         ->assertSee('rounded-sm')
         ->assertSee('bg-neutral-600');
