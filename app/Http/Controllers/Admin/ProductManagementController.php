@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateManagedProductRequest;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ProductManagementController extends Controller
 {
@@ -38,8 +39,14 @@ class ProductManagementController extends Controller
      */
     public function store(StoreManagedProductRequest $request): RedirectResponse
     {
-        //
-        Product::query()->create($request->validated());
+        $validated = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $storedPath = $request->file('photo')->store('products', 'public');
+            $validated['photo_path'] = Storage::url($storedPath);
+        }
+
+        Product::query()->create($validated);
 
         return redirect()
             ->route('cms.products.index')
@@ -73,8 +80,16 @@ class ProductManagementController extends Controller
      */
     public function update(UpdateManagedProductRequest $request, Product $product): RedirectResponse
     {
-        //
-        $product->update($request->validated());
+        $validated = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $this->deleteStoredPhotoIfLocal($product);
+
+            $storedPath = $request->file('photo')->store('products', 'public');
+            $validated['photo_path'] = Storage::url($storedPath);
+        }
+
+        $product->update($validated);
 
         return redirect()
             ->route('cms.products.show', $product)
@@ -86,11 +101,27 @@ class ProductManagementController extends Controller
      */
     public function destroy(Product $product): RedirectResponse
     {
-        //
+        $this->deleteStoredPhotoIfLocal($product);
+
         $product->delete();
 
         return redirect()
             ->route('cms.products.index')
             ->with('status', 'Product deleted successfully.');
+    }
+
+    private function deleteStoredPhotoIfLocal(Product $product): void
+    {
+        if (! is_string($product->photo_path) || ! str_starts_with($product->photo_path, '/storage/')) {
+            return;
+        }
+
+        $diskPath = substr($product->photo_path, strlen('/storage/'));
+
+        if ($diskPath === false || $diskPath === '') {
+            return;
+        }
+
+        Storage::disk('public')->delete($diskPath);
     }
 }

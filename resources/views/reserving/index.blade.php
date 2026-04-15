@@ -70,7 +70,12 @@
                     <flux:card class="border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between gap-3">
-                                <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $reservation->product->name ?? __('N/A') }}</h3>
+                                <div class="flex items-center gap-3">
+                                    @if ($reservation->product?->photo_path)
+                                        <img src="{{ $reservation->product->photo_path }}" alt="{{ $reservation->product->name }}" class="h-10 w-10 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
+                                    @endif
+                                    <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $reservation->product->name ?? __('N/A') }}</h3>
+                                </div>
                                 <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium uppercase text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
                                     {{ $reservation->status->label() }}
                                 </span>
@@ -155,7 +160,12 @@
                             <div class="space-y-2">
                                 @forelse ($day['reservations']->take(3) as $reservation)
                                     <div class="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                                        <p class="font-medium">{{ $reservation->product->name ?? __('N/A') }}</p>
+                                        <div class="flex items-center gap-2">
+                                            @if ($reservation->product?->photo_path)
+                                                <img src="{{ $reservation->product->photo_path }}" alt="{{ $reservation->product->name }}" class="h-6 w-6 rounded object-cover">
+                                            @endif
+                                            <p class="font-medium">{{ $reservation->product->name ?? __('N/A') }}</p>
+                                        </div>
                                         <p>{{ $reservation->user->name ?? __('N/A') }} • {{ $reservation->reserved_quantity }}</p>
                                         <p>{{ $reservation->start_time->format('H:i') }} - {{ $reservation->end_time->format('H:i') }}</p>
                                     </div>

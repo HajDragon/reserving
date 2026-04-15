@@ -20,9 +20,9 @@
 
                         <div class="relative">
                             @if ($product->photo_path)
-                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-48 w-full object-cover" />
+                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-80 w-full object-contain bg-zinc-50 dark:bg-zinc-900" />
                             @else
-                                <div class="flex h-48 w-full items-center justify-center bg-neutral-200 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                                <div class="flex h-64 w-full items-center justify-center bg-neutral-200 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                                     No image available
                                 </div>
                             @endif

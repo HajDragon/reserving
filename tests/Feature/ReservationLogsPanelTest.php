@@ -66,3 +66,23 @@ test('admin can filter returned logs by return weekday', function () {
         ->assertSeeText('Monday Return Device')
         ->assertDontSeeText('Tuesday Return Device');
 });
+
+test('admin can hide photos in returned logs table', function () {
+    $admin = User::factory()->admin()->create();
+
+    ReturnedReservationLog::factory()->create([
+        'product_name' => 'Hidden Photo Product',
+        'returned_at' => Carbon::parse('2026-04-22 10:00:00'),
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->get(route('cms.reservation-logs.index', [
+            'show_photos' => 0,
+        ]));
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Hidden Photo Product')
+        ->assertDontSee('>Photo<', false);
+});

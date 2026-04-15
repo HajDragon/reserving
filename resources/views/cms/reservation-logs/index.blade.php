@@ -38,7 +38,16 @@
                     </select>
                 </label>
 
-                <div class="h-10"></div>
+                <label class="inline-flex h-10 items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                    <input
+                        type="checkbox"
+                        name="show_photos"
+                        value="1"
+                        @checked($filters['show_photos'])
+                        class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 dark:border-zinc-700"
+                    >
+                    <span>{{ __('Show Photos') }}</span>
+                </label>
 
                 <div class="md:col-span-4 flex items-center gap-3">
                     <flux:button type="submit" variant="primary">{{ __('Apply Filters') }}</flux:button>
@@ -57,6 +66,9 @@
                     <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
                         <thead class="bg-zinc-50 dark:bg-zinc-800/60">
                             <tr>
+                                @if ($filters['show_photos'])
+                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Photo') }}</th>
+                                @endif
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Product') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('User') }}</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Quantity') }}</th>
@@ -69,6 +81,15 @@
                         <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                             @foreach ($logs as $log)
                                 <tr>
+                                    @if ($filters['show_photos'])
+                                        <td class="px-4 py-3">
+                                            @if ($log->product?->photo_path)
+                                                <img src="{{ $log->product->photo_path }}" alt="{{ $log->product_name }}" class="h-10 w-10 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
+                                            @else
+                                                <div class="flex h-10 w-10 items-center justify-center rounded-md border border-dashed border-zinc-300 text-xs text-zinc-400 dark:border-zinc-700">-</div>
+                                            @endif
+                                        </td>
+                                    @endif
                                     <td class="px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100">{{ $log->product_name }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->user?->name ?? __('N/A') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $log->quantity }}</td>

@@ -6,7 +6,7 @@
         </div>
 
         <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-            <form method="POST" action="{{ route('cms.products.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('cms.products.store') }}" class="space-y-4" enctype="multipart/form-data">
                 @csrf
                 @include('cms.products.partials.form-fields')
                 <div class="flex items-center gap-3">

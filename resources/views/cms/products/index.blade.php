@@ -20,6 +20,7 @@
             <table class="min-w-full divide-y divide-zinc-200 dark:divide-zinc-700">
                 <thead class="bg-zinc-50 dark:bg-zinc-800/60">
                     <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Photo') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Name') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Asset Tag') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Type') }}</th>
@@ -31,6 +32,13 @@
                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
                     @forelse ($products as $product)
                         <tr>
+                            <td class="px-4 py-3">
+                                @if ($product->photo_path)
+                                    <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-10 w-10 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
+                                @else
+                                    <div class="flex h-10 w-10 items-center justify-center rounded-md border border-dashed border-zinc-300 text-xs text-zinc-400 dark:border-zinc-700">-</div>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200">{{ $product->name }}</td>
                             <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $product->asset_tag }}</td>
                             <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ strtoupper($product->type) }}</td>
@@ -56,7 +64,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">{{ __('No products found.') }}</td>
+                            <td colspan="7" class="px-4 py-6 text-center text-sm text-zinc-500 dark:text-zinc-400">{{ __('No products found.') }}</td>
                         </tr>
                     @endforelse
                 </tbody>

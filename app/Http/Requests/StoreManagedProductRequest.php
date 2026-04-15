@@ -31,6 +31,7 @@ class StoreManagedProductRequest extends FormRequest
             'quantity' => ['required', 'integer', 'min:1'],
             'is_active' => ['nullable', 'boolean'],
             'photo_path' => ['nullable', 'string', 'max:2048'],
+            'photo' => ['nullable', 'image', 'max:5120'],
         ];
     }
 

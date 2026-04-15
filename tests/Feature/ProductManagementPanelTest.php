@@ -3,6 +3,8 @@
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
@@ -65,4 +67,30 @@ test('admin can create view edit and delete product from cms', function () {
 
     expect(Product::query()->whereKey($product->id)->exists())->toBeFalse();
     $this->assertSoftDeleted('products', ['id' => $product->id]);
+});
+
+test('admin can upload product photo from cms', function () {
+    Storage::fake('public');
+
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->post(route('cms.products.store'), [
+            'asset_tag' => 'ASSET-UPLOAD-01',
+            'name' => 'Uploaded Photo Product',
+            'description' => 'Managed by CMS with file upload',
+            'type' => 'camera',
+            'quantity' => 3,
+            'is_active' => 1,
+            'photo' => UploadedFile::fake()->create('camera.jpg', 120, 'image/jpeg'),
+        ])
+        ->assertRedirect(route('cms.products.index'));
+
+    $product = Product::query()->where('asset_tag', 'ASSET-UPLOAD-01')->firstOrFail();
+
+    expect($product->photo_path)->toStartWith('/storage/products/');
+
+    $storedPath = substr($product->photo_path, strlen('/storage/'));
+
+    Storage::disk('public')->assertExists($storedPath);
 });

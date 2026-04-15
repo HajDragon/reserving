@@ -12,6 +12,9 @@
                     <h1 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{{ $product->name }}</h1>
                     <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ $product->asset_tag }}</p>
                 </div>
+                @if ($product->photo_path)
+                    <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-16 w-16 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
+                @endif
                 <div class="flex items-center gap-3">
                     <a href="{{ route('cms.products.edit', $product) }}" class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">{{ __('Edit') }}</a>
                     <a href="{{ route('cms.products.index') }}" class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Back') }}</a>

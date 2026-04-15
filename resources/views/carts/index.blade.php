@@ -36,9 +36,18 @@
                             @foreach ($cart->items as $item)
                                 <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
                                     <div class="mb-4 flex items-start justify-between gap-4">
-                                        <div>
-                                            <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $item->product->name }}</div>
-                                            <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $item->product->asset_tag }}</div>
+                                        <div class="flex items-start gap-3">
+                                            @if ($item->product->photo_path)
+                                                <img src="{{ $item->product->photo_path }}" alt="{{ $item->product->name }}" class="h-16 w-16 rounded-md object-cover" />
+                                            @else
+                                                <div class="flex h-16 w-16 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
+                                                    <span class="text-xs text-zinc-400">-</span>
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $item->product->name }}</div>
+                                                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $item->product->asset_tag }}</div>
+                                            </div>
                                         </div>
 
                                         <form method="POST" action="{{ route('carts.items.destroy', $item) }}">

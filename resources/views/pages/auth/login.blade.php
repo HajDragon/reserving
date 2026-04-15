@@ -1,5 +1,7 @@
 <x-layouts::auth :title="__('Log in')">
-    <div class="flex flex-col gap-6">
+    <div id="login-tsparticles" class="pointer-events-none fixed inset-0 z-10"></div>
+
+    <div class="relative z-20 flex flex-col gap-6 rounded-2xl border border-white/20 bg-white/75 p-6 shadow-xl backdrop-blur-sm dark:border-white/10 dark:bg-zinc-900/75">
         <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
 
         <!-- Session Status -->
@@ -33,7 +35,7 @@
                 />
 
                 @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
+                    <flux:link class="absolute top-0 text-sm inset-e-0" :href="route('password.request')" wire:navigate>
                         {{ __('Forgot your password?') }}
                     </flux:link>
                 @endif

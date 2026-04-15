@@ -8,10 +8,9 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservingController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
-
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('/', [ProductController::class, 'index'])->name('home');
+    Route::get('dashboard', [ProductController::class, 'index'])->name('dashboard');
 
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
 
