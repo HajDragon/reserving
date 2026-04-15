@@ -35,7 +35,9 @@ test('authenticated user can create a reserved reservation', function () {
 
 test('reservation fails when overlapping a reserved reservation', function () {
     $user = User::factory()->create();
-    $product = Product::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 1,
+    ]);
 
     $existingStart = Carbon::now()->addDays(2)->startOfHour();
     $existingEnd = (clone $existingStart)->addHours(2);
@@ -61,7 +63,7 @@ test('reservation fails when overlapping a reserved reservation', function () {
 
     $response
         ->assertUnprocessable()
-        ->assertJsonValidationErrors('start_time');
+        ->assertJsonValidationErrors('reserved_quantity');
 
     expect(Reservation::count())->toBe(1);
 });

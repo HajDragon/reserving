@@ -34,8 +34,7 @@ test('products index renders the styled product card content', function () {
         ->assertSeeText('Qty: '.$product->quantity)
         ->assertSeeText('No description available for this product.')
         ->assertSeeText('No image available')
-        ->assertSee('max-w-md')
-        ->assertSee('rounded-md')
-        ->assertSee('shadow-md')
-        ->assertSee('hover:shadow-lg');
+        ->assertSee('card-snake-border')
+        ->assertSee('rounded-sm')
+        ->assertSee('bg-neutral-600');
 });

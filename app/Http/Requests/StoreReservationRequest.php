@@ -26,6 +26,7 @@ class StoreReservationRequest extends FormRequest
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'start_time' => ['required', 'date', 'after:now'],
             'end_time' => ['required', 'date', 'after:start_time'],
+            'reserved_quantity' => ['sometimes', 'integer', 'min:1'],
         ];
     }
 }

@@ -32,31 +32,42 @@ class ReservationController extends Controller
     public function store(StoreReservationRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $requestedQuantity = (int) ($validated['reserved_quantity'] ?? 1);
 
-        $reservation = DB::transaction(function () use ($request, $validated) {
+        $reservation = DB::transaction(function () use ($request, $validated, $requestedQuantity) {
             $product = Product::where('id', $validated['product_id'])
                 ->lockForUpdate()
                 ->firstOrFail();
 
             $isAvailable = $this->availabilityService->checkAvailability(
-                productId: $product->id,
+                product: $product,
                 startTime: $validated['start_time'],
                 endTime: $validated['end_time'],
+                requestedQuantity: $requestedQuantity,
             );
 
             if (! $isAvailable) {
                 throw ValidationException::withMessages([
-                    'start_time' => ['The selected time window is already reserved for this product.'],
+                    'reserved_quantity' => ['The selected time window does not have enough available units for this product.'],
                 ]);
             }
 
-            return Reservation::create([
+            $reservation = Reservation::create([
                 'user_id' => $request->user()->id,
                 'product_id' => $product->id,
                 'start_time' => $validated['start_time'],
                 'end_time' => $validated['end_time'],
                 'status' => ReservationStatus::Reserved,
+                'reserved_quantity' => $requestedQuantity,
             ]);
+
+            $this->availabilityService->syncProductAvailability(
+                $product,
+                $validated['start_time'],
+                $validated['end_time'],
+            );
+
+            return $reservation;
         }, attempts: 5);
 
         return response()->json([
