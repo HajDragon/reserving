@@ -19,6 +19,7 @@ test('products index renders the styled product card content', function () {
         'name' => 'Studio Headphones',
         'type' => 'camera',
         'quantity' => 7,
+        'available_quantity' => 7,
         'description' => null,
         'photo_path' => null,
     ]);
@@ -42,4 +43,50 @@ test('products index renders the styled product card content', function () {
         ->assertSee('card-snake-border')
         ->assertSee('rounded-sm')
         ->assertSee('bg-neutral-600');
+});
+
+test('products index sorts unavailable products to the end', function () {
+    $user = User::factory()->create();
+
+    Product::factory()->create([
+        'name' => 'Active Product',
+        'is_active' => true,
+        'available_quantity' => 3,
+    ]);
+
+    Product::factory()->create([
+        'name' => 'Inactive Product',
+        'is_active' => false,
+        'available_quantity' => 0,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('products.index'));
+
+    $response
+        ->assertOk()
+        ->assertSeeInOrder(['Active Product', 'Inactive Product']);
+});
+
+test('products index shows unavailable label and disables add to cart when product is unavailable', function () {
+    $user = User::factory()->create();
+
+    Product::factory()->create([
+        'name' => 'Unavailable Camera',
+        'quantity' => 2,
+        'available_quantity' => 0,
+        'is_active' => false,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('products.index'));
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Unavailable Camera')
+        ->assertSeeText('Qty: 0')
+        ->assertSeeText('Unavailable')
+        ->assertDontSeeText('Add to Cart');
 });

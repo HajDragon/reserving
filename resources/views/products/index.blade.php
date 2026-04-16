@@ -3,20 +3,17 @@
         <div class="grid auto-rows-min gap-6 md:grid-cols-2 lg:grid-cols-3">
             @foreach ($products as $product)
                 @php
-                    $reservedQuantity = \App\Models\Reservation::query()
-                        ->where('product_id', $product->id)
-                        ->whereIn('status', [
-                            \App\Enums\ReservationStatus::Reserved->value,
-                            \App\Enums\ReservationStatus::Pending->value,
-                        ])
-                        ->sum('reserved_quantity');
-                    $availableQuantity = max((int) $product->quantity - (int) $reservedQuantity, 0);
+                    $availableQuantity = max((int) $product->available_quantity, 0);
                     $canAddToCart = $product->is_active && $availableQuantity > 0;
                 @endphp
 
                 <div class="mx-auto w-full max-w-md card-snake-border">
 
-                    <div class="relative z-10 flex h-full flex-col overflow-hidden rounded-sm dark:bg-neutral-600">
+                    <div @class([
+                        'relative z-10 flex h-full flex-col overflow-hidden rounded-sm transition-opacity',
+                        'dark:bg-neutral-600' => $canAddToCart,
+                        'bg-zinc-100 dark:bg-neutral-800 opacity-70' => ! $canAddToCart,
+                    ])>
 
                         <div class="relative">
                             @if ($product->photo_path)
@@ -30,6 +27,12 @@
                             <div class="absolute right-0 top-0 m-2 rounded-md bg-red-500 px-2 py-1 text-sm font-medium text-white">
                                 {{ strtoupper($product->type) }}
                             </div>
+
+                            @unless ($canAddToCart)
+                                <div class="absolute left-0 top-0 m-2 rounded-md bg-zinc-900 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-white dark:bg-zinc-200 dark:text-zinc-900">
+                                    {{ __('Unavailable') }}
+                                </div>
+                            @endunless
                         </div>
 
                         <div class="p-4">
