@@ -1,11 +1,11 @@
 <x-layouts::app :title="__('Add Product')">
     <div class="mx-auto max-w-4xl space-y-6 p-6">
-        <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+        <div class=" rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <h1 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Add Product') }}</h1>
-            <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ __('Create a new reservable product.') }}</p>
+                <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ __('Create a new reservable product.') }}</p>
         </div>
 
-        <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+        <div class=" rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <form method="POST" action="{{ route('cms.products.store') }}" class="space-y-4" enctype="multipart/form-data">
                 @csrf
                 @include('cms.products.partials.form-fields')

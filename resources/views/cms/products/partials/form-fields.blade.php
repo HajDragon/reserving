@@ -7,7 +7,7 @@
             type="text"
             name="asset_tag"
             value="{{ old('asset_tag', $current?->asset_tag) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('asset_tag')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -19,7 +19,7 @@
             type="text"
             name="name"
             value="{{ old('name', $current?->name) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('name')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -31,7 +31,7 @@
             type="text"
             name="type"
             value="{{ old('type', $current?->type) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('type')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -44,7 +44,7 @@
             min="1"
             name="quantity"
             value="{{ old('quantity', $current?->quantity ?? 1) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('quantity')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -56,7 +56,7 @@
             type="file"
             name="photo"
             accept="image/*"
-            class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="block w-full rounded-lg border border-zinc-300 bg-gray-200 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >
         <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('Use a small image for compact admin cards. Max size: 5MB.') }}</p>
         @error('photo')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -68,7 +68,7 @@
             type="text"
             name="photo_path"
             value="{{ old('photo_path', $current?->photo_path) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             placeholder="https://example.com/image.jpg"
         >
         <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('If both are set, uploaded image is used.') }}</p>
@@ -87,7 +87,7 @@
         <textarea
             name="description"
             rows="4"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >{{ old('description', $current?->description) }}</textarea>
         @error('description')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>
@@ -98,7 +98,7 @@
             name="is_active"
             value="1"
             @checked(old('is_active', $current?->is_active ?? true))
-            class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 dark:border-zinc-700"
+            class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >
         <span>{{ __('Product is active and reservable') }}</span>
     </label>
