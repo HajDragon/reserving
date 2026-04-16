@@ -182,13 +182,10 @@ class CartController extends Controller
                     'reserved_quantity' => $cartItem->requested_quantity,
                     'extra_wishes' => $cartItem->extra_wishes,
                 ]);
-
-                $this->availabilityService->syncProductAvailability(
-                    product: $product,
-                    startTime: $cartItem->start_time,
-                    endTime: $cartItem->end_time,
-                );
             }
+
+            // Reconcile touched products once per checkout order.
+            $this->availabilityService->reconcileProducts($lockedProducts);
 
             $cart->items()->delete();
 

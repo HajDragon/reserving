@@ -22,6 +22,23 @@ class AvailabilityService
         return max($product->quantity - (int) $activeReservedQuantity, 0);
     }
 
+    /**
+     * Reconcile cached inventory fields for a set of products.
+     *
+     * @param  iterable<Product>  $products
+     */
+    public function reconcileProducts(iterable $products): void
+    {
+        foreach ($products as $product) {
+            $availableQuantity = $this->calculatedAvailableQuantity($product);
+
+            $product->forceFill([
+                'available_quantity' => $availableQuantity,
+                'is_active' => $availableQuantity > 0,
+            ])->save();
+        }
+    }
+
     public function remainingCapacity(Product $product, CarbonInterface|string $startTime, CarbonInterface|string $endTime): int
     {
         $reservedQuantity = Reservation::query()
@@ -45,11 +62,6 @@ class AvailabilityService
 
     public function syncProductAvailability(Product $product, CarbonInterface|string $startTime, CarbonInterface|string $endTime): void
     {
-        $availableQuantity = $this->calculatedAvailableQuantity($product);
-
-        $product->forceFill([
-            'available_quantity' => $availableQuantity,
-            'is_active' => $availableQuantity > 0,
-        ])->save();
+        $this->reconcileProducts([$product]);
     }
 }

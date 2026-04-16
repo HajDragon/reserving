@@ -183,3 +183,62 @@ test('checkout keeps cached product inventory aligned with active reservations',
     expect($refreshedProduct->available_quantity)->toBe($expectedAvailableQuantity)
         ->and($refreshedProduct->is_active)->toBe($expectedAvailableQuantity > 0);
 });
+
+test('checkout reconciles all touched products in the order', function () {
+    $user = User::factory()->create();
+
+    $productA = Product::factory()->create([
+        'quantity' => 5,
+        'available_quantity' => 5,
+        'is_active' => true,
+    ]);
+
+    $productB = Product::factory()->create([
+        'quantity' => 3,
+        'available_quantity' => 3,
+        'is_active' => true,
+    ]);
+
+    $cart = $user->cart()->create();
+
+    $startA = Carbon::now()->addDays(6)->startOfHour();
+    $endA = $startA->copy()->addHours(2);
+    $startB = Carbon::now()->addDays(7)->startOfHour();
+    $endB = $startB->copy()->addHours(2);
+
+    CartItem::factory()->create([
+        'cart_id' => $cart->id,
+        'product_id' => $productA->id,
+        'start_time' => $startA,
+        'end_time' => $endA,
+        'requested_quantity' => 2,
+    ]);
+
+    CartItem::factory()->create([
+        'cart_id' => $cart->id,
+        'product_id' => $productB->id,
+        'start_time' => $startB,
+        'end_time' => $endB,
+        'requested_quantity' => 1,
+    ]);
+
+    $this->actingAs($user)->postJson(route('carts.checkout'))->assertCreated();
+
+    $productAReserved = Reservation::query()
+        ->where('product_id', $productA->id)
+        ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+        ->sum('reserved_quantity');
+
+    $productBReserved = Reservation::query()
+        ->where('product_id', $productB->id)
+        ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+        ->sum('reserved_quantity');
+
+    $refreshedProductA = $productA->refresh();
+    $refreshedProductB = $productB->refresh();
+
+    expect($refreshedProductA->available_quantity)->toBe(max($refreshedProductA->quantity - (int) $productAReserved, 0))
+        ->and($refreshedProductA->is_active)->toBe($refreshedProductA->available_quantity > 0)
+        ->and($refreshedProductB->available_quantity)->toBe(max($refreshedProductB->quantity - (int) $productBReserved, 0))
+        ->and($refreshedProductB->is_active)->toBe($refreshedProductB->available_quantity > 0);
+});
