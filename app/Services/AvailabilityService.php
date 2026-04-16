@@ -9,6 +9,19 @@ use Carbon\CarbonInterface;
 
 class AvailabilityService
 {
+    /**
+     * Calculate cached available quantity from all active reservations.
+     */
+    public function calculatedAvailableQuantity(Product $product): int
+    {
+        $activeReservedQuantity = Reservation::query()
+            ->where('product_id', $product->id)
+            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+            ->sum('reserved_quantity');
+
+        return max($product->quantity - (int) $activeReservedQuantity, 0);
+    }
+
     public function remainingCapacity(Product $product, CarbonInterface|string $startTime, CarbonInterface|string $endTime): int
     {
         $reservedQuantity = Reservation::query()
@@ -32,8 +45,11 @@ class AvailabilityService
 
     public function syncProductAvailability(Product $product, CarbonInterface|string $startTime, CarbonInterface|string $endTime): void
     {
+        $availableQuantity = $this->calculatedAvailableQuantity($product);
+
         $product->forceFill([
-            'is_active' => $this->remainingCapacity($product, $startTime, $endTime) > 0,
+            'available_quantity' => $availableQuantity,
+            'is_active' => $availableQuantity > 0,
         ])->save();
     }
 }

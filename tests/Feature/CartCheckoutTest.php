@@ -148,3 +148,38 @@ test('checkout prevents double reservation on overlapping requests', function ()
         ->and($product->refresh()->available_quantity)->toBe(0)
         ->and(CartItem::query()->count())->toBe(1);
 });
+
+test('checkout keeps cached product inventory aligned with active reservations', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 4,
+        'available_quantity' => 4,
+        'is_active' => true,
+    ]);
+
+    $cart = $user->cart()->create();
+
+    $start = Carbon::now()->addDays(5)->startOfHour();
+    $end = $start->copy()->addHours(2);
+
+    CartItem::factory()->create([
+        'cart_id' => $cart->id,
+        'product_id' => $product->id,
+        'start_time' => $start,
+        'end_time' => $end,
+        'requested_quantity' => 3,
+    ]);
+
+    $this->actingAs($user)->postJson(route('carts.checkout'))->assertCreated();
+
+    $activeReservedQuantity = Reservation::query()
+        ->where('product_id', $product->id)
+        ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+        ->sum('reserved_quantity');
+
+    $refreshedProduct = $product->refresh();
+    $expectedAvailableQuantity = max($refreshedProduct->quantity - (int) $activeReservedQuantity, 0);
+
+    expect($refreshedProduct->available_quantity)->toBe($expectedAvailableQuantity)
+        ->and($refreshedProduct->is_active)->toBe($expectedAvailableQuantity > 0);
+});

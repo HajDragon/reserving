@@ -258,3 +258,34 @@ test('status update rejects unknown status value', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('status');
 });
+
+test('confirming return keeps cached product inventory aligned with active reservations', function () {
+    $admin = User::factory()->admin()->create();
+
+    $product = Product::factory()->create([
+        'quantity' => 3,
+        'available_quantity' => 3,
+        'is_active' => true,
+    ]);
+
+    $reservation = Reservation::factory()->create([
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Reserved,
+        'reserved_quantity' => 2,
+    ]);
+
+    $this->actingAs($admin)
+        ->postJson(route('reservations.confirm-returned', $reservation))
+        ->assertOk();
+
+    $activeReservedQuantity = Reservation::query()
+        ->where('product_id', $product->id)
+        ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+        ->sum('reserved_quantity');
+
+    $refreshedProduct = $product->refresh();
+    $expectedAvailableQuantity = max($refreshedProduct->quantity - (int) $activeReservedQuantity, 0);
+
+    expect($refreshedProduct->available_quantity)->toBe($expectedAvailableQuantity)
+        ->and($refreshedProduct->is_active)->toBe($expectedAvailableQuantity > 0);
+});
