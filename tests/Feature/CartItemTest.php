@@ -203,3 +203,43 @@ test('browser form cart update and delete redirect back to cart page', function 
 
     expect(CartItem::query()->whereKey($cartItem->id)->exists())->toBeFalse();
 });
+
+test('user cannot update or delete another users cart item', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 3,
+    ]);
+
+    $ownerCart = $owner->cart()->create();
+
+    $cartItem = CartItem::factory()->create([
+        'cart_id' => $ownerCart->id,
+        'product_id' => $product->id,
+        'requested_quantity' => 1,
+        'start_time' => Carbon::now()->addDay()->startOfHour(),
+        'end_time' => Carbon::now()->addDay()->startOfHour()->addHours(2),
+    ]);
+
+    $start = Carbon::now()->addDays(2)->startOfHour();
+    $end = (clone $start)->addHours(2);
+
+    $updateResponse = $this
+        ->actingAs($intruder)
+        ->patchJson(route('carts.items.update', $cartItem), [
+            'product_id' => $product->id,
+            'start_time' => $start->toDateTimeString(),
+            'end_time' => $end->toDateTimeString(),
+            'requested_quantity' => 1,
+        ]);
+
+    $updateResponse->assertNotFound();
+
+    $deleteResponse = $this
+        ->actingAs($intruder)
+        ->deleteJson(route('carts.items.destroy', $cartItem));
+
+    $deleteResponse->assertNotFound();
+
+    expect($cartItem->fresh())->not->toBeNull();
+});
