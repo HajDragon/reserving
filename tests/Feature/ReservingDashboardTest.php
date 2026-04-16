@@ -124,6 +124,80 @@ test('admin can filter reserving dashboard by start and return weekdays', functi
         ->assertDontSeeText('Tuesday Start Product');
 });
 
+test('admin can sort reserving dashboard by start weekday', function () {
+    $admin = User::factory()->admin()->create();
+    $user = User::factory()->create();
+
+    $mondayProduct = Product::factory()->create(['name' => 'Monday Start Sort Product']);
+    $wednesdayProduct = Product::factory()->create(['name' => 'Wednesday Start Sort Product']);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $wednesdayProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'start_time' => Carbon::parse('2026-04-22 10:00:00'),
+        'end_time' => Carbon::parse('2026-04-24 10:00:00'),
+    ]);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $mondayProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'start_time' => Carbon::parse('2026-04-20 10:00:00'),
+        'end_time' => Carbon::parse('2026-04-21 10:00:00'),
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->get(route('reserving.index', [
+            'start_weekday_sort' => 'asc',
+        ]));
+
+    $response
+        ->assertOk()
+        ->assertSeeInOrder([
+            'Monday Start Sort Product',
+            'Wednesday Start Sort Product',
+        ]);
+});
+
+test('admin can sort reserving dashboard by return weekday', function () {
+    $admin = User::factory()->admin()->create();
+    $user = User::factory()->create();
+
+    $mondayProduct = Product::factory()->create(['name' => 'Monday Return Sort Product']);
+    $fridayProduct = Product::factory()->create(['name' => 'Friday Return Sort Product']);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $mondayProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'start_time' => Carbon::parse('2026-04-20 10:00:00'),
+        'end_time' => Carbon::parse('2026-04-20 16:00:00'),
+    ]);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $fridayProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'start_time' => Carbon::parse('2026-04-21 10:00:00'),
+        'end_time' => Carbon::parse('2026-04-24 16:00:00'),
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->get(route('reserving.index', [
+            'return_weekday_sort' => 'desc',
+        ]));
+
+    $response
+        ->assertOk()
+        ->assertSeeInOrder([
+            'Friday Return Sort Product',
+            'Monday Return Sort Product',
+        ]);
+});
+
 test('calendar view uses weekday filters as well', function () {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
