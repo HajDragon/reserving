@@ -107,3 +107,44 @@ test('checkout rolls back when capacity is no longer available', function () {
         ->and(Reservation::query()->where('user_id', $user->id)->count())->toBe(0)
         ->and(CartItem::query()->count())->toBe(1);
 });
+
+test('checkout prevents double reservation on overlapping requests', function () {
+    $firstUser = User::factory()->create();
+    $secondUser = User::factory()->create();
+    $product = Product::factory()->create(['quantity' => 1]);
+
+    $start = Carbon::now()->addDays(4)->startOfHour();
+    $end = $start->copy()->addHours(2);
+
+    $firstCart = $firstUser->cart()->create();
+    $secondCart = $secondUser->cart()->create();
+
+    CartItem::factory()->create([
+        'cart_id' => $firstCart->id,
+        'product_id' => $product->id,
+        'start_time' => $start,
+        'end_time' => $end,
+        'requested_quantity' => 1,
+    ]);
+
+    CartItem::factory()->create([
+        'cart_id' => $secondCart->id,
+        'product_id' => $product->id,
+        'start_time' => $start,
+        'end_time' => $end,
+        'requested_quantity' => 1,
+    ]);
+
+    $this->actingAs($firstUser)->postJson(route('carts.checkout'))->assertCreated();
+
+    $secondResponse = $this->actingAs($secondUser)->postJson(route('carts.checkout'));
+
+    $secondResponse
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('items.2');
+
+    expect(ReservationOrder::query()->count())->toBe(1)
+        ->and(Reservation::query()->count())->toBe(1)
+        ->and($product->refresh()->available_quantity)->toBe(0)
+        ->and(CartItem::query()->count())->toBe(1);
+});
