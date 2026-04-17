@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Auth\Notifications\ResetPassword;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -25,6 +27,24 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        VerifyEmail::toMailUsing(function ($notifiable, string $url) {
+            return (new MailMessage)
+                ->subject('Verify your email address')
+                ->greeting("Dear {$notifiable->name},")
+                ->line('Welcome to '.config('app.name').'.')
+                ->action('Verify Email Address', $url)
+                ->line('Click the button above to verify your email address.');
+        });
+
+        ResetPassword::toMailUsing(function ($notifiable, string $url) {
+            return (new MailMessage)
+                ->subject('Reset your password')
+                ->greeting("Dear {$notifiable->name},")
+                ->line('You are receiving this email because we received a password reset request for your account.')
+                ->action('Reset Password', $url)
+                ->line('If you did not request a password reset, no further action is required.');
+        });
     }
 
     /**

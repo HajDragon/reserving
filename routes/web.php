@@ -8,7 +8,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReservingController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', ])->group(function () {
     Route::get('/', [ProductController::class, 'index'])->name('home');
     Route::get('dashboard', [ProductController::class, 'index'])->name('dashboard');
 

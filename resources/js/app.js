@@ -37,7 +37,7 @@ if (loginParticlesElement) {
 						speed: 1.75,
 					},
 					color: {
-						value: ["#0ea5e9", "#424", "#245"],
+						value: ["#0ea5e9", "rgb(187, 50, 187)", "#245"],
 					},
 					opacity: {
 						value: 0.7,
