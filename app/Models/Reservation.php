@@ -29,6 +29,9 @@ class Reservation extends Model
         'reservation_order_id',
         'returned_at',
         'returned_by',
+        'reviewed_by',
+        'reviewed_at',
+        'rejection_reason',
     ];
 
     /**
@@ -41,6 +44,7 @@ class Reservation extends Model
             'end_time' => 'datetime',
             'status' => ReservationStatus::class,
             'returned_at' => 'datetime',
+            'reviewed_at' => 'datetime',
             'reserved_quantity' => 'integer',
         ];
     }
@@ -65,6 +69,11 @@ class Reservation extends Model
     public function returnedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'returned_by');
+    }
+
+    public function reviewedByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 
     public function reservationOrder(): BelongsTo

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\ReservationStatus;
 use App\Http\Requests\StoreCartItemRequest;
 use App\Http\Requests\UpdateCartItemRequest;
+use App\Mail\ReservationOrderSubmittedToAdminMail;
+use App\Mail\ReservationPendingReviewMail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -18,6 +20,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
@@ -55,7 +58,7 @@ class CartController extends Controller
         ]);
 
         if (! $request->expectsJson()) {
-            return back()->with('status', 'Product added to cart. Set date, quantity, and wishes from your cart dashboard.');
+            return back()->with('status', 'Item added to cart successfully.');
         }
 
         return response()->json([
@@ -178,7 +181,7 @@ class CartController extends Controller
                     'reservation_order_id' => $reservationOrder->id,
                     'start_time' => $cartItem->start_time,
                     'end_time' => $cartItem->end_time,
-                    'status' => ReservationStatus::Reserved,
+                    'status' => ReservationStatus::Pending,
                     'reserved_quantity' => $cartItem->requested_quantity,
                     'extra_wishes' => $cartItem->extra_wishes,
                 ]);
@@ -191,6 +194,16 @@ class CartController extends Controller
 
             return $reservationOrder->load('reservations.product');
         }, attempts: 5);
+
+        Mail::to($request->user())->queue(new ReservationPendingReviewMail($reservationOrder));
+
+        $admins = User::query()
+            ->where('is_admin', true)
+            ->get();
+
+        foreach ($admins as $admin) {
+            Mail::to($admin)->queue(new ReservationOrderSubmittedToAdminMail($reservationOrder));
+        }
 
         if (! $request->expectsJson()) {
             return redirect()

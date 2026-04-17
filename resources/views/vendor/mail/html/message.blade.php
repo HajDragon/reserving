@@ -2,7 +2,10 @@
 {{-- Header --}}
 <x-slot:header>
     <x-mail::header :url="config('app.url')">
-        <img src="{{ asset('storage/Logos/Summa-logo.png') }}" alt="{{ config('app.name') }}" style="height: 60px;" />
+        <div style="text-align: center;">
+            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(storage_path('app/public/Logos/lab-logo.png'))) }}" alt="{{ config('app.name') }}" style="height: 60px; margin-bottom: 8px;" />
+            <div style="font-weight: bold; font-size: 16px;">Reserving System</div>
+        </div>
     </x-mail::header>
 </x-slot:header>
 

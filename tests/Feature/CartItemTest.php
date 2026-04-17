@@ -45,6 +45,29 @@ test('authenticated user can add a cart item', function () {
         ->and($cartItem->extra_wishes)->toBeNull();
 });
 
+test('browser form add to cart redirects back with success message', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create([
+        'quantity' => 3,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('carts.items.store'), [
+            'product_id' => $product->id,
+        ]);
+
+    $response
+        ->assertRedirect()
+        ->assertSessionHas('status', 'Item added to cart successfully.');
+
+    $cartItem = CartItem::query()->first();
+
+    expect($cartItem)->not->toBeNull()
+        ->and($cartItem->product_id)->toBe($product->id)
+        ->and($cartItem->requested_quantity)->toBe(1);
+});
+
 test('cart item update fails when requested quantity exceeds product quantity', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create([

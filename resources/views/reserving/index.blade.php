@@ -10,6 +10,11 @@
         <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <form method="GET" action="{{ route('reserving.index') }}" class="grid gap-4 md:grid-cols-4">
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+                    <span>{{ __('Search') }}</span>
+                    <input type="text" name="search" placeholder="{{ __('Product, Username, or Email') }}" value="{{ $filters['search'] }}" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                </label>
+
+                <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('View') }}</span>
                     <select name="view" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="cards" @selected($filters['view'] === 'cards')>{{ __('Cards') }}</option>
@@ -23,8 +28,6 @@
                         <option value="">{{ __('All') }}</option>
                         <option value="pending" @selected($filters['status'] === 'pending')>{{ __('Pending') }}</option>
                         <option value="reserved" @selected($filters['status'] === 'reserved')>{{ __('Reserved') }}</option>
-                        <option value="returned" @selected($filters['status'] === 'returned')>{{ __('Returned') }}</option>
-                        <option value="cancelled" @selected($filters['status'] === 'cancelled')>{{ __('Cancelled') }}</option>
                     </select>
                 </label>
 
@@ -76,9 +79,7 @@
                                     @endif
                                     <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ $reservation->product->name ?? __('N/A') }}</h3>
                                 </div>
-                                <span class="rounded-full bg-zinc-100 px-2 py-1 text-xs font-medium uppercase text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                                    {{ $reservation->status->label() }}
-                                </span>
+                                <x-reservation-status-badge :status="$reservation->status" />
                             </div>
 
                             <div class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -96,19 +97,61 @@
                             </div>
 
                             <div class="space-y-2 border-t border-zinc-200 pt-3 dark:border-zinc-700">
-                                <form method="POST" action="{{ route('reservations.update-status', $reservation) }}" class="flex items-center gap-2">
+                                <form method="POST" action="{{ route('reservations.update-status', $reservation) }}" class="space-y-2">
                                     @csrf
                                     @method('PATCH')
-                                    <select
-                                        name="status"
-                                        class="h-10 flex-1 rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-                                    >
-                                        <option value="pending" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'pending')>{{ __('Pending') }}</option>
-                                        <option value="approved" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'approved')>{{ __('Approved') }}</option>
-                                        <option value="rejected" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'rejected')>{{ __('Rejected') }}</option>
-                                        <option value="returned" @selected(App\Enums\AdminReservationStatus::fromReservationStatus($reservation->status)->value === 'returned')>{{ __('Returned') }}</option>
-                                    </select>
-                                    <flux:button type="submit" size="sm">{{ __('Update') }}</flux:button>
+
+                                    @if ($reservation->status === App\Enums\ReservationStatus::Pending)
+                                        <div class="grid gap-2 sm:grid-cols-2">
+                                            <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                                <span>{{ __('Start time') }}</span>
+                                                <input type="datetime-local" name="start_time" value="{{ $reservation->start_time->format('Y-m-d\\TH:i') }}" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            </label>
+                                            <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                                <span>{{ __('End time') }}</span>
+                                                <input type="datetime-local" name="end_time" value="{{ $reservation->end_time->format('Y-m-d\\TH:i') }}" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            </label>
+                                        </div>
+
+                                        <div class="grid gap-2 sm:grid-cols-2">
+                                            <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                                <span>{{ __('Quantity') }}</span>
+                                                <input type="number" min="1" name="reserved_quantity" value="{{ $reservation->reserved_quantity }}" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            </label>
+                                            <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                                <span>{{ __('Status') }}</span>
+                                                <select
+                                                    name="status"
+                                                    class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                                >
+                                                    <option value="approved">{{ __('Approve') }}</option>
+                                                    <option value="rejected">{{ __('Reject') }}</option>
+                                                </select>
+                                            </label>
+                                        </div>
+
+                                        <label class="block space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                            <span>{{ __('Extra wishes') }}</span>
+                                            <textarea name="extra_wishes" rows="2" class="w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $reservation->extra_wishes }}</textarea>
+                                        </label>
+
+                                        <label class="block space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                            <span>{{ __('Rejection reason (required when rejecting)') }}</span>
+                                            <textarea name="rejection_reason" rows="2" class="w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $reservation->rejection_reason }}</textarea>
+                                        </label>
+
+                                        <flux:button type="submit" size="sm">{{ __('Submit Review') }}</flux:button>
+                                    @elseif ($reservation->status === App\Enums\ReservationStatus::Reserved)
+                                        <div class="flex items-center gap-2">
+                                            <select
+                                                name="status"
+                                                class="h-10 flex-1 rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                            >
+                                                <option value="returned">{{ __('Returned') }}</option>
+                                            </select>
+                                            <flux:button type="submit" size="sm">{{ __('Update') }}</flux:button>
+                                        </div>
+                                    @endif
                                 </form>
 
                                 @if ($reservation->reservation_order_id)

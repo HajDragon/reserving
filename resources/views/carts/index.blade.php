@@ -65,22 +65,28 @@
 
                                         <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
                                             <span>{{ __('Start time') }}</span>
-                                            <input type="datetime-local" name="start_time" value="{{ $item->start_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            <input type="datetime-local" name="start_time" value="{{ $item->start_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                                         </label>
 
                                         <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
                                             <span>{{ __('End time') }}</span>
-                                            <input type="datetime-local" name="end_time" value="{{ $item->end_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            <input type="datetime-local" name="end_time" value="{{ $item->end_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                                         </label>
 
-                                        <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+                                        <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400 ">
                                             <span>{{ __('Requested quantity') }}</span>
-                                            <input type="number" min="1" name="requested_quantity" value="{{ $item->requested_quantity }}" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            <input type="number" min="1" name="requested_quantity" value="{{ $item->requested_quantity }}" class="w-full h-6 rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                                         </label>
-
+                                        <div class="bg-neutral-200 w-1/5 text-center rounded-xl">
+                                            <span class="relative flex size-3">
+                                                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+                                                <span class="relative inline-flex size-3 rounded-full bg-green-500"></span>
+                                            </span>
+                                            <h1 class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Available: :quantity', ['quantity' => $item->product->available_quantity]) }}</h1>
+                                        </div>
                                         <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400 md:col-span-2">
                                             <span>{{ __('Extra wishes') }}</span>
-                                            <textarea name="extra_wishes" rows="3" class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $item->extra_wishes }}</textarea>
+                                            <textarea name="extra_wishes" rows="3" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $item->extra_wishes }}</textarea>
                                         </label>
 
                                         <div class="md:col-span-2">
@@ -107,8 +113,9 @@
                 </div>
 
                 <div class="space-y-4 p-6 text-sm text-zinc-600 dark:text-zinc-400">
-                    <p>{{ __('Use the add-to-cart form on each product card to create a cart line with product, dates, quantity, and wishes.') }}</p>
-                    <p>{{ __('Cart items can be edited here before checkout.') }}</p>
+                        <p>{{ __('Use the add-to-cart form on each product card to create a cart line with product, dates, quantity, and wishes.') }}</p>
+                        <p>{{ __('Cart items can be edited here before checkout.') }}</p>
+                    <p>{{ __('Press on update or ENTER on your keyboard after updating the product details. Otherwise, your changes will not be saved.') }}</p>
                 </div>
             </flux:card>
         </div>
