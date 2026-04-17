@@ -90,3 +90,28 @@ test('products index shows unavailable label and disables add to cart when produ
         ->assertSeeText('Unavailable')
         ->assertDontSeeText('Add to Cart');
 });
+
+test('products index can filter products by search query', function () {
+    $user = User::factory()->create();
+
+    Product::factory()->create([
+        'name' => 'Cinema Camera Kit',
+        'asset_tag' => 'CAM-100',
+    ]);
+
+    Product::factory()->create([
+        'name' => 'Audio Recorder',
+        'asset_tag' => 'AUD-200',
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('products.index', ['search' => 'Cinema']));
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Cinema Camera Kit')
+        ->assertDontSeeText('Audio Recorder')
+        ->assertSee('name="search"', false)
+        ->assertSee('value="Cinema"', false);
+});

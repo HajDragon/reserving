@@ -11,7 +11,7 @@
                 @include('cms.products.partials.form-fields')
                 <div class="flex items-center gap-3">
                     <button type="submit" class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">{{ __('Create') }}</button>
-                    <a href="{{ route('cms.products.index') }}" class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Cancel') }}</a>
+                    <a href="{{ route('cms.products.index') }}" wire:navigate class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Cancel') }}</a>
                 </div>
             </form>
         </div>

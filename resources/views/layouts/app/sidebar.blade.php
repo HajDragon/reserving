@@ -7,32 +7,32 @@
         <!-- Desktop Header -->
         <flux:header sticky class="hidden xl:flex border-b border-zinc-200 bg-zinc-50 px-0 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:navbar class="-mb-px flex w-full items-center gap-0">
-            <x-app-logo href="{{ route('dashboard') }}" wire:navigate class="mr-4 sm:hidden lg:block" />
+            <x-app-logo href="{{ route('dashboard') }}" wire:navigate.hover class="mr-4 sm:hidden lg:block" />
 
-                <flux:navbar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate>
+                <flux:navbar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate.hover>
                     {{ __('Products') }}
                 </flux:navbar.item>
 
-                <flux:navbar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate>
+                <flux:navbar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate.hover>
                     {{ __('Cart') }}
                 </flux:navbar.item>
 
-                <flux:navbar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate>
+                <flux:navbar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate.hover>
                     {{ __('My Reservations') }}
                 </flux:navbar.item>
 
                 @can('access-reserving-dashboard')
                     <flux:separator vertical variant="subtle" class="my-2" />
 
-                    <flux:navbar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate>
+                    <flux:navbar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate.hover>
                         {{ __('Reserving Admin') }}
                     </flux:navbar.item>
 
-                    <flux:navbar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate>
+                    <flux:navbar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate.hover>
                         {{ __('Product CMS') }}
                     </flux:navbar.item>
 
-                    <flux:navbar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate>
+                    <flux:navbar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate.hover>
                         {{ __('Reservation Logs') }}
                     </flux:navbar.item>
                 @endcan
@@ -46,41 +46,41 @@
         <!-- Mobile / Tablet Top Bar -->
         <flux:header class="xl:hidden border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="me-2" icon="bars-2" inset="left" />
-            <x-app-logo href="{{ route('dashboard') }}" wire:navigate class="scale-90 lg:hidden sm:block" />
+            <x-app-logo href="{{ route('dashboard') }}" wire:navigate.hover class="scale-90 lg:hidden sm:block" />
             <flux:spacer />
         </flux:header>
 
         <!-- Mobile Sidebar -->
-        <flux:sidebar collapsible="mobile" sticky class="xl:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar collapsible="mobile" sticky class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.header>
-                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate.hover />
                 <flux:sidebar.collapse class="xl:hidden" />
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Menu')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate>
+                    <flux:sidebar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate.hover>
                         {{ __('Products') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate>
+                    <flux:sidebar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate.hover>
                         {{ __('Carts') }}
                     </flux:sidebar.item>
 
-                    <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate>
+                    <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate.hover>
                         {{ __('My Reservations') }}
                     </flux:sidebar.item>
 
                     @can('access-reserving-dashboard')
-                        <flux:sidebar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate>
+                        <flux:sidebar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate.hover>
                             {{ __('Reserving Admin') }}
                         </flux:sidebar.item>
 
-                        <flux:sidebar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate>
+                        <flux:sidebar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate.hover>
                             {{ __('Product CMS') }}
                         </flux:sidebar.item>
 
-                        <flux:sidebar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate>
+                        <flux:sidebar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate.hover>
                             {{ __('Reservation Logs') }}
                         </flux:sidebar.item>
                     @endcan
@@ -146,7 +146,9 @@
         </main>
 
         <div class="w-full shrink-0">
-            @include('layouts.app.footer')
+            @persist('app-footer')
+                @include('layouts.app.footer')
+            @endpersist
         </div>
 
         @persist('toast')

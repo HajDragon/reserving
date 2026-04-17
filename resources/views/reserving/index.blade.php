@@ -28,6 +28,7 @@
                         <option value="">{{ __('All') }}</option>
                         <option value="pending" @selected($filters['status'] === 'pending')>{{ __('Pending') }}</option>
                         <option value="reserved" @selected($filters['status'] === 'reserved')>{{ __('Reserved') }}</option>
+                        <option value="cancelled" @selected($filters['status'] === 'cancelled')>{{ __('Cancelled') }}</option>
                     </select>
                 </label>
 
@@ -58,7 +59,7 @@
 
                 <div class="md:col-span-4 flex items-center gap-3">
                     <flux:button type="submit" variant="primary">{{ __('Apply Filters') }}</flux:button>
-                    <a href="{{ route('reserving.index') }}" class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Clear') }}</a>
+                    <a href="{{ route('reserving.index') }}" wire:navigate class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Clear') }}</a>
                 </div>
             </form>
         </div>
