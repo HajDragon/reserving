@@ -58,7 +58,7 @@ class CartController extends Controller
         ]);
 
         if (! $request->expectsJson()) {
-            return back()->with('status', 'Product added to cart. Set date, quantity, and wishes from your cart dashboard.');
+            return back()->with('status', 'Item added to cart successfully.');
         }
 
         return response()->json([
