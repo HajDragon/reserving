@@ -64,3 +64,39 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+@layer components {
+    /* 1. The Outer Container */
+    .card-snake-border {
+        @apply relative z-0 overflow-hidden rounded-md p-[3px] shadow-md transition-transform delay-150 duration-500 hover:scale-105 hover:shadow-lg;
+    }
+
+    /* 2. The Spinning Gradient (Hidden by default) */
+    .card-snake-border::before {
+        @apply absolute left-1/2 top-1/2 -z-20 aspect-square w-[200%] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(transparent_70%,#ef4444,#eab308,#22c55e,#3b82f6,#a855f7)] content-[''] opacity-0 transition-opacity delay-150 duration-500;
+    }
+
+    /* 3. The Hover Trigger (Fades in and starts spinning) */
+    .card-snake-border:hover::before {
+        @apply opacity-100 animate-[spin_3s_linear_infinite];
+    }
+
+    /* 4. The Inner Mask (The solid background that creates the "border" effect) */
+    .card-snake-border::after {
+        @apply absolute inset-[3px] -z-10 rounded-[4px] bg-white content-[''] dark:bg-neutral-900;
+    }
+
+    .btn-spotlight {
+        @apply relative overflow-hidden rounded-2xl bg-neutral-900 px-4 py-3 text-lg font-medium text-white transition-transform active:scale-[0.985];
+    }
+
+    /* The text layer (uses mix-blend to invert colors over the spotlight) */
+    .btn-spotlight-text {
+        @apply pointer-events-none relative z-10 mix-blend-difference;
+    }
+
+    /* The moving circle */
+    .btn-spotlight-circle {
+        @apply pointer-events-none absolute top-[50%] h-32 w-32 -translate-x-[50%] -translate-y-[50%] rounded-full bg-slate-100 transition-[left] duration-200 ease-out;
+    }
+}

@@ -11,24 +11,38 @@
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                <flux:sidebar.group :heading="__('Menu !')" class="grid">
+                    <flux:sidebar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate>
+                        {{ __('products') }}
                     </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate>
+                        {{ __('Carts') }}
+                    </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate>
+                        {{ __('My Reservations') }}
+                    </flux:sidebar.item>
+
+                    @can('access-reserving-dashboard')
+                        <flux:sidebar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate>
+                            {{ __('Reserving Admin') }}
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate>
+                            {{ __('Product CMS') }}
+                        </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate>
+                            {{ __('Reservation Logs') }}
+                        </flux:sidebar.item>
+                    @endcan
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <flux:spacer />
 
-            <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                    {{ __('Repository') }}
-                </flux:sidebar.item>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                    {{ __('Documentation') }}
-                </flux:sidebar.item>
-            </flux:sidebar.nav>
 
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
