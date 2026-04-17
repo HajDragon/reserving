@@ -17,7 +17,7 @@
 
                         <div class="relative">
                             @if ($product->photo_path)
-                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-80 w-full object-contain bg-zinc-50 dark:bg-zinc-900" />
+                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-80 w-full object-contain bg-zinc-50 dark:bg-zinc-900 rounded-xl" />
                             @else
                                 <div class="flex h-64 w-full items-center justify-center bg-neutral-200 text-sm text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                                     No image available
@@ -64,4 +64,12 @@
             @endforeach
         </div>
     </flux:card>
+
+    @if (session('status'))
+        <div class="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
+            <div class="pointer-events-auto rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 shadow-lg dark:border-emerald-700 dark:bg-emerald-900/80 dark:text-emerald-200">
+                {{ session('status') }}
+            </div>
+        </div>
+    @endif
 </x-layouts::app>
