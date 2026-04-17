@@ -25,6 +25,7 @@ class ReservingController extends Controller
         $returnWeekdaySort = $request->string('return_weekday_sort')->toString();
         $view = $request->string('view')->toString();
         $calendarMonth = $request->string('month')->toString();
+        $search = $request->string('search')->toString();
 
         if (! in_array($startWeekdaySort, ['asc', 'desc'], true)) {
             $startWeekdaySort = '';
@@ -46,7 +47,14 @@ class ReservingController extends Controller
             ->when($startFrom !== '', fn (Builder $query) => $query->whereDate('start_time', '>=', $startFrom))
             ->when($startTo !== '', fn (Builder $query) => $query->whereDate('start_time', '<=', $startTo))
             ->when($returnFrom !== '', fn (Builder $query) => $query->whereDate('end_time', '>=', $returnFrom))
-            ->when($returnTo !== '', fn (Builder $query) => $query->whereDate('end_time', '<=', $returnTo));
+            ->when($returnTo !== '', fn (Builder $query) => $query->whereDate('end_time', '<=', $returnTo))
+            ->when($search !== '', function (Builder $query) use ($search) {
+                $query->where(function (Builder $q) use ($search) {
+                    $q->whereHas('product', fn (Builder $subQuery) => $subQuery->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('user', fn (Builder $subQuery) => $subQuery->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('user', fn (Builder $subQuery) => $subQuery->where('email', 'like', "%{$search}%"));
+                });
+            });
 
         if ($startWeekday >= 1 && $startWeekday <= 7) {
             $this->applyWeekdayFilter($filteredQuery, 'start_time', $startWeekday);
@@ -102,6 +110,7 @@ class ReservingController extends Controller
                 'return_weekday_sort' => $returnWeekdaySort,
                 'view' => $view,
                 'month' => $monthReference->format('Y-m'),
+                'search' => $search,
             ],
         ]);
     }

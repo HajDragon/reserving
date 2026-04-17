@@ -1,4 +1,5 @@
 <x-mail::message>
+
 Hello {{ $user->name }},
 
 Your reservation item has been approved.
