@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Enums\AdminReservationStatus;
 use App\Enums\ReservationStatus;
 use App\Events\ReservationReturned;
+use App\Http\Requests\ReviewReservationRequest;
 use App\Http\Requests\StoreReservationRequest;
+use App\Mail\ReservationApprovedMail;
+use App\Mail\ReservationRejectedMail;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\ReservationOrder;
@@ -15,7 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class ReservationController extends Controller
@@ -159,45 +162,108 @@ class ReservationController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
+    public function updateStatus(ReviewReservationRequest $request, Reservation $reservation): JsonResponse|RedirectResponse
     {
-        $validated = $request->validate([
-            'status' => ['required', Rule::in(array_map(
-                static fn (AdminReservationStatus $status): string => $status->value,
-                AdminReservationStatus::cases(),
-            ))],
-        ]);
+        $validated = $request->validated();
 
         $updatedReservation = DB::transaction(function () use ($request, $reservation, $validated) {
             $lockedReservation = Reservation::query()
-                ->with('product')
+                ->with(['product', 'user', 'reservationOrder.reservations.product'])
                 ->whereKey($reservation->getKey())
                 ->lockForUpdate()
                 ->firstOrFail();
 
             $adminStatus = AdminReservationStatus::from($validated['status']);
-            $newStatus = $adminStatus->toReservationStatus();
-
-            if ($lockedReservation->status === $newStatus) {
-                return $lockedReservation->fresh();
-            }
-
-            $lockedReservation->forceFill([
-                'status' => $newStatus,
-                'returned_at' => $newStatus === ReservationStatus::Returned ? now() : null,
-                'returned_by' => $newStatus === ReservationStatus::Returned ? $request->user()->id : null,
-            ])->save();
-
-            if ($newStatus === ReservationStatus::Returned) {
-                event(new ReservationReturned($lockedReservation, $request->user()->id));
-
-                return $lockedReservation->fresh();
-            }
-
             $lockedProduct = Product::query()
                 ->whereKey($lockedReservation->product_id)
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            if ($adminStatus === AdminReservationStatus::Approved) {
+                if ($lockedReservation->status !== ReservationStatus::Pending) {
+                    throw ValidationException::withMessages([
+                        'status' => ['Only pending reservations can be approved.'],
+                    ]);
+                }
+
+                $nextStartTime = $validated['start_time'] ?? $lockedReservation->start_time;
+                $nextEndTime = $validated['end_time'] ?? $lockedReservation->end_time;
+                $nextQuantity = (int) ($validated['reserved_quantity'] ?? $lockedReservation->reserved_quantity);
+
+                if ($nextQuantity > $lockedProduct->quantity) {
+                    throw ValidationException::withMessages([
+                        'reserved_quantity' => ['The requested quantity exceeds available product quantity.'],
+                    ]);
+                }
+
+                $overlappingReservedQuantity = Reservation::query()
+                    ->where('product_id', $lockedProduct->id)
+                    ->whereKeyNot($lockedReservation->id)
+                    ->whereIn('status', [ReservationStatus::Pending->value, ReservationStatus::Reserved->value])
+                    ->where('start_time', '<', $nextEndTime)
+                    ->where('end_time', '>', $nextStartTime)
+                    ->sum('reserved_quantity');
+
+                $remainingCapacity = max($lockedProduct->quantity - (int) $overlappingReservedQuantity, 0);
+
+                if ($nextQuantity > $remainingCapacity) {
+                    throw ValidationException::withMessages([
+                        'reserved_quantity' => ['The selected time window does not have enough available units for this product.'],
+                    ]);
+                }
+
+                $lockedReservation->forceFill([
+                    'start_time' => $nextStartTime,
+                    'end_time' => $nextEndTime,
+                    'reserved_quantity' => $nextQuantity,
+                    'extra_wishes' => $validated['extra_wishes'] ?? $lockedReservation->extra_wishes,
+                    'status' => ReservationStatus::Reserved,
+                    'reviewed_by' => $request->user()->id,
+                    'reviewed_at' => now(),
+                    'rejection_reason' => null,
+                ])->save();
+            }
+
+            if ($adminStatus === AdminReservationStatus::Rejected) {
+                if ($lockedReservation->status !== ReservationStatus::Pending) {
+                    throw ValidationException::withMessages([
+                        'status' => ['Only pending reservations can be rejected.'],
+                    ]);
+                }
+
+                $lockedReservation->forceFill([
+                    'status' => ReservationStatus::Cancelled,
+                    'reviewed_by' => $request->user()->id,
+                    'reviewed_at' => now(),
+                    'rejection_reason' => $validated['rejection_reason'],
+                ])->save();
+            }
+
+            if ($adminStatus === AdminReservationStatus::Returned) {
+                if ($lockedReservation->status !== ReservationStatus::Reserved) {
+                    throw ValidationException::withMessages([
+                        'status' => ['Only approved reservations can be marked as returned.'],
+                    ]);
+                }
+
+                $lockedReservation->forceFill([
+                    'status' => ReservationStatus::Returned,
+                    'returned_at' => now(),
+                    'returned_by' => $request->user()->id,
+                    'reviewed_by' => $request->user()->id,
+                    'reviewed_at' => now(),
+                ])->save();
+
+                event(new ReservationReturned($lockedReservation, $request->user()->id));
+
+                return $lockedReservation->fresh(['product', 'user', 'reservationOrder.reservations.product']);
+            }
+
+            if ($adminStatus === AdminReservationStatus::Pending) {
+                throw ValidationException::withMessages([
+                    'status' => ['Use approved or rejected for pending reservation reviews.'],
+                ]);
+            }
 
             $this->availabilityService->syncProductAvailability(
                 product: $lockedProduct,
@@ -205,8 +271,16 @@ class ReservationController extends Controller
                 endTime: $lockedReservation->end_time,
             );
 
-            return $lockedReservation->fresh();
+            return $lockedReservation->fresh(['product', 'user', 'reservationOrder.reservations.product']);
         }, attempts: 5);
+
+        if ($updatedReservation->status === ReservationStatus::Reserved) {
+            Mail::to($updatedReservation->user)->queue(new ReservationApprovedMail($updatedReservation));
+        }
+
+        if ($updatedReservation->status === ReservationStatus::Cancelled) {
+            Mail::to($updatedReservation->user)->queue(new ReservationRejectedMail($updatedReservation));
+        }
 
         if (! $request->expectsJson()) {
             return back()->with('status', 'Reservation status updated successfully.');

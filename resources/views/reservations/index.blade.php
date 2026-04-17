@@ -35,7 +35,9 @@
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->start_time->format('Y-m-d H:i') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->end_time->format('Y-m-d H:i') }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->returned_at?->format('Y-m-d H:i') ?? __('Not returned yet') }}</td>
-                                    <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->status->label() }}</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <x-reservation-status-badge :status="$reservation->status" />
+                                    </td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->reserved_quantity }}</td>
                                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $reservation->extra_wishes ?? __('None') }}</td>
                                 </tr>
