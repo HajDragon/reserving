@@ -1,14 +1,21 @@
 <?php
 
 use App\Enums\ReservationStatus;
+use App\Mail\ReservationApprovedMail;
+use App\Mail\ReservationRejectedMail;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\ReservationOrder;
 use App\Models\ReturnedReservationLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    Mail::fake();
+});
 
 test('admin can confirm single reservation as returned', function () {
     $admin = User::factory()->admin()->create();
@@ -209,39 +216,64 @@ test('admin can update reservation status from dashboard flow', function () {
 
     $reservation = Reservation::factory()->create([
         'product_id' => $product->id,
-        'status' => ReservationStatus::Reserved,
+        'status' => ReservationStatus::Pending,
     ]);
 
     $response = $this
         ->actingAs($admin)
         ->patchJson(route('reservations.update-status', $reservation), [
             'status' => 'rejected',
+            'rejection_reason' => 'Item currently unavailable for selected period.',
         ]);
 
     $response
         ->assertOk()
         ->assertJsonPath('reservation.status', ReservationStatus::Cancelled->value);
 
-    expect($reservation->refresh()->status)->toBe(ReservationStatus::Cancelled);
+    expect($reservation->refresh()->status)->toBe(ReservationStatus::Cancelled)
+        ->and($reservation->reviewed_by)->toBe($admin->id)
+        ->and($reservation->rejection_reason)->not->toBeNull();
+
+    Mail::assertQueued(ReservationRejectedMail::class, 1);
 });
 
-test('admin can update reservation status from web form to pending', function () {
+test('admin can approve pending reservation from web form and edit reservation details', function () {
     $admin = User::factory()->admin()->create();
+    $product = Product::factory()->create(['quantity' => 5]);
+    $start = now()->addDays(2)->startOfHour();
+    $end = $start->copy()->addHours(2);
+
     $reservation = Reservation::factory()->create([
-        'status' => ReservationStatus::Reserved,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Pending,
+        'start_time' => $start,
+        'end_time' => $end,
+        'reserved_quantity' => 1,
     ]);
+
+    $nextStart = $start->copy()->addDay();
+    $nextEnd = $nextStart->copy()->addHours(3);
 
     $response = $this
         ->actingAs($admin)
         ->patch(route('reservations.update-status', $reservation), [
-            'status' => 'pending',
+            'status' => 'approved',
+            'start_time' => $nextStart->toDateTimeString(),
+            'end_time' => $nextEnd->toDateTimeString(),
+            'reserved_quantity' => 2,
+            'extra_wishes' => 'Updated by admin',
         ]);
 
     $response
         ->assertRedirect()
         ->assertSessionHas('status', 'Reservation status updated successfully.');
 
-    expect($reservation->refresh()->status)->toBe(ReservationStatus::Pending);
+    expect($reservation->refresh()->status)->toBe(ReservationStatus::Reserved)
+        ->and($reservation->reviewed_by)->toBe($admin->id)
+        ->and($reservation->reserved_quantity)->toBe(2)
+        ->and($reservation->extra_wishes)->toBe('Updated by admin');
+
+    Mail::assertQueued(ReservationApprovedMail::class, 1);
 });
 
 test('status update rejects unknown status value', function () {

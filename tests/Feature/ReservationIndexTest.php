@@ -82,3 +82,36 @@ test('user sees returned date and status for returned reservation', function () 
         ->assertSeeText('2026-04-15 13:45')
         ->assertSeeText('Add tripod');
 });
+
+test('user sees color coded statuses in my reservations list', function () {
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Pending,
+    ]);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Reserved,
+    ]);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Cancelled,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('reservations.index'));
+
+    $response
+        ->assertOk()
+        ->assertSee('bg-yellow-100', false)
+        ->assertSee('bg-green-100', false)
+        ->assertSee('bg-red-100', false);
+});

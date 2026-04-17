@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\ReservationStatus;
+use App\Mail\ReservationOrderSubmittedToAdminMail;
+use App\Mail\ReservationPendingReviewMail;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Reservation;
@@ -8,11 +10,17 @@ use App\Models\ReservationOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function (): void {
+    Mail::fake();
+});
+
 test('checkout creates reservation order from cart items and clears cart', function () {
     $user = User::factory()->create();
+    User::factory()->admin()->count(2)->create();
 
     $productA = Product::factory()->create(['quantity' => 3]);
     $productB = Product::factory()->create(['quantity' => 2]);
@@ -52,8 +60,14 @@ test('checkout creates reservation order from cart items and clears cart', funct
     $reservation = Reservation::query()->first();
 
     expect($reservation)->not->toBeNull()
-        ->and($reservation->status)->toBe(ReservationStatus::Reserved)
+        ->and($reservation->status)->toBe(ReservationStatus::Pending)
         ->and($reservation->reservation_order_id)->not->toBeNull();
+
+    Mail::assertQueued(ReservationPendingReviewMail::class, function (ReservationPendingReviewMail $mail) use ($user): bool {
+        return $mail->hasTo($user->email);
+    });
+
+    Mail::assertQueued(ReservationOrderSubmittedToAdminMail::class, 2);
 });
 
 test('checkout fails for an empty cart', function () {
