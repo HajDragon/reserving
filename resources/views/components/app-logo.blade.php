@@ -2,16 +2,9 @@
     'sidebar' => false,
 ])
 
-@if($sidebar)
-    <flux:sidebar.brand name=" Reserveering systeem" {{ $attributes }}>
-        <x-slot name="logo" class="flex aspect-square size-12 items-center justify-center rounded-md">
-            <x-app-logo-icon class="size-12 object-contain" />
-        </x-slot>
-    </flux:sidebar.brand>
-@else
-    <flux:brand name="Reserveering systeem" {{ $attributes }}>
-        <x-slot name="logo" class="flex aspect-square size-12 items-center justify-center rounded-md">
-            <x-app-logo-icon class="size-12 object-contain" />
-        </x-slot>
-    </flux:brand>
-@endif
+<a href="/" class="flex flex-col items-center gap-2 text-center {{ $attributes }}">
+    <div class="flex w-36 items-center justify-center">
+        <x-app-logo-icon class="h-auto w-full object-contain" />
+    </div>
+    <span class="text-sm font-semibold">Reserveering systeem</span>
+</a>

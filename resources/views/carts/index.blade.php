@@ -107,8 +107,9 @@
                 </div>
 
                 <div class="space-y-4 p-6 text-sm text-zinc-600 dark:text-zinc-400">
-                    <p>{{ __('Use the add-to-cart form on each product card to create a cart line with product, dates, quantity, and wishes.') }}</p>
-                    <p>{{ __('Cart items can be edited here before checkout.') }}</p>
+                        <p>{{ __('Use the add-to-cart form on each product card to create a cart line with product, dates, quantity, and wishes.') }}</p>
+                        <p>{{ __('Cart items can be edited here before checkout.') }}</p>
+                    <p>{{ __('Press on update or ENTER on your keyboard after updating the product details. Otherwise, your changes will not be saved.') }}</p>
                 </div>
             </flux:card>
         </div>

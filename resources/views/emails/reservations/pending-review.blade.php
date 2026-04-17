@@ -1,4 +1,5 @@
 <x-mail::message>
+
 Hello {{ $user->name }},
 
 Your order #{{ $reservationOrder->id }} has been received and is currently under admin review.
