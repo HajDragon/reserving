@@ -35,14 +35,14 @@ test('products index renders the styled product card content', function () {
         ->assertSeeText('Qty: '.$product->quantity)
         ->assertSeeText('No description available for this product.')
         ->assertSeeText('No image available')
-        ->assertSeeText('Add to Cart')
+        ->assertSeeText('Add')
         ->assertDontSeeText('Start time')
         ->assertDontSeeText('End time')
         ->assertDontSeeText('Quantity')
         ->assertDontSeeText('Extra wishes')
-        ->assertSee('card-snake-border')
-        ->assertSee('rounded-sm')
-        ->assertSee('bg-neutral-600');
+        ->assertSee('rounded-4xl')
+        ->assertSee('backdrop-blur-2xl')
+        ->assertSee('shadow-[0_20px_60px_rgba(15,23,42,0.14)]', false);
 });
 
 test('products index sorts unavailable products to the end', function () {
@@ -88,7 +88,7 @@ test('products index shows unavailable label and disables add to cart when produ
         ->assertSeeText('Unavailable Camera')
         ->assertSeeText('Qty: 0')
         ->assertSeeText('Unavailable')
-        ->assertDontSeeText('Add to Cart');
+        ->assertDontSeeText('Add');
 });
 
 test('products index can filter products by search query', function () {
