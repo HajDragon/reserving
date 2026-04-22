@@ -32,34 +32,29 @@
         @else
             <div class="relative z-10 grid auto-rows-min gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($products as $product)
-                @php
-                    $availableQuantity = max((int) $product->available_quantity, 0);
-                    $canAddToCart = $product->is_active && $availableQuantity > 0;
-                @endphp
-
-                <div class="rounded-4xl group mx-auto w-full max-w-md shadow-[0_20px_60px_rgba(15,23,42,0.14)] backdrop-blur-2xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
+                <div class="group mx-auto w-full max-w-md rounded-4xl shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl">
 
                     <div @class([
-                        'relative z-10 flex h-full flex-col overflow-hidden rounded-[calc(1.75rem-1px)] border border-white/15 bg-white/35 shadow-inner transition-opacity backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/35',
-                        'opacity-100' => $canAddToCart,
-                        'opacity-65 saturate-75' => ! $canAddToCart,
+                        'relative z-10 flex h-full flex-col overflow-hidden rounded-[calc(1.75rem-1px)] border border-white/15 bg-white/35 transition-opacity dark:border-white/10 dark:bg-zinc-950/35',
+                        'opacity-100' => $product->can_add_to_cart,
+                        'opacity-65 saturate-75' => ! $product->can_add_to_cart,
                     ])>
 
                         <div class="relative">
                             @if ($product->photo_path)
-                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-80 w-full rounded-3xl object-contain bg-white/20 dark:bg-zinc-900/40 hover:scale-110 transition-transform duration-300" />
+                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" loading="lazy" decoding="async" width="640" height="640" class="h-80 w-full rounded-3xl object-contain bg-white/20 dark:bg-zinc-900/40 hover:scale-105 transition-transform duration-150 with-ease-in-out" />
                             @else
                                 <div class="flex h-64 w-full items-center justify-center rounded-3xl bg-white/20 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">
                                     No image available
                                 </div>
                             @endif
 
-                            <div class="absolute right-0 top-0 m-3 rounded-full border border-white/20 bg-white/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-lg backdrop-blur-md dark:bg-white/10 dark:text-white">
+                            <div class="absolute right-0 top-0 m-3 rounded-full border border-white/20 bg-white/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-sm dark:bg-white/10 dark:text-white hover:text-red-500 hover:scale-105">
                                 {{ strtoupper($product->type) }}
                             </div>
 
-                            @unless ($canAddToCart)
-                                <div class="absolute left-0 top-0 m-3 rounded-full border border-white/20 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white backdrop-blur-md dark:bg-white/80 dark:text-slate-900">
+                            @unless ($product->can_add_to_cart)
+                                <div class="absolute left-0 top-0 m-3 rounded-full border border-white/20 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white dark:bg-white/80 dark:text-slate-900">
                                     {{ __('Unavailable') }}
                                 </div>
                             @endunless
@@ -76,13 +71,17 @@
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
 
                                 <div class="flex items-center justify-between gap-3">
-                                    <span class="text-lg font-bold text-slate-900 dark:text-white">Qty: {{ $availableQuantity }}</span>
-                                    <span class="text-sm text-slate-500 dark:text-slate-400">More info </span>
+                                    <span class="text-lg font-bold text-slate-900 dark:text-white">Qty: {{ $product->available_quantity_safe }}</span>
+                                    @if ($product->external_link_url)
+                                        <a href="{{ $product->external_link_url }}" target="_blank" rel="noopener noreferrer" class="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-500">More info</a>
+                                    @else
+                                        <span class="text-sm text-slate-400 dark:text-slate-500">More info</span>
+                                    @endif
 
-                                    @if ($canAddToCart)
+                                    @if ($product->can_add_to_cart)
                                         <x-spotlight-button type="submit" class="w-1/4 text-sm font-medium max-w-xs hover:scale-110">Add</x-spotlight-button>
                                     @else
-                                        <button type="button" disabled class="w-1/3 max-w-xs rounded-2xl border border-white/15 bg-white/20 px-4 py-2 text-sm font-medium text-slate-500 backdrop-blur-md dark:bg-white/5 dark:text-slate-400">
+                                        <button type="button" disabled class="w-1/3 max-w-xs rounded-2xl border border-white/15 bg-white/20 px-4 py-2 text-sm font-medium text-slate-500 dark:bg-white/5 dark:text-slate-400">
                                             {{ __('Unavailable') }}
                                         </button>
                                     @endif
@@ -93,6 +92,10 @@
                     </div>
                 </div>
                 @endforeach
+            </div>
+
+            <div class="relative z-10 pt-2 flex flex-col items-center justify-center gap-4">
+                {{ $products->links() }}
             </div>
         @endif
     </flux:card>

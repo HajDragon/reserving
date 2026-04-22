@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Product;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class UpdateManagedProductRequest extends FormRequest
@@ -36,13 +37,21 @@ class UpdateManagedProductRequest extends FormRequest
             'is_active' => ['nullable', 'boolean'],
             'photo_path' => ['nullable', 'string', 'max:2048'],
             'photo' => ['nullable', 'image', 'max:5120'],
+            'external_link' => ['nullable', 'url', 'max:2048'],
         ];
     }
 
     protected function prepareForValidation(): void
     {
+        $externalLink = trim((string) $this->input('external_link', ''));
+
+        if ($externalLink !== '' && ! Str::startsWith($externalLink, ['http://', 'https://'])) {
+            $externalLink = 'https://'.$externalLink;
+        }
+
         $this->merge([
             'is_active' => $this->boolean('is_active'),
+            'external_link' => $externalLink !== '' ? $externalLink : null,
         ]);
     }
 }

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('quantity')->default(1);
             $table->boolean('is_active')->default(true);
             $table->string('photo_path')->nullable();
+            $table->string('external_link')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

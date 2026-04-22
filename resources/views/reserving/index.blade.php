@@ -143,14 +143,26 @@
 
                                         <flux:button type="submit" size="sm">{{ __('Submit Review') }}</flux:button>
                                     @elseif ($reservation->status === App\Enums\ReservationStatus::Reserved)
-                                        <div class="flex items-center gap-2">
-                                            <select
-                                                name="status"
-                                                class="h-10 flex-1 rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-                                            >
-                                                <option value="returned">{{ __('Returned') }}</option>
-                                            </select>
-                                            <flux:button type="submit" size="sm">{{ __('Update') }}</flux:button>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2">
+                                                <select
+                                                    name="status"
+                                                    class="h-10 flex-1 rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                                >
+                                                    <option value="still_waiting_for_return">{{ __('Still Waiting for Return') }}</option>
+                                                    <option value="returned">{{ __('Returned') }}</option>
+                                                </select>
+                                                <flux:button type="submit" size="sm">{{ __('Update') }}</flux:button>
+                                            </div>
+
+                                            @if ($reservation->reservation_order_id)
+                                                <a
+                                                    href="{{ route('reservation-orders.manage-items', $reservation->reservation_order_id) }}"
+                                                    class="block text-center h-10 rounded-lg border border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center justify-center"
+                                                >
+                                                    {{ __('Manage Items') }}
+                                                </a>
+                                            @endif
                                         </div>
                                     @endif
                                 </form>

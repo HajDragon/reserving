@@ -1,3 +1,42 @@
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
+const initAos = () => {
+	if (document.querySelector('[data-aos]') === null) {
+		return;
+	}
+
+	AOS.init({
+		duration: 500,
+		easing: 'ease-out-cubic',
+		once: false,
+		offset: 80,
+	});
+};
+
+const refreshAos = () => {
+	if (document.querySelector('[data-aos]') === null) {
+		return;
+	}
+
+	AOS.refreshHard();
+};
+
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', initAos, { once: true });
+} else {
+	initAos();
+}
+
+document.addEventListener('livewire:navigated', () => {
+	initAos();
+	refreshAos();
+});
+
+document.addEventListener('products-appended', () => {
+	refreshAos();
+});
+
 const loginParticlesElement = document.getElementById("login-tsparticles");
 
 if (loginParticlesElement) {
