@@ -1,7 +1,6 @@
 <x-layouts::auth :title="__('Log in')">
-    <div id="login-tsparticles" class="pointer-events-none fixed inset-0 z-10"></div>
 
-    <div class="relative z-20 flex flex-col gap-6 rounded-2xl border border-white/20 bg-white/75 p-6 shadow-xl backdrop-blur-sm dark:border-white/10 dark:bg-zinc-900/75">
+    <div class="relative z-20 flex flex-col gap-6 rounded-2xl border glassborder glassbg  glassshadow glassblur glassraduis p-6 shadow-xl backdrop-blur-sm dark:border-white/10 ">
         <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
 
         <!-- Session Status -->

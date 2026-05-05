@@ -114,7 +114,7 @@ select:focus[data-flux-control] {
     }
 
     .glassblur {
-        backdrop-filter: blur(5.3px) !important;
+        backdrop-filter: blur(1.3px) !important;
         -webkit-backdrop-filter: blur(5.3px) !important;
     }
 

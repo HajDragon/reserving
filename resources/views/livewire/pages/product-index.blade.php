@@ -1,5 +1,5 @@
 <div>
-    <flux:card class="relative isolate flex h-full w-full flex-1 flex-col gap-4 overflow-hidden rounded-4xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-zinc-950/40">
+    <flux:card class="relative isolate flex h-full w-full flex-1 flex-col gap-4 overflow-hidden rounded-4xl glass bg-white/10 p-6 dark:border-white/10 dark:bg-zinc-950/40">
         <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(123,28,64,0.5),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.18),transparent_30%)]"></div>
 
         <div class="relative z-10 rounded-3xl border border-white/20 bg-white/20 p-4 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/40">
@@ -35,7 +35,7 @@
                         wire:key="product-card-{{ $product['id'] }}"
                         data-aos="fade-up"
                         data-aos-anchor-placement="bottom-bottom"
-                        class="group mx-auto w-full max-w-md rounded-4xl shadow-lg transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+                        class="glassblur glassbg glassshadow glassraduis group mx-auto w-full max-w-md rounded-4xl  transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
                     >
                         <div @class([
                             'relative z-10 flex h-full flex-col overflow-hidden rounded-[calc(1.75rem-1px)] border border-white/15 bg-white/35 transition-opacity dark:border-white/10 dark:bg-zinc-950/35',
@@ -44,7 +44,7 @@
                         ])>
                             <div class="relative">
                                 @if ($product['photo_path'])
-                                    <img src="{{ $product['photo_path'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-105 dark:bg-zinc-900/40" />
+                                    <img src="{{ $product['photo_path'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
                                 @else
                                     <div class="flex h-64 w-full items-center justify-center rounded-3xl bg-white/20 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">
                                         No image available
