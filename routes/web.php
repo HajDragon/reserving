@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ApiTokenManagementController;
 use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\ReservationLogController;
 use App\Http\Controllers\CartController;
@@ -36,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('can:access-reserving-dashboard')
         ->name('reservation-orders.manage-items');
 
-    Route::get('reserving', [ReservingController::class, 'index'])
+    Route::get('reserving-admin', [ReservingController::class, 'index'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reserving.index');
 
@@ -44,6 +45,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('products', AdminProductIndex::class)->name('products.index');
         Route::resource('products', ProductManagementController::class)->except(['index']);
         Route::get('reservation-logs', [ReservationLogController::class, 'index'])->name('reservation-logs.index');
+        Route::get('api-tokens', [ApiTokenManagementController::class, 'index'])->name('api-tokens.index');
+        Route::post('api-tokens', [ApiTokenManagementController::class, 'store'])->name('api-tokens.store');
+        Route::delete('api-tokens/{token}', [ApiTokenManagementController::class, 'destroy'])->name('api-tokens.destroy');
     });
 });
 

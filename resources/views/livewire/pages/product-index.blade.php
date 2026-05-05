@@ -1,6 +1,6 @@
 <div>
     <flux:card class="relative isolate flex h-full w-full flex-1 flex-col gap-4 overflow-hidden rounded-4xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-zinc-950/40">
-        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(52,28,64,0.8),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.18),transparent_30%)]"></div>
+        <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(123,28,64,0.5),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.18),transparent_30%)]"></div>
 
         <div class="relative z-10 rounded-3xl border border-white/20 bg-white/20 p-4 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/40">
             <div class="flex flex-col gap-3">

@@ -9,7 +9,7 @@
             <flux:navbar class="-mb-px flex w-full items-center gap-0">
             <x-app-logo href="{{ route('dashboard') }}" wire:navigate.hover class="mr-4 sm:hidden lg:block" />
 
-                <flux:navbar.item icon="home" :href="route('products.index')" :current="request()->routeIs('products.*')" wire:navigate.hover>
+                <flux:navbar.item icon="home" :href="route('products.index')" :current="request()->routeIs('dashboard')" wire:navigate.hover>
                     {{ __('Products') }}
                 </flux:navbar.item>
 
@@ -24,9 +24,24 @@
                 @can('access-reserving-dashboard')
                     <flux:separator vertical variant="subtle" class="my-2" />
 
-                    <flux:navbar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate.hover>
-                        {{ __('Reserving Admin') }}
-                    </flux:navbar.item>
+                    <flux:dropdown position="bottom" align="start">
+                        <flux:button
+                            variant="ghost"
+                            icon="shield-check"
+                            class="h-10 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                        >
+                            {{ __('Reserving Admin') }}
+                        </flux:button>
+
+                        <flux:menu>
+                            <flux:menu.item :href="route('reserving.index')" icon="clipboard-document-list" wire:navigate>
+                                {{ __('Order Management') }}
+                            </flux:menu.item>
+                            <flux:menu.item :href="route('cms.api-tokens.index')" icon="key" wire:navigate>
+                                {{ __('API Tokens') }}
+                            </flux:menu.item>
+                        </flux:menu>
+                    </flux:dropdown>
 
                     <flux:navbar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate.hover>
                         {{ __('Product CMS') }}
@@ -66,23 +81,29 @@
                     <flux:sidebar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate.hover>
                         {{ __('Carts') }}
                     </flux:sidebar.item>
-
-                    <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index')" wire:navigate.hover>
-                        {{ __('My Reservations') }}
-                    </flux:sidebar.item>
-
                     @can('access-reserving-dashboard')
-                        <flux:sidebar.item icon="rectangle-group" :href="route('reserving.index')" :current="request()->routeIs('reserving.*')" wire:navigate.hover>
-                            {{ __('Reserving Admin') }}
-                        </flux:sidebar.item>
+                            <flux:navlist position="top" align="start">
 
-                        <flux:sidebar.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate.hover>
-                            {{ __('Product CMS') }}
-                        </flux:sidebar.item>
+                                    <flux:navlist.group heading="Admin" icon="shield-check" expandable>
 
-                        <flux:sidebar.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate.hover>
-                            {{ __('Reservation Logs') }}
-                        </flux:sidebar.item>
+                                        <flux:navlist.item :href="route('reserving.index')" icon="clipboard-document-list" wire:navigate>
+                                        {{ __('Order Management') }}
+                                        </flux:navlist.item>
+
+                                        <flux:navlist.item :href="route('cms.api-tokens.index')" icon="key" wire:navigate>
+                                        {{ __('API Tokens') }}
+                                    </flux:navlist.item>
+
+                                        <flux:navlist.item icon="clipboard-document-list" :href="route('cms.products.index')" :current="request()->routeIs('cms.products.*')" wire:navigate.hover>
+                                            {{ __('Product CMS') }}
+                                        </flux:navlist.item>
+
+                                        <flux:navlist.item icon="archive-box" :href="route('cms.reservation-logs.index')" :current="request()->routeIs('cms.reservation-logs.*')" wire:navigate.hover>
+                                            {{ __('Reservation Logs') }}
+                                        </flux:navlist.item>
+                                    </flux:navlist.group>
+                            </flux:navlist>
+
                     @endcan
                 </flux:sidebar.group>
             </flux:sidebar.nav>

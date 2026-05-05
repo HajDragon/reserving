@@ -81,4 +81,44 @@ select:focus[data-flux-control] {
     .btn-spotlight-circle {
         @apply pointer-events-none absolute top-[50%] h-32 w-32 -translate-x-[50%] -translate-y-[50%] rounded-full bg-slate-100 transition-[left] duration-200 ease-out;
     }
+
+}
+
+/* Glass utilities: use `glass` for all combined styles, or the specific helpers.
+   - glassbg: background color
+   - glassborder: subtle border
+   - glassshadow: soft shadow
+   - glassblur: backdrop blur
+   - glassradius: border radius
+*/
+@layer utilities {
+    .glass {
+        background: rgba(105, 97, 97, 0.21);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5.3px);
+        -webkit-backdrop-filter: blur(5.3px);
+        border: 1px solid rgba(105, 97, 97, 0.57);
+    }
+
+    .glassbg {
+        background: rgba(105, 97, 97, 0.21) !important;
+    }
+
+    .glassborder {
+        border: 1px solid rgba(105, 97, 97, 0.57) !important;
+    }
+
+    .glassshadow {
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .glassblur {
+        backdrop-filter: blur(5.3px) !important;
+        -webkit-backdrop-filter: blur(5.3px) !important;
+    }
+
+    .glassradius {
+        border-radius: 16px !important;
+    }
 }
