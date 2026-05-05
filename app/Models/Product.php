@@ -25,6 +25,7 @@ class Product extends Model
         'available_quantity',
         'is_active',
         'photo_path',
+        'external_link',
     ];
 
     /**

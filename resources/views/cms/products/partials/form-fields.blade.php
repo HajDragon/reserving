@@ -75,6 +75,18 @@
         @error('photo_path')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>
 
+    <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300 md:col-span-2">
+        <span>{{ __('External link') }}</span>
+        <input
+            type="text"
+            name="external_link"
+            value="{{ old('external_link', $current?->external_link) }}"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            placeholder="https://example.com/product-info"
+        >
+        @error('external_link')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+    </label>
+
     @if ($current?->photo_path)
         <div class="md:col-span-2">
             <p class="mb-2 text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{{ __('Current Photo') }}</p>
@@ -92,7 +104,7 @@
         @error('description')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>
 
-    <label class="inline-flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300 md:col-span-2">
+    <label class="inline-flex items-center gap-2 text-sm text-zinc-900 dark:text-zinc-100 md:col-span-2">
         <input
             type="checkbox"
             name="is_active"
@@ -100,7 +112,7 @@
             @checked(old('is_active', $current?->is_active ?? true))
             class="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >
-        <span>{{ __('Product is active and reservable') }}</span>
+        <span>{{ __('Is Active to be reserved') }}</span>
     </label>
     @error('is_active')<p class="text-xs text-red-600 md:col-span-2">{{ $message }}</p>@enderror
 </div>

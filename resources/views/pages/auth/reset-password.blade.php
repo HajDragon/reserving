@@ -11,6 +11,7 @@
             <input type="hidden" name="token" value="{{ request()->route('token') }}">
 
             <!-- Email Address -->
+
             <flux:input
                 name="email"
                 value="{{ request('email') }}"

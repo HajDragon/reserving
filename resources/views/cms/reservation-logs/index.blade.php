@@ -51,7 +51,7 @@
 
                 <div class="md:col-span-4 flex items-center gap-3">
                     <flux:button type="submit" variant="primary">{{ __('Apply Filters') }}</flux:button>
-                    <a href="{{ route('cms.reservation-logs.index') }}" class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Clear') }}</a>
+                    <a href="{{ route('cms.reservation-logs.index') }}" wire:navigate class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Clear') }}</a>
                 </div>
             </form>
         </div>

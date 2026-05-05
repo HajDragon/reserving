@@ -53,4 +53,30 @@ class CartIndexTest extends TestCase
             ->assertDontSeeText('Other User')
             ->assertDontSeeText('other@example.com');
     }
+
+    public function test_user_can_open_cart_index_when_cart_contains_soft_deleted_product(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        $product = Product::factory()->create([
+            'name' => 'Temporarily Available Product',
+        ]);
+
+        CartItem::factory()->create([
+            'cart_id' => $user->cart()->create()->id,
+            'product_id' => $product->id,
+        ]);
+
+        $product->delete();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('carts.index'));
+
+        $response
+            ->assertOk()
+            ->assertSeeText('Unavailable product')
+            ->assertSeeText('removed');
+    }
 }

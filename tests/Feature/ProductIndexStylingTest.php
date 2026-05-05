@@ -3,6 +3,7 @@
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 
 uses(RefreshDatabase::class);
 
@@ -21,7 +22,7 @@ test('products index renders the styled product card content', function () {
         'quantity' => 7,
         'available_quantity' => 7,
         'description' => null,
-        'photo_path' => null,
+        'photo_path' => '/storage/products/studio-headphones.jpg',
     ]);
 
     $response = $this
@@ -34,15 +35,14 @@ test('products index renders the styled product card content', function () {
         ->assertSeeText(strtoupper($product->type))
         ->assertSeeText('Qty: '.$product->quantity)
         ->assertSeeText('No description available for this product.')
-        ->assertSeeText('No image available')
-        ->assertSeeText('Add to Cart')
+        ->assertSeeText('Add')
         ->assertDontSeeText('Start time')
         ->assertDontSeeText('End time')
         ->assertDontSeeText('Quantity')
         ->assertDontSeeText('Extra wishes')
-        ->assertSee('card-snake-border')
-        ->assertSee('rounded-sm')
-        ->assertSee('bg-neutral-600');
+        ->assertSee('rounded-4xl')
+        ->assertSee('loading="lazy"', false)
+        ->assertDontSee('shadow-[0_20px_60px_rgba(15,23,42,0.14)]', false);
 });
 
 test('products index sorts unavailable products to the end', function () {
@@ -88,5 +88,53 @@ test('products index shows unavailable label and disables add to cart when produ
         ->assertSeeText('Unavailable Camera')
         ->assertSeeText('Qty: 0')
         ->assertSeeText('Unavailable')
-        ->assertDontSeeText('Add to Cart');
+        ->assertDontSeeText('Add');
+});
+
+test('products index can filter products by search query', function () {
+    $user = User::factory()->create();
+
+    Product::factory()->create([
+        'name' => 'Cinema Camera Kit',
+        'asset_tag' => 'CAM-100',
+    ]);
+
+    Product::factory()->create([
+        'name' => 'Audio Recorder',
+        'asset_tag' => 'AUD-200',
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('products.index', ['search' => 'Cinema']));
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Cinema Camera Kit')
+        ->assertDontSeeText('Audio Recorder')
+        ->assertSee('name="search"', false)
+        ->assertSee('wire:model.live.debounce.400ms="search"', false);
+});
+
+test('products index renders first infinite-scroll chunk for search results', function () {
+    $user = User::factory()->create();
+
+    Collection::times(20, function (int $index) {
+        Product::factory()->create([
+            'name' => sprintf('Camera %02d', $index),
+            'asset_tag' => sprintf('CAM-%03d', $index),
+            'is_active' => true,
+        ]);
+    });
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('products.index', ['search' => 'Camera']));
+
+    $response
+        ->assertOk()
+        ->assertSee('wire:model.live.debounce.400ms="search"', false)
+        ->assertSeeText('Camera 01')
+        ->assertSeeText('Camera 09')
+        ->assertDontSeeText('Camera 10');
 });

@@ -5,13 +5,13 @@
                 <h1 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Product CMS Management') }}</h1>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ __('Create, view, edit, and delete products.') }}</p>
             </div>
-            <a href="{{ route('cms.products.create') }}" class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+            <a href="{{ route('cms.products.create') }}" wire:navigate.hover class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
                 {{ __('Add Product') }}
             </a>
         </div>
 
         @if (session('status'))
-            <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-300">
+            <div wire:transition class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-300">
                 {{ session('status') }}
             </div>
         @endif
@@ -52,8 +52,8 @@
                             </td>
                             <td class="px-4 py-3 text-right text-sm">
                                 <div class="flex justify-end gap-3">
-                                    <a href="{{ route('cms.products.show', $product) }}" class="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">{{ __('View') }}</a>
-                                    <a href="{{ route('cms.products.edit', $product) }}" class="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">{{ __('Edit') }}</a>
+                                    <a href="{{ route('cms.products.show', $product) }}" wire:navigate.hover class="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">{{ __('View') }}</a>
+                                    <a href="{{ route('cms.products.edit', $product) }}" wire:navigate class="text-zinc-600 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100">{{ __('Edit') }}</a>
                                     <form method="POST" action="{{ route('cms.products.destroy', $product) }}" onsubmit="return confirm('{{ __('Delete this product?') }}')">
                                         @csrf
                                         @method('DELETE')

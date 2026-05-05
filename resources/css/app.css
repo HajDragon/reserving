@@ -52,7 +52,8 @@
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    margin-bottom: 0 !important;
+    line-height: 1.25 !important;
 }
 
 input:focus[data-flux-control],
@@ -66,25 +67,6 @@ select:focus[data-flux-control] {
 } */
 
 @layer components {
-    /* 1. The Outer Container */
-    .card-snake-border {
-        @apply relative z-0 overflow-hidden rounded-md p-[3px] shadow-md transition-transform delay-150 duration-500 hover:scale-105 hover:shadow-lg;
-    }
-
-    /* 2. The Spinning Gradient (Hidden by default) */
-    .card-snake-border::before {
-        @apply absolute left-1/2 top-1/2 -z-20 aspect-square w-[200%] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(transparent_70%,#ef4444,#eab308,#22c55e,#3b82f6,#a855f7)] content-[''] opacity-0 transition-opacity delay-150 duration-500;
-    }
-
-    /* 3. The Hover Trigger (Fades in and starts spinning) */
-    .card-snake-border:hover::before {
-        @apply opacity-100 animate-[spin_3s_linear_infinite];
-    }
-
-    /* 4. The Inner Mask (The solid background that creates the "border" effect) */
-    .card-snake-border::after {
-        @apply absolute inset-[3px] -z-10 rounded-[4px] bg-white content-[''] dark:bg-neutral-900;
-    }
 
     .btn-spotlight {
         @apply relative overflow-hidden rounded-2xl bg-neutral-900 px-4 py-3 text-lg font-medium text-white transition-transform active:scale-[0.985];
@@ -98,5 +80,45 @@ select:focus[data-flux-control] {
     /* The moving circle */
     .btn-spotlight-circle {
         @apply pointer-events-none absolute top-[50%] h-32 w-32 -translate-x-[50%] -translate-y-[50%] rounded-full bg-slate-100 transition-[left] duration-200 ease-out;
+    }
+
+}
+
+/* Glass utilities: use `glass` for all combined styles, or the specific helpers.
+   - glassbg: background color
+   - glassborder: subtle border
+   - glassshadow: soft shadow
+   - glassblur: backdrop blur
+   - glassradius: border radius
+*/
+@layer utilities {
+    .glass {
+        background: rgba(105, 97, 97, 0.21);
+        border-radius: 16px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5.3px);
+        -webkit-backdrop-filter: blur(5.3px);
+        border: 1px solid rgba(105, 97, 97, 0.57);
+    }
+
+    .glassbg {
+        background: rgba(105, 97, 97, 0.21) !important;
+    }
+
+    .glassborder {
+        border: 1px solid rgba(105, 97, 97, 0.57) !important;
+    }
+
+    .glassshadow {
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .glassblur {
+        backdrop-filter: blur(1.3px) !important;
+        -webkit-backdrop-filter: blur(5.3px) !important;
+    }
+
+    .glassradius {
+        border-radius: 16px !important;
     }
 }

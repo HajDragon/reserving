@@ -24,7 +24,7 @@
                     <h3 class="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Cart Items') }}</h3>
 
                     @if (session('status'))
-                        <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                        <div wire:transition class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
                             {{ session('status') }}
                         </div>
                     @endif
@@ -34,19 +34,20 @@
                     @else
                         <div class="space-y-4">
                             @foreach ($cart->items as $item)
+                                @php($product = $item->product)
                                 <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
                                     <div class="mb-4 flex items-start justify-between gap-4">
                                         <div class="flex items-start gap-3">
-                                            @if ($item->product->photo_path)
-                                                <img src="{{ $item->product->photo_path }}" alt="{{ $item->product->name }}" class="h-16 w-16 rounded-md object-cover" />
+                                            @if ($product?->photo_path)
+                                                <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-16 w-16 rounded-md object-cover" />
                                             @else
                                                 <div class="flex h-16 w-16 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
                                                     <span class="text-xs text-zinc-400">-</span>
                                                 </div>
                                             @endif
                                             <div>
-                                                <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $item->product->name }}</div>
-                                                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $item->product->asset_tag }}</div>
+                                                <div class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{{ $product?->name ?? __('Unavailable product') }}</div>
+                                                <div class="text-xs text-zinc-500 dark:text-zinc-400">{{ $product?->asset_tag ?? __('This item no longer exists in the catalog.') }}</div>
                                             </div>
                                         </div>
 
@@ -57,42 +58,48 @@
                                         </form>
                                     </div>
 
-                                    <form method="POST" action="{{ route('carts.items.update', $item) }}" class="grid gap-3 md:grid-cols-2">
-                                        @csrf
-                                        @method('PATCH')
+                                    @if ($product)
+                                        <form method="POST" action="{{ route('carts.items.update', $item) }}" class="grid gap-3 md:grid-cols-2">
+                                            @csrf
+                                            @method('PATCH')
 
-                                        <input type="hidden" name="product_id" value="{{ $item->product_id }}">
+                                            <input type="hidden" name="product_id" value="{{ $item->product_id }}">
 
-                                        <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
-                                            <span>{{ __('Start time') }}</span>
-                                            <input type="datetime-local" name="start_time" value="{{ $item->start_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
-                                        </label>
+                                            <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+                                                <span>{{ __('Start time') }}</span>
+                                                <input type="datetime-local" name="start_time" value="{{ $item->start_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            </label>
 
-                                        <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
-                                            <span>{{ __('End time') }}</span>
-                                            <input type="datetime-local" name="end_time" value="{{ $item->end_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
-                                        </label>
+                                            <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
+                                                <span>{{ __('End time') }}</span>
+                                                <input type="datetime-local" name="end_time" value="{{ $item->end_time->format('Y-m-d\TH:i') }}" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            </label>
 
-                                        <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400 ">
-                                            <span>{{ __('Requested quantity') }}</span>
-                                            <input type="number" min="1" name="requested_quantity" value="{{ $item->requested_quantity }}" class="w-full h-6 rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
-                                        </label>
-                                        <div class="bg-neutral-200 w-1/5 text-center rounded-xl">
-                                            <span class="relative flex size-3">
-                                                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
-                                                <span class="relative inline-flex size-3 rounded-full bg-green-500"></span>
-                                            </span>
-                                            <h1 class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Available: :quantity', ['quantity' => $item->product->available_quantity]) }}</h1>
+                                            <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400 ">
+                                                <span>{{ __('Requested quantity') }}</span>
+                                                <input type="number" min="1" name="requested_quantity" value="{{ $item->requested_quantity }}" class="w-full h-6 rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                            </label>
+                                            <div class="bg-neutral-200 dark:bg-zinc-800 w-1/5 text-center rounded-xl">
+                                                <span class="relative flex size-3">
+                                                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+                                                    <span class="relative inline-flex size-3 rounded-full bg-green-500"></span>
+                                                </span>
+                                                <h1 class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Available: :quantity', ['quantity' => $product->available_quantity]) }}</h1>
+                                            </div>
+                                            <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400 md:col-span-2">
+                                                <span>{{ __('Extra wishes') }}</span>
+                                                <textarea name="extra_wishes" rows="3" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $item->extra_wishes }}</textarea>
+                                            </label>
+
+                                            <div class="md:col-span-2">
+                                                <flux:button type="submit">{{ __('Update item') }}</flux:button>
+                                            </div>
+                                        </form>
+                                    @else
+                                        <div class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                                            {{ __('This cart item references a product that was removed. You can remove this item from your cart.') }}
                                         </div>
-                                        <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400 md:col-span-2">
-                                            <span>{{ __('Extra wishes') }}</span>
-                                            <textarea name="extra_wishes" rows="3" class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $item->extra_wishes }}</textarea>
-                                        </label>
-
-                                        <div class="md:col-span-2">
-                                            <flux:button type="submit">{{ __('Update item') }}</flux:button>
-                                        </div>
-                                    </form>
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

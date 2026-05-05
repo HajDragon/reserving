@@ -43,12 +43,21 @@ class CartController extends Controller
 
     public function store(StoreCartItemRequest $request): JsonResponse|RedirectResponse
     {
+        $isInTheCart = $this->currentUserCart($request->user())->items()->where('product_id', $request->validated()['product_id'])->exists();
         $validated = $request->validated();
 
         $cart = $this->currentUserCart($request->user());
         $defaultStartTime = Carbon::now()->addDay()->startOfHour();
         $defaultEndTime = $defaultStartTime->copy()->addHours(2);
+        if ($isInTheCart) {
+            if (! $request->expectsJson()) {
+                return back()->with('status', 'This product is already in your cart.');
+            }
 
+            return response()->json([
+                'message' => 'This product is already in your cart.',
+            ], 409);
+        }
         $cartItem = $cart->items()->create([
             'product_id' => $validated['product_id'],
             'start_time' => $defaultStartTime,

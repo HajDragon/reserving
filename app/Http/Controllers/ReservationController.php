@@ -239,10 +239,24 @@ class ReservationController extends Controller
                 ])->save();
             }
 
-            if ($adminStatus === AdminReservationStatus::Returned) {
+            if ($adminStatus === AdminReservationStatus::StillWaitingForReturn) {
                 if ($lockedReservation->status !== ReservationStatus::Reserved) {
                     throw ValidationException::withMessages([
-                        'status' => ['Only approved reservations can be marked as returned.'],
+                        'status' => ['Only approved reservations can be marked as still waiting for return.'],
+                    ]);
+                }
+
+                $lockedReservation->forceFill([
+                    'status' => ReservationStatus::StillWaitingForReturn,
+                    'reviewed_by' => $request->user()->id,
+                    'reviewed_at' => now(),
+                ])->save();
+            }
+
+            if ($adminStatus === AdminReservationStatus::Returned) {
+                if (! in_array($lockedReservation->status, [ReservationStatus::Reserved, ReservationStatus::StillWaitingForReturn])) {
+                    throw ValidationException::withMessages([
+                        'status' => ['Only approved or waiting-for-return reservations can be marked as returned.'],
                     ]);
                 }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\ReservationOrder;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -112,6 +113,17 @@ class ReservingController extends Controller
                 'month' => $monthReference->format('Y-m'),
                 'search' => $search,
             ],
+        ]);
+    }
+
+    public function manageItems(Request $request, $reservationOrder): View
+    {
+        $order = ReservationOrder::findOrFail($reservationOrder);
+        $reservations = $order->reservations()->with(['product', 'user'])->get();
+
+        return view('reserving.manage-items', [
+            'order' => $order,
+            'reservations' => $reservations,
         ]);
     }
 
