@@ -16,7 +16,7 @@ class AvailabilityService
     {
         $activeReservedQuantity = Reservation::query()
             ->where('product_id', $product->id)
-            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value, ReservationStatus::RemovalRequest->value])
             ->sum('reserved_quantity');
 
         return max($product->quantity - (int) $activeReservedQuantity, 0);
@@ -43,7 +43,7 @@ class AvailabilityService
     {
         $reservedQuantity = Reservation::query()
             ->where('product_id', $product->id)
-            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value, ReservationStatus::RemovalRequest->value])
             ->where('start_time', '<', $endTime)
             ->where('end_time', '>', $startTime)
             ->sum('reserved_quantity');

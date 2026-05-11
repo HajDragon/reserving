@@ -1,0 +1,4 @@
+sending a reminder mail 1 day nefore pickup date
+simplifying the reservatiion system
+being able to edit or cancel a reservation when its on pending
+being able to request  to remove a reservation after its reserved

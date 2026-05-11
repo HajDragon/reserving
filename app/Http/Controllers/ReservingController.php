@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Reservations\AdjustProductInventoryAction;
+use App\Enums\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\ReservationOrder;
+use App\Models\ReservationRemovalRequest;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class ReservingController extends Controller
 {
@@ -26,6 +30,7 @@ class ReservingController extends Controller
         $returnWeekdaySort = $request->string('return_weekday_sort')->toString();
         $view = $request->string('view')->toString();
         $calendarMonth = $request->string('month')->toString();
+        $selectedDay = $request->string('selected_day')->toString();
         $search = $request->string('search')->toString();
 
         if (! in_array($startWeekdaySort, ['asc', 'desc'], true)) {
@@ -40,10 +45,19 @@ class ReservingController extends Controller
 
         $monthReference = preg_match('/^\d{4}-\d{2}$/', $calendarMonth) === 1
             ? CarbonImmutable::createFromFormat('Y-m', $calendarMonth)->startOfMonth()
-            : CarbonImmutable::now()->startOfMonth();
+            : (preg_match('/^\d{4}-\d{2}-\d{2}$/', $startFrom) === 1
+                ? CarbonImmutable::createFromFormat('Y-m-d', $startFrom)->startOfMonth()
+                : (preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDay) === 1
+                    ? CarbonImmutable::createFromFormat('Y-m-d', $selectedDay)->startOfMonth()
+                    : CarbonImmutable::now()->startOfMonth()));
+
+        $selectedDayReference = preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDay) === 1
+            ? CarbonImmutable::createFromFormat('Y-m-d', $selectedDay)->startOfDay()
+            : null;
 
         $filteredQuery = Reservation::query()
-            ->with(['user', 'product'])
+            ->with(['user', 'product', 'removalRequests'])
+            ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ReservationStatus::RemovalRequest->value])
             ->when($status !== '', fn (Builder $query) => $query->where('status', $status))
             ->when($startFrom !== '', fn (Builder $query) => $query->whereDate('start_time', '>=', $startFrom))
             ->when($startTo !== '', fn (Builder $query) => $query->whereDate('start_time', '<=', $startTo))
@@ -84,12 +98,43 @@ class ReservingController extends Controller
             ->orderBy('start_time')
             ->get();
 
+        $selectedDayOrders = collect();
+
+        if ($selectedDayReference !== null) {
+            $selectedDayReservations = (clone $filteredQuery)
+                ->with(['user', 'product'])
+                ->whereDate('start_time', '<=', $selectedDayReference->toDateString())
+                ->whereDate('end_time', '>=', $selectedDayReference->toDateString())
+                ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ReservationStatus::RemovalRequest->value])
+                ->orderBy('reservation_order_id')
+                ->orderBy('start_time')
+                ->get();
+
+            $selectedDayOrders = $selectedDayReservations
+                ->groupBy(function (Reservation $reservation): string {
+                    return $reservation->reservation_order_id !== null
+                        ? 'order-'.$reservation->reservation_order_id
+                        : 'reservation-'.$reservation->id;
+                })
+                ->map(function (Collection $reservations): array {
+                    $firstReservation = $reservations->first();
+
+                    return [
+                        'reservation_order_id' => $firstReservation?->reservation_order_id,
+                        'reservations' => $reservations->values(),
+                    ];
+                })
+                ->values();
+        }
+
         $calendarDays = $this->buildCalendarDays($monthReference, $calendarReservations);
 
         return view('reserving.index', [
             'reservations' => $reservations,
             'calendar_days' => $calendarDays,
             'calendar_month' => $monthReference,
+            'selected_day' => $selectedDayReference,
+            'selected_day_orders' => $selectedDayOrders,
             'weekdays' => [
                 1 => 'Monday',
                 2 => 'Tuesday',
@@ -111,6 +156,7 @@ class ReservingController extends Controller
                 'return_weekday_sort' => $returnWeekdaySort,
                 'view' => $view,
                 'month' => $monthReference->format('Y-m'),
+                'selected_day' => $selectedDayReference?->format('Y-m-d') ?? '',
                 'search' => $search,
             ],
         ]);
@@ -119,7 +165,18 @@ class ReservingController extends Controller
     public function manageItems(Request $request, $reservationOrder): View
     {
         $order = ReservationOrder::findOrFail($reservationOrder);
-        $reservations = $order->reservations()->with(['product', 'user'])->get();
+        $reservations = $order->reservations()
+            ->with(['product', 'user', 'removalRequests'])
+            ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ReservationStatus::RemovalRequest->value])
+            ->orderBy('start_time')
+            ->get();
+
+        if ($request->ajax()) {
+            return view('reserving.partials.manage-items-panel', [
+                'order' => $order,
+                'reservations' => $reservations,
+            ]);
+        }
 
         return view('reserving.manage-items', [
             'order' => $order,
@@ -170,5 +227,48 @@ class ReservingController extends Controller
             'sqlite' => '((CAST(strftime("%w", '.$column.') AS integer) + 6) % 7) + 1',
             default => 'WEEKDAY('.$column.') + 1',
         };
+    }
+
+    public function updateRemovalRequestStatus(Request $request, ReservationRemovalRequest $removalRequest)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'in:approved,rejected'],
+            'reason' => ['nullable', 'string'],
+        ]);
+
+        if ($validated['status'] === 'rejected' && blank($validated['reason'] ?? null)) {
+            throw ValidationException::withMessages([
+                'reason' => ['A rejection reason is required when rejecting a removal request.'],
+            ]);
+        }
+
+        $result = DB::transaction(function () use ($validated, $removalRequest, $request) {
+            $lockedRequest = ReservationRemovalRequest::query()->whereKey($removalRequest->getKey())->lockForUpdate()->firstOrFail();
+            $lockedReservation = Reservation::query()->whereKey($lockedRequest->reservation_id)->with('product')->lockForUpdate()->firstOrFail();
+
+            $lockedRequest->reviewed_by = $request->user()->id;
+            $lockedRequest->reviewed_at = now();
+            $lockedRequest->status = $validated['status'];
+            $lockedRequest->review_reason = $validated['reason'] ?? null;
+            $lockedRequest->save();
+
+            if ($validated['status'] === 'approved') {
+                $lockedReservation->status = ReservationStatus::Cancelled;
+                $lockedReservation->save();
+
+                app(AdjustProductInventoryAction::class)->restoreForReservation($lockedReservation);
+            } else {
+                $lockedReservation->status = ReservationStatus::Reserved;
+                $lockedReservation->save();
+            }
+
+            return ['removal_request' => $lockedRequest->fresh(), 'reservation' => $lockedReservation->fresh()];
+        }, attempts: 5);
+
+        if (! $request->expectsJson()) {
+            return back()->with('status', 'Removal request updated.');
+        }
+
+        return response()->json(['message' => 'Removal request updated.', 'data' => $result]);
     }
 }

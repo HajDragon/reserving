@@ -24,6 +24,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::patch('reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+    Route::delete('reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+    Route::post('reservations/{reservation}/request-removal', [ReservationController::class, 'requestRemoval'])->name('reservations.request-removal');
     Route::post('reservations/{reservation}/confirm-returned', [ReservationController::class, 'confirmReturned'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reservations.confirm-returned');
@@ -49,6 +52,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('api-tokens', [ApiTokenManagementController::class, 'store'])->name('api-tokens.store');
         Route::delete('api-tokens/{token}', [ApiTokenManagementController::class, 'destroy'])->name('api-tokens.destroy');
     });
+
+    Route::patch('reservation-removal-requests/{removalRequest}/status', [ReservingController::class, 'updateRemovalRequestStatus'])
+        ->middleware('can:access-reserving-dashboard')
+        ->name('reservation-removal-requests.update-status');
 });
 
 require __DIR__.'/settings.php';

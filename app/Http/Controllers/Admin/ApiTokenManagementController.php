@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Enums\ApiTokenAbility;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreApiTokenRequest;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
