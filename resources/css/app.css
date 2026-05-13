@@ -121,4 +121,5 @@ select:focus[data-flux-control] {
     .glassradius {
         border-radius: 16px !important;
     }
+
 }

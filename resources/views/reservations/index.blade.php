@@ -78,24 +78,24 @@
                                             </div>
 
                                             <div class="grid gap-4 sm:grid-cols-2">
-                                                <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+                                                <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300  " >
                                                     <span>{{ __('Start time') }}</span>
-                                                    <input type="datetime-local" name="start_time" value="{{ $reservation->start_time->format('Y-m-d\\TH:i') }}" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                                    <input type="datetime-local" name="start_time" value="{{ $reservation->start_time->format('Y-m-d\\TH:i') }}" class="h-10 w-full rounded-lg border-zinc-300 bg-zinc-100 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">
                                                 </label>
                                                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                                                     <span>{{ __('End time') }}</span>
-                                                    <input type="datetime-local" name="end_time" value="{{ $reservation->end_time->format('Y-m-d\\TH:i') }}" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                                    <input type="datetime-local" name="end_time" value="{{ $reservation->end_time->format('Y-m-d\\TH:i') }}" class="h-10 w-full rounded-lg border-zinc-300 bg-zinc-100 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">
                                                 </label>
                                             </div>
 
                                             <div class="grid gap-4 sm:grid-cols-2">
                                                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                                                     <span>{{ __('Quantity') }}</span>
-                                                    <input type="number" min="1" name="reserved_quantity" value="{{ $reservation->reserved_quantity }}" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                                    <input type="number" min="1" name="reserved_quantity" value="{{ $reservation->reserved_quantity }}" class="h-10 w-full rounded-lg border-zinc-300 bg-zinc-100  text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">
                                                 </label>
                                                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                                                     <span>{{ __('Extra wishes') }}</span>
-                                                    <textarea name="extra_wishes" rows="3" class="w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">{{ $reservation->extra_wishes }}</textarea>
+                                                    <textarea name="extra_wishes" rows="3" class="w-full rounded-lg border-zinc-300 bg-zinc-100 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-700  dark:text-zinc-100 mb-2">{{ $reservation->extra_wishes }}</textarea>
                                                 </label>
                                             </div>
 
@@ -145,5 +145,6 @@
                 </div>
             @endif
         </div>
+        <div class="sitedark">hshdshsdhsdsdsd</div>
     </div>
 </x-layouts::app>
