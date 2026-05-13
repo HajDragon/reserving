@@ -9,11 +9,13 @@ use App\Http\Controllers\ReservingController;
 use App\Livewire\Pages\Admin\ProductIndex as AdminProductIndex;
 use App\Livewire\Pages\ProductIndex;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\testController;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', ProductIndex::class)->name('home');
     Route::get('dashboard', ProductIndex::class)->name('dashboard');
 
+
+    Route::get('test', [testController::class, 'index'])->name('test.index');
     Route::get('products', ProductIndex::class)->name('products.index');
 
     Route::resource('carts', CartController::class)->only(['index']);
