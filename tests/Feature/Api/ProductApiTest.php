@@ -15,7 +15,7 @@ test('product index supports filtering and sorting for authenticated users', fun
         'asset_tag' => 'ASSET-2000BB',
     ]);
 
-    Sanctum::actingAs(User::factory()->create());
+    Sanctum::actingAs(User::factory()->create(), ['*']);
 
     $response = $this->getJson('/api/products?filter[name]=Laptop&sort=name');
 
@@ -30,13 +30,14 @@ test('product api is protected by sanctum', function () {
 });
 
 test('product store returns api resource payload', function () {
-    Sanctum::actingAs(User::factory()->create());
+    Sanctum::actingAs(User::factory()->create(), ['*']);
+    $category = \App\Models\Category::factory()->create();
 
     $response = $this->postJson('/api/products', [
         'asset_tag' => 'ASSET-9999ZZ',
         'name' => 'Camera Prime',
         'description' => '4K camera',
-        'type' => 'camera',
+        'category_id' => $category->id,
         'quantity' => 10,
         'available_quantity' => 10,
         'is_active' => true,

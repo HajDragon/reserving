@@ -26,7 +26,6 @@ class ProductController extends Controller
                 'type',
                 'available_quantity',
                 'is_active',
-                'photo_path',
                 'external_link',
             ])
             ->when($search !== '', function (Builder $query) use ($search) {

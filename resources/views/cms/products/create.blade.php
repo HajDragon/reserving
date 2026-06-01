@@ -16,4 +16,6 @@
             </form>
         </div>
     </div>
+
+    @include('cms.products.partials.category-modal')
 </x-layouts::app>

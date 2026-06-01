@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        INSTALL_XDEBUG: "1"
+    environment:
+      XDEBUG_MODE: "develop,debug"
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
+    volumes:
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:ro

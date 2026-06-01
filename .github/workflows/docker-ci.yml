@@ -1,0 +1,48 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ Dev, master ]
+  pull_request:
+    branches: [ master, Dev ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:24.0-dind
+        options: --privileged
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build images
+        run: |
+          docker build -f docker/php/Dockerfile.prod -t reserving/app:ci .
+          docker build -f docker/node/Dockerfile -t reserving/node:ci .
+
+      - name: Start DB
+        run: |
+          docker run -d --name ci_db -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=reserving -e MYSQL_USER=res_user -e MYSQL_PASSWORD=secret -p 3307:3306 mysql:8.0
+
+      - name: Run Composer install
+        run: docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/app:ci composer install --no-interaction --prefer-dist
+
+      - name: Run migrations
+        env:
+          DB_HOST: host.docker.internal
+          DB_PORT: 3307
+          DB_DATABASE: reserving
+          DB_USERNAME: res_user
+          DB_PASSWORD: secret
+        run: docker run --rm -v "$PWD":/var/www/html -w /var/www/html -e DB_HOST=host.docker.internal -e DB_PORT=3307 reserving/app:ci php artisan migrate --force || true
+
+      - name: Run tests
+        run: docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/app:ci php artisan test

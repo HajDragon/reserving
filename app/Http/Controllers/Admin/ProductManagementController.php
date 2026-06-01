@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreManagedProductRequest;
 use App\Http\Requests\UpdateManagedProductRequest;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 
 class ProductManagementController extends Controller
 {
@@ -17,9 +17,9 @@ class ProductManagementController extends Controller
      */
     public function index(): View
     {
-        //
         return view('cms.products.index', [
             'products' => Product::query()
+                ->with('category')
                 ->latest()
                 ->paginate(12),
         ]);
@@ -30,8 +30,9 @@ class ProductManagementController extends Controller
      */
     public function create(): View
     {
-        //
-        return view('cms.products.create');
+        return view('cms.products.create', [
+            'categories' => Category::all(),
+        ]);
     }
 
     /**
@@ -40,13 +41,11 @@ class ProductManagementController extends Controller
     public function store(StoreManagedProductRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $product = Product::query()->create($validated);
 
         if ($request->hasFile('photo')) {
-            $storedPath = $request->file('photo')->store('products', 'public');
-            $validated['photo_path'] = Storage::url($storedPath);
+            $product->addMediaFromRequest('photo')->toMediaCollection('photo');
         }
-
-        Product::query()->create($validated);
 
         return redirect()
             ->route('cms.products.index')
@@ -58,9 +57,8 @@ class ProductManagementController extends Controller
      */
     public function show(Product $product): View
     {
-        //
         return view('cms.products.show', [
-            'product' => $product,
+            'product' => $product->load('category'),
         ]);
     }
 
@@ -69,9 +67,9 @@ class ProductManagementController extends Controller
      */
     public function edit(Product $product): View
     {
-        //
         return view('cms.products.edit', [
             'product' => $product,
+            'categories' => Category::all(),
         ]);
     }
 
@@ -81,15 +79,12 @@ class ProductManagementController extends Controller
     public function update(UpdateManagedProductRequest $request, Product $product): RedirectResponse
     {
         $validated = $request->validated();
+        $product->update($validated);
 
         if ($request->hasFile('photo')) {
-            $this->deleteStoredPhotoIfLocal($product);
-
-            $storedPath = $request->file('photo')->store('products', 'public');
-            $validated['photo_path'] = Storage::url($storedPath);
+            $product->clearMediaCollection('photo');
+            $product->addMediaFromRequest('photo')->toMediaCollection('photo');
         }
-
-        $product->update($validated);
 
         return redirect()
             ->route('cms.products.show', $product)
@@ -97,31 +92,29 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * Store a newly created category in storage.
+     */
+    public function storeCategory(\Illuminate\Http\Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+        ]);
+
+        Category::create($validated);
+
+        return redirect()->back()->with('status', 'Category created successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Product $product): RedirectResponse
     {
-        $this->deleteStoredPhotoIfLocal($product);
-
+        $product->clearMediaCollection('photo');
         $product->delete();
 
         return redirect()
             ->route('cms.products.index')
             ->with('status', 'Product deleted successfully.');
-    }
-
-    private function deleteStoredPhotoIfLocal(Product $product): void
-    {
-        if (! is_string($product->photo_path) || ! str_starts_with($product->photo_path, '/storage/')) {
-            return;
-        }
-
-        $diskPath = substr($product->photo_path, strlen('/storage/'));
-
-        if ($diskPath === false || $diskPath === '') {
-            return;
-        }
-
-        Storage::disk('public')->delete($diskPath);
     }
 }

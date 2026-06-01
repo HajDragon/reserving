@@ -25,11 +25,23 @@ class ProductFactory extends Factory
             'asset_tag' => strtoupper(fake()->bothify('ASSET-####??')),
             'name' => fake()->words(3, true),
             'description' => fake()->optional()->sentence(),
-            'type' => fake()->randomElement(['laptop', 'projector', 'tablet', 'camera']),
+            'category_id' => null,
             'quantity' => $quantity,
             'available_quantity' => $quantity,
             'is_active' => true,
-            'photo_path' => "https://picsum.photos/640/480?random={$imageId}",
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Product $product) {
+            $imageId = fake()->numberBetween(1, 1000);
+            try {
+                // To avoid long seeding times and test failures, you can mock or skip downloading
+                // $product->addMediaFromUrl("https://picsum.photos/640/480?random={$imageId}")->toMediaCollection('photo');
+            } catch (\Exception $e) {
+                // Ignore download errors on seeding
+            }
+        });
     }
 }

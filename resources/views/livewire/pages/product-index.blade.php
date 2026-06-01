@@ -3,30 +3,39 @@
         <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(123,28,64,0.5),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.18),transparent_30%)]"></div>
 
         <div class="relative z-10 rounded-3xl border border-white/20 bg-white/20 p-4 shadow-lg backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/40">
-            <div class="flex flex-col gap-3">
-                <flux:input
-                    wire:model.live.debounce.400ms="search"
-                    name="search"
-                    type="search"
-                    :label="__('Search products')"
-                    :placeholder="__('Name, asset tag, type, or description...')"
-                    class="mx-auto w-full"
-                />
-
-                <div class="flex items-center gap-2 sm:pb-0.5">
-
-                    @if ($search !== '')
-                        <button type="button" wire:click="clearSearch" class="text-sm text-zinc-700 underline dark:text-zinc-200">
-                            Clear
-                        </button>
-                    @endif
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
+                <div class="flex-1">
+                    <flux:input
+                        wire:model.live.debounce.400ms="search"
+                        name="search"
+                        type="search"
+                        :label="__('Search products')"
+                        :placeholder="__('Name, asset tag, category, or description...')"
+                    />
                 </div>
+
+                <div class="flex-1">
+                    <flux:select wire:model.live="category" :label="__('Filter by Category')">
+                        <option value="">{{ __('All Categories') }}</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </flux:select>
+                </div>
+
+                @if ($search !== '' || $category !== '')
+                    <div class="flex items-center lg:pb-1">
+                        <button type="button" wire:click="clearFilters" class="text-sm text-zinc-700 underline dark:text-zinc-200">
+                            {{ __('Clear Filters') }}
+                        </button>
+                    </div>
+                @endif
             </div>
         </div>
 
         @if (count($products) === 0)
             <div class="relative z-10 rounded-2xl border border-white/20 bg-white/25 px-4 py-6 text-sm text-zinc-800 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/50 dark:text-zinc-200">
-                No products match your current search.
+                No products match your current filters.
             </div>
         @else
             <div class="relative z-10 grid auto-rows-min gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -35,7 +44,7 @@
                         wire:key="product-card-{{ $product['id'] }}"
                         data-aos="fade-up"
                         data-aos-anchor-placement="bottom-bottom"
-                        class="glass group mx-auto w-full max-w-md rounded-4xl  transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+                        class="glass group mx-auto w-full max-w-md rounded-4xl transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
                     >
                         <div @class([
                             'relative z-10 flex h-full flex-col overflow-hidden rounded-[calc(1.75rem-1px)] border border-white/15 bg-white/35 transition-opacity dark:border-white/10 dark:bg-zinc-950/35',
@@ -43,8 +52,8 @@
                             'opacity-65 saturate-75' => ! $product['can_add_to_cart'],
                         ])>
                             <div class="relative">
-                                @if ($product['photo_path'])
-                                    <img src="{{ $product['photo_path'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
+                                @if ($product['photo_url'] ?? false)
+                                    <img src="{{ $product['photo_url'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
                                 @else
                                     <div class="flex h-64 w-full items-center justify-center rounded-3xl bg-white/20 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">
                                         No image available
@@ -52,7 +61,7 @@
                                 @endif
 
                                 <div class="absolute right-0 top-0 m-3 rounded-full border border-white/20 bg-white/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-sm hover:scale-105 hover:text-red-500 dark:bg-white/10 dark:text-white">
-                                    {{ strtoupper($product['type']) }}
+                                    {{ strtoupper($product['category']) }}
                                 </div>
 
                                 @unless ($product['can_add_to_cart'])
