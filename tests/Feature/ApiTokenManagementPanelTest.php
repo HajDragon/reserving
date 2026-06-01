@@ -135,10 +135,10 @@ test('api product routes require matching token abilities', function () {
 
     Sanctum::actingAs($user, [ApiTokenAbility::ProductsRead->value]);
 
-    get(route('products.index'))
+    get(route('api.products.index'))
         ->assertOk();
 
-    post(route('products.store'), [
+    post(route('api.products.store'), [
         'asset_tag' => 'ASSET-1000',
         'name' => 'Permission Test Product',
         'description' => null,
@@ -152,7 +152,7 @@ test('api product routes require matching token abilities', function () {
 
     Sanctum::actingAs($user, [ApiTokenAbility::ProductsWrite->value]);
 
-    post(route('products.store'), [
+    post(route('api.products.store'), [
         'asset_tag' => 'ASSET-1001',
         'name' => 'Writable Product',
         'description' => null,

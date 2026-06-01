@@ -15,12 +15,12 @@
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Search') }}</span>
-                    <input type="text" name="search" placeholder="{{ __('Product, Username, or Email') }}" value="{{ $filters['search'] }}" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <input type="text" name="search" placeholder="{{ __('Product, Username, or Email') }}" value="{{ $filters['search'] }}" class="p-2 w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                 </label>
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('View') }}</span>
-                    <select name="view" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="view" class="p-2 w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="cards" @selected($filters['view'] === 'cards')>{{ __('Cards') }}</option>
                         <option value="calendar" @selected($filters['view'] === 'calendar')>{{ __('Calendar') }}</option>
                     </select>
@@ -28,7 +28,7 @@
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Status') }}</span>
-                    <select name="status" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="status" class="p-2 w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="">{{ __('All') }}</option>
                         <option value="pending" @selected($filters['status'] === 'pending')>{{ __('Pending') }}</option>
                         <option value="reserved" @selected($filters['status'] === 'reserved')>{{ __('Reserved') }}</option>
@@ -38,12 +38,12 @@
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Start from') }}</span>
-                    <input type="date" name="start_from" value="{{ $filters['start_from'] }}" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <input type="date" name="start_from" value="{{ $filters['start_from'] }}" class="p-2 w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                 </label>
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Start weekday') }}</span>
-                    <select name="start_weekday" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="start_weekday" class="p-2 w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="">{{ __('All') }}</option>
                         @foreach ($weekdays as $weekdayValue => $weekdayLabel)
                             <option value="{{ $weekdayValue }}" @selected((int) $filters['start_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>
@@ -53,7 +53,7 @@
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Return weekday') }}</span>
-                    <select name="return_weekday" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="return_weekday" class="p-2 w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="">{{ __('All') }}</option>
                         @foreach ($weekdays as $weekdayValue => $weekdayLabel)
                             <option value="{{ $weekdayValue }}" @selected((int) $filters['return_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>

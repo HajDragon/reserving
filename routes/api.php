@@ -11,13 +11,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('products')->middleware(CheckAbilities::class.':products.read')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->name('products.index');
-        Route::get('{product}', [ProductController::class, 'show'])->name('products.show');
+        Route::get('/', [ProductController::class, 'index'])->name('api.products.index');
+        Route::get('{product}', [ProductController::class, 'show'])->name('api.products.show');
     });
 
     Route::prefix('products')->middleware(CheckAbilities::class.':products.write')->group(function () {
-        Route::post('/', [ProductController::class, 'store'])->name('products.store');
-        Route::match(['put', 'patch'], '{product}', [ProductController::class, 'update'])->name('products.update');
-        Route::delete('{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+        Route::post('/', [ProductController::class, 'store'])->name('api.products.store');
+        Route::match(['put', 'patch'], '{product}', [ProductController::class, 'update'])->name('api.products.update');
+        Route::delete('{product}', [ProductController::class, 'destroy'])->name('api.products.destroy');
     });
 });

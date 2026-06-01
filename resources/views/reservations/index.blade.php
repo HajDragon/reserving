@@ -145,6 +145,5 @@
                 </div>
             @endif
         </div>
-        <div class="sitedark">hshdshsdhsdsdsd</div>
     </div>
 </x-layouts::app>
