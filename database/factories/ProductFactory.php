@@ -25,7 +25,7 @@ class ProductFactory extends Factory
             'asset_tag' => strtoupper(fake()->bothify('ASSET-####??')),
             'name' => fake()->words(3, true),
             'description' => fake()->optional()->sentence(),
-            'type' => fake()->randomElement(['laptop', 'projector', 'tablet', 'camera']),
+            'category_id' => null,
             'quantity' => $quantity,
             'available_quantity' => $quantity,
             'is_active' => true,

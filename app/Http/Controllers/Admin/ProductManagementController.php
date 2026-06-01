@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreManagedProductRequest;
 use App\Http\Requests\UpdateManagedProductRequest;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 
 class ProductManagementController extends Controller
 {
@@ -17,9 +17,9 @@ class ProductManagementController extends Controller
      */
     public function index(): View
     {
-        //
         return view('cms.products.index', [
             'products' => Product::query()
+                ->with('category')
                 ->latest()
                 ->paginate(12),
         ]);
@@ -30,8 +30,9 @@ class ProductManagementController extends Controller
      */
     public function create(): View
     {
-        //
-        return view('cms.products.create');
+        return view('cms.products.create', [
+            'categories' => Category::all(),
+        ]);
     }
 
     /**
@@ -40,19 +41,10 @@ class ProductManagementController extends Controller
     public function store(StoreManagedProductRequest $request): RedirectResponse
     {
         $validated = $request->validated();
-        $photoPath = $validated['photo_path'] ?? null;
-        unset($validated['photo_path']);
-
         $product = Product::query()->create($validated);
 
         if ($request->hasFile('photo')) {
             $product->addMediaFromRequest('photo')->toMediaCollection('photo');
-        } elseif ($photoPath) {
-            try {
-                $product->addMediaFromUrl($photoPath)->toMediaCollection('photo');
-            } catch (\Exception $e) {
-                // Ignore invalid URLs
-            }
         }
 
         return redirect()
@@ -65,9 +57,8 @@ class ProductManagementController extends Controller
      */
     public function show(Product $product): View
     {
-        //
         return view('cms.products.show', [
-            'product' => $product,
+            'product' => $product->load('category'),
         ]);
     }
 
@@ -76,9 +67,9 @@ class ProductManagementController extends Controller
      */
     public function edit(Product $product): View
     {
-        //
         return view('cms.products.edit', [
             'product' => $product,
+            'categories' => Category::all(),
         ]);
     }
 
@@ -88,26 +79,30 @@ class ProductManagementController extends Controller
     public function update(UpdateManagedProductRequest $request, Product $product): RedirectResponse
     {
         $validated = $request->validated();
-        $photoPath = $validated['photo_path'] ?? null;
-        unset($validated['photo_path']);
-
         $product->update($validated);
 
         if ($request->hasFile('photo')) {
             $product->clearMediaCollection('photo');
             $product->addMediaFromRequest('photo')->toMediaCollection('photo');
-        } elseif ($photoPath) {
-            try {
-                $product->clearMediaCollection('photo');
-                $product->addMediaFromUrl($photoPath)->toMediaCollection('photo');
-            } catch (\Exception $e) {
-                // Ignore invalid URLs
-            }
         }
 
         return redirect()
             ->route('cms.products.show', $product)
             ->with('status', 'Product updated successfully.');
+    }
+
+    /**
+     * Store a newly created category in storage.
+     */
+    public function storeCategory(\Illuminate\Http\Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+        ]);
+
+        Category::create($validated);
+
+        return redirect()->back()->with('status', 'Category created successfully.');
     }
 
     /**

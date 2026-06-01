@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +17,9 @@ class ProductIndex extends Component
 {
     #[Url]
     public string $search = '';
+
+    #[Url]
+    public string $category = '';
 
     public array $products = [];
 
@@ -36,14 +40,18 @@ class ProductIndex extends Component
 
     public function updatedSearch(): void
     {
-        $this->search = trim($this->search);
-
         $this->resetAndLoadProducts();
     }
 
-    public function clearSearch(): void
+    public function updatedCategory(): void
+    {
+        $this->resetAndLoadProducts();
+    }
+
+    public function clearFilters(): void
     {
         $this->search = '';
+        $this->category = '';
 
         $this->resetAndLoadProducts();
     }
@@ -72,7 +80,7 @@ class ProductIndex extends Component
                 'id' => $product->id,
                 'name' => $product->name,
                 'description' => $product->description,
-                'type' => $product->type,
+                'category' => $product->category?->name ?? __('N/A'),
                 'photo_url' => ($url = $product->getFirstMediaUrl('photo')) ? parse_url($url, PHP_URL_PATH) : null,
                 'is_active' => (bool) $product->is_active,
                 'available_quantity_safe' => $availableQuantity,
@@ -101,16 +109,17 @@ class ProductIndex extends Component
         $this->loadMore();
     }
 
-    private function productsQuery()
+    private function productsQuery(): Builder
     {
         $search = trim($this->search);
 
         return Product::query()
+            ->with('category')
             ->select([
                 'id',
                 'name',
                 'description',
-                'type',
+                'category_id',
                 'available_quantity',
                 'is_active',
                 'external_link',
@@ -121,9 +130,14 @@ class ProductIndex extends Component
                     $searchQuery
                         ->where('name', 'like', "%{$search}%")
                         ->orWhere('asset_tag', 'like', "%{$search}%")
-                        ->orWhere('type', 'like', "%{$search}%")
+                        ->orWhereHas('category', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        })
                         ->orWhere('description', 'like', "%{$search}%");
                 });
+            })
+            ->when($this->category !== '', function (Builder $query) {
+                $query->where('category_id', $this->category);
             })
             ->orderByDesc('is_active')
             ->orderBy('name');
@@ -131,6 +145,8 @@ class ProductIndex extends Component
 
     public function render(): View
     {
-        return view('livewire.pages.product-index');
+        return view('livewire.pages.product-index', [
+            'categories' => Category::all(),
+        ]);
     }
 }

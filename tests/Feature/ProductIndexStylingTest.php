@@ -19,7 +19,7 @@ test('products index renders the styled product card content', function () {
 
     $product = Product::factory()->create([
         'name' => 'Studio Headphones',
-        'type' => 'camera',
+        'category_id' => \App\Models\Category::factory()->create(['name' => 'camera'])->id,
         'quantity' => 7,
         'available_quantity' => 7,
         'description' => null,

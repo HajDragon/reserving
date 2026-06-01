@@ -31,12 +31,13 @@ test('product api is protected by sanctum', function () {
 
 test('product store returns api resource payload', function () {
     Sanctum::actingAs(User::factory()->create(), ['*']);
+    $category = \App\Models\Category::factory()->create();
 
     $response = $this->postJson('/api/products', [
         'asset_tag' => 'ASSET-9999ZZ',
         'name' => 'Camera Prime',
         'description' => '4K camera',
-        'type' => 'camera',
+        'category_id' => $category->id,
         'quantity' => 10,
         'available_quantity' => 10,
         'is_active' => true,

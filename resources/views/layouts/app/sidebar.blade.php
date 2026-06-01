@@ -174,7 +174,6 @@
                 @include('layouts.app.footer')
             </div>
         @endif
-
         @persist('toast')
             <flux:toast.group>
                 <flux:toast />
@@ -183,5 +182,4 @@
 
         @fluxScripts
     </body>
-
 </html>

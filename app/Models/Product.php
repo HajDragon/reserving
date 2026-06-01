@@ -22,7 +22,7 @@ class Product extends Model implements HasMedia
         'asset_tag',
         'name',
         'description',
-        'type',
+        'category_id',
         'quantity',
         'available_quantity',
         'is_active',
@@ -44,6 +44,11 @@ class Product extends Model implements HasMedia
     protected $appends = [
         'photo_path',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 
     public function getPhotoPathAttribute(): ?string
     {

@@ -19,7 +19,7 @@ class ProductResource extends JsonResource
             'asset_tag' => $this->asset_tag,
             'name' => $this->name,
             'description' => $this->description,
-            'type' => $this->type,
+            'category' => $this->category?->name ?? __('N/A'),
             'quantity' => $this->quantity,
             'available_quantity' => $this->available_quantity,
             'is_active' => $this->is_active,

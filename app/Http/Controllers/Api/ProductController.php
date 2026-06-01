@@ -122,7 +122,7 @@ class ProductController extends Controller
             ],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'string', 'max:255'],
+            'category_id' => ['required', 'exists:categories,id'],
             'quantity' => ['required', 'integer', 'min:0'],
             'available_quantity' => ['required', 'integer', 'min:0', 'lte:quantity'],
             'is_active' => ['required', 'boolean'],

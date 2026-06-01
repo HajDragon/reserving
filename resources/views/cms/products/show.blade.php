@@ -23,8 +23,8 @@
 
             <dl class="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-zinc-500">{{ __('Type') }}</dt>
-                    <dd class="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{{ strtoupper($product->type) }}</dd>
+                    <dt class="text-xs uppercase tracking-wide text-zinc-500">{{ __('Category') }}</dt>
+                    <dd class="mt-1 text-sm text-zinc-800 dark:text-zinc-200">{{ $product->category?->name ?? __('N/A') }}</dd>
                 </div>
                 <div>
                     <dt class="text-xs uppercase tracking-wide text-zinc-500">{{ __('Quantity') }}</dt>

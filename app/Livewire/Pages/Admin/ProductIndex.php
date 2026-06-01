@@ -64,7 +64,7 @@ class ProductIndex extends Component
                 'id' => $product->id,
                 'name' => $product->name,
                 'asset_tag' => $product->asset_tag,
-                'type' => $product->type,
+                'category' => $product->category?->name ?? __('N/A'),
                 'quantity' => (int) $product->quantity,
                 'is_active' => (bool) $product->is_active,
                 'photo_path' => $product->photo_path,
@@ -92,11 +92,12 @@ class ProductIndex extends Component
         $search = trim($this->search);
 
         return Product::query()
+            ->with('category')
             ->select([
                 'id',
                 'name',
                 'asset_tag',
-                'type',
+                'category_id',
                 'quantity',
                 'is_active',
                 'description',
@@ -107,7 +108,9 @@ class ProductIndex extends Component
                     $searchQuery
                         ->where('name', 'like', "%{$search}%")
                         ->orWhere('asset_tag', 'like', "%{$search}%")
-                        ->orWhere('type', 'like', "%{$search}%")
+                        ->orWhereHas('category', function (Builder $q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        })
                         ->orWhere('description', 'like', "%{$search}%");
                 });
             })
