@@ -3,6 +3,7 @@
 use App\Enums\ReservationStatus;
 use App\Models\Product;
 use App\Models\Reservation;
+use App\Models\ReservationOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -237,4 +238,98 @@ test('calendar view uses weekday filters as well', function () {
         ->assertSeeText('April 2026')
         ->assertSeeText('Calendar Monday Product')
         ->assertDontSeeText('Calendar Tuesday Product');
+});
+
+test('calendar view month follows the start from filter when no month is supplied', function () {
+    Carbon::setTestNow(Carbon::parse('2026-05-15 12:00:00'));
+
+    $admin = User::factory()->admin()->create();
+    $user = User::factory()->create();
+    $product = Product::factory()->create(['name' => 'June Calendar Product']);
+
+    Reservation::factory()->create([
+        'user_id' => $user->id,
+        'product_id' => $product->id,
+        'status' => ReservationStatus::Reserved,
+        'start_time' => Carbon::parse('2026-06-03 09:00:00'),
+        'end_time' => Carbon::parse('2026-06-03 11:00:00'),
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->get(route('reserving.index', [
+            'view' => 'calendar',
+            'start_from' => '2026-06-01',
+        ]));
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Calendar View')
+        ->assertSeeText('June 2026')
+        ->assertSeeText('June Calendar Product');
+
+    Carbon::setTestNow();
+});
+
+test('calendar view shows grouped orders for the selected day', function () {
+    Carbon::setTestNow(Carbon::parse('2026-05-15 12:00:00'));
+
+    $admin = User::factory()->admin()->create();
+    $user = User::factory()->create();
+    $order = ReservationOrder::factory()->create();
+    $otherOrder = ReservationOrder::factory()->create();
+
+    $firstProduct = Product::factory()->create(['name' => 'Day One Camera']);
+    $secondProduct = Product::factory()->create(['name' => 'Day One Tripod']);
+    $otherProduct = Product::factory()->create(['name' => 'Day One Lighting']);
+
+    Reservation::factory()->create([
+        'reservation_order_id' => $order->id,
+        'user_id' => $user->id,
+        'product_id' => $firstProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'reserved_quantity' => 2,
+        'start_time' => Carbon::parse('2026-06-03 09:00:00'),
+        'end_time' => Carbon::parse('2026-06-03 11:00:00'),
+    ]);
+
+    Reservation::factory()->create([
+        'reservation_order_id' => $order->id,
+        'user_id' => $user->id,
+        'product_id' => $secondProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'reserved_quantity' => 1,
+        'start_time' => Carbon::parse('2026-06-03 09:30:00'),
+        'end_time' => Carbon::parse('2026-06-03 10:30:00'),
+    ]);
+
+    Reservation::factory()->create([
+        'reservation_order_id' => $otherOrder->id,
+        'user_id' => $user->id,
+        'product_id' => $otherProduct->id,
+        'status' => ReservationStatus::Reserved,
+        'reserved_quantity' => 1,
+        'start_time' => Carbon::parse('2026-06-03 12:00:00'),
+        'end_time' => Carbon::parse('2026-06-03 14:00:00'),
+    ]);
+
+    $response = $this
+        ->actingAs($admin)
+        ->get(route('reserving.index', [
+            'view' => 'calendar',
+            'start_from' => '2026-06-01',
+            'selected_day' => '2026-06-03',
+        ]));
+
+    $response
+        ->assertOk()
+        ->assertSeeText('Orders on June 3, 2026')
+        ->assertSeeText('Order #'.$order->id)
+        ->assertSeeText('Order #'.$otherOrder->id)
+        ->assertSeeText('Day One Camera')
+        ->assertSeeText('Day One Tripod')
+        ->assertSeeText('Day One Lighting')
+        ->assertSeeText('Manage items');
+
+    Carbon::setTestNow();
 });

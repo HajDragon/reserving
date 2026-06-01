@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Reservations\AdjustProductInventoryAction;
 use App\Enums\AdminReservationStatus;
 use App\Enums\ReservationStatus;
 use App\Events\ReservationReturned;
@@ -9,9 +10,12 @@ use App\Http\Requests\ReviewReservationRequest;
 use App\Http\Requests\StoreReservationRequest;
 use App\Mail\ReservationApprovedMail;
 use App\Mail\ReservationRejectedMail;
+use App\Mail\ReservationRemovalRequestedMail;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\ReservationOrder;
+use App\Models\ReservationRemovalRequest;
+use App\Models\User;
 use App\Services\AvailabilityService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
@@ -199,7 +203,7 @@ class ReservationController extends Controller
                 $overlappingReservedQuantity = Reservation::query()
                     ->where('product_id', $lockedProduct->id)
                     ->whereKeyNot($lockedReservation->id)
-                    ->whereIn('status', [ReservationStatus::Pending->value, ReservationStatus::Reserved->value])
+                    ->whereIn('status', [ReservationStatus::Pending->value, ReservationStatus::Reserved->value, ReservationStatus::RemovalRequest->value])
                     ->where('start_time', '<', $nextEndTime)
                     ->where('end_time', '>', $nextStartTime)
                     ->sum('reserved_quantity');
@@ -304,5 +308,179 @@ class ReservationController extends Controller
             'message' => 'Reservation status updated successfully.',
             'reservation' => $updatedReservation,
         ]);
+    }
+
+    public function update(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
+    {
+        if ($request->user()->id !== $reservation->user_id) {
+            abort(403);
+        }
+
+        if ($reservation->status !== ReservationStatus::Pending) {
+            throw ValidationException::withMessages([
+                'reservation' => ['Only pending reservations can be edited.'],
+            ]);
+        }
+
+        $validated = $request->validate([
+            'start_time' => ['required', 'date'],
+            'end_time' => ['required', 'date'],
+            'reserved_quantity' => ['required', 'integer', 'min:1'],
+            'extra_wishes' => ['nullable', 'string'],
+        ]);
+
+        $updated = DB::transaction(function () use ($validated, $reservation) {
+            $lockedReservation = Reservation::query()
+                ->with('product')
+                ->whereKey($reservation->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $lockedProduct = Product::query()
+                ->whereKey($lockedReservation->product_id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $nextStartTime = $validated['start_time'];
+            $nextEndTime = $validated['end_time'];
+            $nextQuantity = (int) $validated['reserved_quantity'];
+
+            $overlappingReservedQuantity = Reservation::query()
+                ->where('product_id', $lockedProduct->id)
+                ->whereKeyNot($lockedReservation->id)
+                ->whereIn('status', [ReservationStatus::Pending->value, ReservationStatus::Reserved->value, ReservationStatus::RemovalRequest->value])
+                ->where('start_time', '<', $nextEndTime)
+                ->where('end_time', '>', $nextStartTime)
+                ->sum('reserved_quantity');
+
+            $remainingCapacity = max($lockedProduct->quantity - (int) $overlappingReservedQuantity, 0);
+
+            if ($nextQuantity > $remainingCapacity) {
+                throw ValidationException::withMessages([
+                    'reserved_quantity' => ['The selected time window does not have enough available units for this product.'],
+                ]);
+            }
+
+            $lockedReservation->forceFill([
+                'start_time' => $nextStartTime,
+                'end_time' => $nextEndTime,
+                'reserved_quantity' => $nextQuantity,
+                'extra_wishes' => $validated['extra_wishes'] ?? $lockedReservation->extra_wishes,
+            ])->save();
+
+            $this->availabilityService->syncProductAvailability(
+                product: $lockedProduct,
+                startTime: $lockedReservation->start_time,
+                endTime: $lockedReservation->end_time,
+            );
+
+            return $lockedReservation->fresh();
+        }, attempts: 5);
+
+        if (! $request->expectsJson()) {
+            return back()->with('status', 'Reservation updated successfully.');
+        }
+
+        return response()->json([
+            'message' => 'Reservation updated successfully.',
+            'reservation' => $updated,
+        ]);
+    }
+
+    public function destroy(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
+    {
+        if ($request->user()->id !== $reservation->user_id) {
+            abort(403);
+        }
+
+        if ($reservation->status !== ReservationStatus::Pending) {
+            throw ValidationException::withMessages([
+                'reservation' => ['Only pending reservations can be cancelled by the user.'],
+            ]);
+        }
+
+        $deleted = DB::transaction(function () use ($reservation) {
+            $lockedReservation = Reservation::query()
+                ->with('product')
+                ->whereKey($reservation->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $lockedReservation->forceFill([
+                'status' => ReservationStatus::Cancelled,
+            ])->save();
+
+            app(AdjustProductInventoryAction::class)->restoreForReservation($lockedReservation);
+
+            return $lockedReservation->fresh();
+        }, attempts: 5);
+
+        if (! $request->expectsJson()) {
+            return back()->with('status', 'Reservation cancelled successfully.');
+        }
+
+        return response()->json([
+            'message' => 'Reservation cancelled successfully.',
+            'reservation' => $deleted,
+        ]);
+    }
+
+    public function requestRemoval(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
+    {
+        if ($request->user()->id !== $reservation->user_id) {
+            abort(403);
+        }
+
+        if ($reservation->status !== ReservationStatus::Reserved) {
+            throw ValidationException::withMessages([
+                'reservation' => ['Removal can only be requested for reservations with status reserved.'],
+            ]);
+        }
+
+        $validated = $request->validate([
+            'reason' => ['nullable', 'string'],
+        ]);
+
+        $removalRequest = DB::transaction(function () use ($request, $reservation, $validated) {
+            $lockedReservation = Reservation::query()
+                ->with(['product', 'user', 'reservationOrder'])
+                ->whereKey($reservation->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedReservation->status !== ReservationStatus::Reserved) {
+                throw ValidationException::withMessages([
+                    'reservation' => ['Removal can only be requested for reservations with status reserved.'],
+                ]);
+            }
+
+            $removalRequest = ReservationRemovalRequest::create([
+                'reservation_id' => $lockedReservation->id,
+                'user_id' => $request->user()->id,
+                'reason' => $validated['reason'] ?? null,
+                'status' => ReservationStatus::RemovalRequest->value,
+            ]);
+
+            $lockedReservation->forceFill([
+                'status' => ReservationStatus::RemovalRequest,
+            ])->save();
+
+            return $removalRequest->load(['reservation.product', 'reservation.user']);
+        }, attempts: 5);
+
+        $admins = User::query()->where('is_admin', true)->get();
+
+        foreach ($admins as $admin) {
+            Mail::to($admin)->queue(new ReservationRemovalRequestedMail($removalRequest->reservation, $removalRequest));
+        }
+
+        if (! $request->expectsJson()) {
+            return back()->with('status', 'Removal request submitted and pending admin review.');
+        }
+
+        return response()->json([
+            'message' => 'Removal request submitted successfully.',
+            'request' => $removalRequest,
+        ], 201);
     }
 }

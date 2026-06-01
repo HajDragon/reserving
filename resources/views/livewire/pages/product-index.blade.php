@@ -35,7 +35,7 @@
                         wire:key="product-card-{{ $product['id'] }}"
                         data-aos="fade-up"
                         data-aos-anchor-placement="bottom-bottom"
-                        class="glassblur glassbg glassshadow glassraduis group mx-auto w-full max-w-md rounded-4xl  transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+                        class="glass group mx-auto w-full max-w-md rounded-4xl  transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
                     >
                         <div @class([
                             'relative z-10 flex h-full flex-col overflow-hidden rounded-[calc(1.75rem-1px)] border border-white/15 bg-white/35 transition-opacity dark:border-white/10 dark:bg-zinc-950/35',

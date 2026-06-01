@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+@props(['title' => null, 'showFooter' => true])
+
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
@@ -166,11 +168,12 @@
             {{ $slot }}
         </main>
 
-        <div class="w-full shrink-0">
-            @persist('app-footer')
+        <!-- DEBUG: showFooter = {{ var_export($showFooter, true) }} -->
+        @if ($showFooter)
+            <div class="w-full shrink-0">
                 @include('layouts.app.footer')
-            @endpersist
-        </div>
+            </div>
+        @endif
 
         @persist('toast')
             <flux:toast.group>

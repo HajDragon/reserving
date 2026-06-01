@@ -23,7 +23,7 @@ class ReconcileProductInventory extends Command
 
         $activeReservedByProduct = Reservation::query()
             ->select('product_id', DB::raw('SUM(reserved_quantity) as reserved_quantity_total'))
-            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
+            ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value, ReservationStatus::RemovalRequest->value])
             ->groupBy('product_id')
             ->pluck('reserved_quantity_total', 'product_id');
 

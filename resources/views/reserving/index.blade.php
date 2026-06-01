@@ -9,6 +9,10 @@
 
         <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <form method="GET" action="{{ route('reserving.index') }}" class="grid gap-4 md:grid-cols-4">
+                @if ($filters['selected_day'] !== '')
+                    <input type="hidden" name="selected_day" value="{{ $filters['selected_day'] }}">
+                @endif
+
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Search') }}</span>
                     <input type="text" name="search" placeholder="{{ __('Product, Username, or Email') }}" value="{{ $filters['search'] }}" class="w-full h-10 rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
@@ -71,7 +75,12 @@
         @elseif ($filters['view'] === 'cards')
             <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 @foreach ($reservations as $reservation)
-                    <flux:card class="border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+                    @php
+                        $latestRemovalRequest = $reservation->removalRequests->last();
+                        $isRemovalRequest = $reservation->status === App\Enums\ReservationStatus::RemovalRequest;
+                    @endphp
+
+                    <flux:card class="border {{ $isRemovalRequest ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20' : 'border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900' }}">
                         <div class="space-y-3">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="flex items-center gap-3">
@@ -90,6 +99,9 @@
                                 <p><span class="font-medium">{{ __('Reservation Date:') }}</span> {{ $reservation->start_time->format('Y-m-d H:i') }}</p>
                                 <p><span class="font-medium">{{ __('Return Date:') }}</span> {{ $reservation->end_time->format('Y-m-d H:i') }}</p>
                                 <p><span class="font-medium">{{ __('Wishes:') }}</span> {{ $reservation->extra_wishes ?: __('None') }}</p>
+                                @if ($isRemovalRequest && $latestRemovalRequest?->reason)
+                                    <p class="text-red-700 dark:text-red-300"><span class="font-medium">{{ __('Removal Reason:') }}</span> {{ $latestRemovalRequest->reason }}</p>
+                                @endif
                             </div>
 
                             <div class="border-t border-zinc-200 pt-3 text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
@@ -98,11 +110,27 @@
                             </div>
 
                             <div class="space-y-2 border-t border-zinc-200 pt-3 dark:border-zinc-700">
-                                <form method="POST" action="{{ route('reservations.update-status', $reservation) }}" class="space-y-2">
+                                <form method="POST" action="{{ $isRemovalRequest ? route('reservation-removal-requests.update-status', $latestRemovalRequest) : route('reservations.update-status', $reservation) }}" class="space-y-2">
                                     @csrf
                                     @method('PATCH')
 
-                                    @if ($reservation->status === App\Enums\ReservationStatus::Pending)
+                                    @if ($isRemovalRequest)
+                                        <div class="grid gap-2 sm:grid-cols-2">
+                                            <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                                <span>{{ __('Decision') }}</span>
+                                                <select name="status" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                                                    <option value="approved">{{ __('Approve Removal') }}</option>
+                                                    <option value="rejected">{{ __('Reject Removal') }}</option>
+                                                </select>
+                                            </label>
+                                            <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                                                <span>{{ __('Rejection reason') }}</span>
+                                                <textarea name="reason" rows="2" class="w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"></textarea>
+                                            </label>
+                                        </div>
+
+                                        <flux:button type="submit" size="sm">{{ __('Update Removal Request') }}</flux:button>
+                                    @elseif ($reservation->status === App\Enums\ReservationStatus::Pending)
                                         <div class="grid gap-2 sm:grid-cols-2">
                                             <label class="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
                                                 <span>{{ __('Start time') }}</span>
@@ -158,12 +186,14 @@
                                             @if ($reservation->reservation_order_id)
                                                 <a
                                                     href="{{ route('reservation-orders.manage-items', $reservation->reservation_order_id) }}"
-                                                    class="block text-center h-10 rounded-lg border border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center justify-center"
+                                                    class="inline-flex h-10 w-full items-center justify-center rounded-lg border border-zinc-300 bg-white text-center text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-700"
                                                 >
                                                     {{ __('Manage Items') }}
                                                 </a>
                                             @endif
                                         </div>
+                                    @else
+                                        <span class="text-sm text-zinc-500">{{ $reservation->status->label() }}</span>
                                     @endif
                                 </form>
 
@@ -205,7 +235,19 @@
 
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7">
                     @foreach ($calendar_days as $day)
-                        <div class="min-h-36 rounded-lg border p-3 {{ $day['in_month'] ? 'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900' : 'border-zinc-100 bg-zinc-50/40 dark:border-zinc-800 dark:bg-zinc-900/40' }}">
+                        <a
+                                href="{{ route('reserving.index', array_merge(request()->query(), ['selected_day' => $day['date']->format('Y-m-d')])) }}"
+                                @class([
+                                    'reserving-day-link',
+                                    'block min-h-36 rounded-lg border p-3 transition hover:-translate-y-0.5 hover:shadow-md',
+                                    'ring-2 ring-zinc-900/15 dark:ring-zinc-100/15' => $selected_day?->isSameDay($day['date']),
+                                    'border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900' => $day['in_month'],
+                                    'border-zinc-100 bg-zinc-50/40 dark:border-zinc-800 dark:bg-zinc-900/40' => ! $day['in_month'],
+                                ])
+                            @if ($selected_day?->isSameDay($day['date']))
+                                aria-current="date"
+                            @endif
+                        >
                             <div class="mb-2 flex items-center justify-between">
                                 <span class="text-sm font-semibold {{ $day['in_month'] ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-400 dark:text-zinc-500' }}">{{ $day['date']->format('d') }}</span>
                                 <span class="rounded-full bg-zinc-200 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
@@ -233,10 +275,150 @@
                                     <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('+ :count more', ['count' => $day['reservations']->count() - 3]) }}</p>
                                 @endif
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
+
+                @if ($selected_day)
+                    <div id="selected-day-panel" class="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900">
+                        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                                    {{ __('Orders on :date', ['date' => $selected_day->format('F j, Y')]) }}
+                                </h3>
+                                <p class="text-sm text-zinc-600 dark:text-zinc-300">{{ __('Click a day to inspect the reservations and orders for that date.') }}</p>
+                            </div>
+
+                            <a href="{{ route('reserving.index', request()->except('selected_day')) }}" class="text-sm font-medium text-zinc-600 underline dark:text-zinc-300">
+                                {{ __('Clear day selection') }}
+                            </a>
+                        </div>
+
+                        @if ($selected_day_orders->isEmpty())
+                            <p class="text-sm text-zinc-600 dark:text-zinc-300">{{ __('No reservations were found for this date.') }}</p>
+                        @else
+                            <div class="space-y-4">
+                                @foreach ($selected_day_orders as $orderGroup)
+                                    @php
+                                        $orderReservations = $orderGroup['reservations'];
+                                        $firstReservation = $orderReservations->first();
+                                    @endphp
+
+                                    <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-950/40">
+                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                            <div>
+                                                <h4 class="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                                                    @if ($orderGroup['reservation_order_id'])
+                                                        {{ __('Order #') }}{{ $orderGroup['reservation_order_id'] }}
+                                                    @else
+                                                        {{ __('Reservation #') }}{{ $firstReservation?->id }}
+                                                    @endif
+                                                </h4>
+                                                <p class="text-sm text-zinc-600 dark:text-zinc-300">
+                                                    {{ __(':count reservation(s)', ['count' => $orderReservations->count()]) }}
+                                                </p>
+                                            </div>
+
+                                            @if ($orderGroup['reservation_order_id'])
+                                                <a href="{{ route('reservation-orders.manage-items', $orderGroup['reservation_order_id']) }}" class="text-sm font-medium text-zinc-600 underline dark:text-zinc-300 reserving-manage-link">
+                                                    {{ __('Manage items') }}
+                                                </a>
+                                            @endif
+                                        </div>
+
+                                        <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                                            @foreach ($orderReservations as $reservation)
+                                                <div class="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
+                                                    <div class="flex items-center gap-2">
+                                                        @if ($reservation->product?->photo_path)
+                                                            <img src="{{ $reservation->product->photo_path }}" alt="{{ $reservation->product->name }}" class="h-6 w-6 rounded object-cover">
+                                                        @endif
+                                                        <p class="font-medium">{{ $reservation->product->name ?? __('N/A') }}</p>
+                                                    </div>
+                                                    <p>{{ $reservation->user->name ?? __('N/A') }} • {{ $reservation->reserved_quantity }}</p>
+                                                    <p>{{ $reservation->start_time->format('H:i') }} - {{ $reservation->end_time->format('H:i') }}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
         @endif
     </div>
+
+            <script>
+        (function () {
+            function fetchAndShowPanel(href) {
+                return fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (r) { return r.text(); })
+                    .then(function (html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, 'text/html');
+                        var panel = doc.getElementById('selected-day-panel');
+                        var container = document.getElementById('selected-day-panel');
+                        if (panel) {
+                            if (container) {
+                                container.replaceWith(panel);
+                            } else {
+                                // Insert after the calendar grid
+                                var calendar = document.querySelector('.grid.grid-cols-1');
+                                if (calendar && calendar.parentNode) {
+                                    calendar.parentNode.appendChild(panel);
+                                }
+                            }
+
+                            // update the URL without reloading
+                            try { history.pushState({}, '', href); } catch (e) {}
+                        }
+                    })
+                    .catch(function (err) { console.error('Failed loading selected-day panel', err); });
+            }
+
+            document.addEventListener('click', function (ev) {
+                // use capture phase to run before other handlers
+                var el = ev.target;
+                while (el && el !== document) {
+                            if (el.matches && (el.matches('a.reserving-day-link') || el.matches('a.reserving-manage-link'))) {
+                        ev.preventDefault();
+                        var href = el.href;
+                        fetchAndShowPanel(href);
+                        return;
+                    }
+                    el = el.parentNode;
+                }
+            }, true);
+
+                    // delegate submits from the inserted panel to perform AJAX updates
+                    document.addEventListener('submit', function (ev) {
+                        var el = ev.target;
+                        if (! (el instanceof HTMLFormElement)) return;
+                        if (! el.closest('#selected-day-panel')) return;
+
+                        ev.preventDefault();
+
+                        var action = el.action;
+                        var method = (el.getAttribute('method') || 'POST').toUpperCase();
+
+                        var formData = new FormData(el);
+
+                        fetch(action, {
+                            method: method === 'GET' ? 'GET' : 'POST',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: formData,
+                        })
+                        .then(function (r) { return r.text(); })
+                        .then(function () {
+                            // re-fetch the current URL (manage-items) to refresh the panel
+                            fetchAndShowPanel(window.location.href);
+                        })
+                        .catch(function (err) { console.error('Failed to submit form', err); });
+                    }, true);
+        })();
+    </script>
 </x-layouts::app>

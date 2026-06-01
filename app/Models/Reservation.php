@@ -8,6 +8,7 @@ use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
@@ -43,6 +44,7 @@ class Reservation extends Model
             'start_time' => 'datetime',
             'end_time' => 'datetime',
             'status' => ReservationStatus::class,
+            'reminder_sent_at' => 'datetime',
             'returned_at' => 'datetime',
             'reviewed_at' => 'datetime',
             'reserved_quantity' => 'integer',
@@ -79,6 +81,11 @@ class Reservation extends Model
     public function reservationOrder(): BelongsTo
     {
         return $this->belongsTo(ReservationOrder::class);
+    }
+
+    public function removalRequests(): HasMany
+    {
+        return $this->hasMany(ReservationRemovalRequest::class);
     }
 
     /**
