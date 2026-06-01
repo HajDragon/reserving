@@ -48,7 +48,19 @@ class ProductController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $product = Product::create($request->validate($this->rules()));
+        $validated = $request->validate($this->rules());
+        $photoPath = $validated['photo_path'] ?? null;
+        unset($validated['photo_path']);
+
+        $product = Product::create($validated);
+
+        if ($photoPath) {
+            try {
+                $product->addMediaFromUrl($photoPath)->toMediaCollection('photo');
+            } catch (\Exception $e) {
+                // Ignore invalid URLs
+            }
+        }
 
         return (new ProductResource($product))
             ->response()
@@ -68,7 +80,20 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product): ProductResource
     {
-        $product->update($request->validate($this->rules($product)));
+        $validated = $request->validate($this->rules($product));
+        $photoPath = $validated['photo_path'] ?? null;
+        unset($validated['photo_path']);
+
+        $product->update($validated);
+
+        if ($photoPath) {
+            try {
+                $product->clearMediaCollection('photo');
+                $product->addMediaFromUrl($photoPath)->toMediaCollection('photo');
+            } catch (\Exception $e) {
+                // Ignore invalid URLs
+            }
+        }
 
         return new ProductResource($product->refresh());
     }

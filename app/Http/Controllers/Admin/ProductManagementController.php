@@ -40,13 +40,20 @@ class ProductManagementController extends Controller
     public function store(StoreManagedProductRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $photoPath = $validated['photo_path'] ?? null;
+        unset($validated['photo_path']);
+
+        $product = Product::query()->create($validated);
 
         if ($request->hasFile('photo')) {
-            $storedPath = $request->file('photo')->store('products', 'public');
-            $validated['photo_path'] = Storage::url($storedPath);
+            $product->addMediaFromRequest('photo')->toMediaCollection('photo');
+        } elseif ($photoPath) {
+            try {
+                $product->addMediaFromUrl($photoPath)->toMediaCollection('photo');
+            } catch (\Exception $e) {
+                // Ignore invalid URLs
+            }
         }
-
-        Product::query()->create($validated);
 
         return redirect()
             ->route('cms.products.index')
@@ -81,15 +88,22 @@ class ProductManagementController extends Controller
     public function update(UpdateManagedProductRequest $request, Product $product): RedirectResponse
     {
         $validated = $request->validated();
-
-        if ($request->hasFile('photo')) {
-            $this->deleteStoredPhotoIfLocal($product);
-
-            $storedPath = $request->file('photo')->store('products', 'public');
-            $validated['photo_path'] = Storage::url($storedPath);
-        }
+        $photoPath = $validated['photo_path'] ?? null;
+        unset($validated['photo_path']);
 
         $product->update($validated);
+
+        if ($request->hasFile('photo')) {
+            $product->clearMediaCollection('photo');
+            $product->addMediaFromRequest('photo')->toMediaCollection('photo');
+        } elseif ($photoPath) {
+            try {
+                $product->clearMediaCollection('photo');
+                $product->addMediaFromUrl($photoPath)->toMediaCollection('photo');
+            } catch (\Exception $e) {
+                // Ignore invalid URLs
+            }
+        }
 
         return redirect()
             ->route('cms.products.show', $product)
@@ -101,27 +115,11 @@ class ProductManagementController extends Controller
      */
     public function destroy(Product $product): RedirectResponse
     {
-        $this->deleteStoredPhotoIfLocal($product);
-
+        $product->clearMediaCollection('photo');
         $product->delete();
 
         return redirect()
             ->route('cms.products.index')
             ->with('status', 'Product deleted successfully.');
-    }
-
-    private function deleteStoredPhotoIfLocal(Product $product): void
-    {
-        if (! is_string($product->photo_path) || ! str_starts_with($product->photo_path, '/storage/')) {
-            return;
-        }
-
-        $diskPath = substr($product->photo_path, strlen('/storage/'));
-
-        if ($diskPath === false || $diskPath === '') {
-            return;
-        }
-
-        Storage::disk('public')->delete($diskPath);
     }
 }

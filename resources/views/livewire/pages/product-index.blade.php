@@ -43,8 +43,8 @@
                             'opacity-65 saturate-75' => ! $product['can_add_to_cart'],
                         ])>
                             <div class="relative">
-                                @if ($product['photo_path'])
-                                    <img src="{{ $product['photo_path'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
+                                @if ($product['photo_url'] ?? false)
+                                    <img src="{{ $product['photo_url'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
                                 @else
                                     <div class="flex h-64 w-full items-center justify-center rounded-3xl bg-white/20 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">
                                         No image available

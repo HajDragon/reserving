@@ -99,7 +99,6 @@ class ProductIndex extends Component
                 'type',
                 'quantity',
                 'is_active',
-                'photo_path',
                 'description',
                 'created_at',
             ])

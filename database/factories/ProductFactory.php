@@ -29,7 +29,19 @@ class ProductFactory extends Factory
             'quantity' => $quantity,
             'available_quantity' => $quantity,
             'is_active' => true,
-            'photo_path' => "https://picsum.photos/640/480?random={$imageId}",
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Product $product) {
+            $imageId = fake()->numberBetween(1, 1000);
+            try {
+                // To avoid long seeding times and test failures, you can mock or skip downloading
+                // $product->addMediaFromUrl("https://picsum.photos/640/480?random={$imageId}")->toMediaCollection('photo');
+            } catch (\Exception $e) {
+                // Ignore download errors on seeding
+            }
+        });
     }
 }

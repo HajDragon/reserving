@@ -23,7 +23,7 @@ class ProductResource extends JsonResource
             'quantity' => $this->quantity,
             'available_quantity' => $this->available_quantity,
             'is_active' => $this->is_active,
-            'photo_path' => $this->photo_path,
+            'photo_url' => $this->getFirstMediaUrl('photo') ?: null,
             'external_link' => $this->external_link,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),

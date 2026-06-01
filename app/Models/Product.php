@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, InteractsWithMedia;
 
     /**
      * @var list<string>
@@ -24,7 +26,6 @@ class Product extends Model
         'quantity',
         'available_quantity',
         'is_active',
-        'photo_path',
         'external_link',
     ];
 
@@ -36,6 +37,20 @@ class Product extends Model
         'available_quantity' => 1,
         'is_active' => true,
     ];
+
+    /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'photo_path',
+    ];
+
+    public function getPhotoPathAttribute(): ?string
+    {
+        $url = $this->getFirstMediaUrl('photo');
+
+        return $url ? parse_url($url, PHP_URL_PATH) : null;
+    }
 
     /**
      * @return array<string, string>

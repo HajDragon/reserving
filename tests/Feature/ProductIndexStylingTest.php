@@ -3,6 +3,7 @@
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 
 uses(RefreshDatabase::class);
@@ -22,8 +23,11 @@ test('products index renders the styled product card content', function () {
         'quantity' => 7,
         'available_quantity' => 7,
         'description' => null,
-        'photo_path' => '/storage/products/studio-headphones.jpg',
     ]);
+
+    // Add a fake media item to ensure the image is rendered
+    $product->addMedia(UploadedFile::fake()->image('photo.jpg'))
+        ->toMediaCollection('photo');
 
     $response = $this
         ->actingAs($user)

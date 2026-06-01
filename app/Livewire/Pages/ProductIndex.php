@@ -73,7 +73,7 @@ class ProductIndex extends Component
                 'name' => $product->name,
                 'description' => $product->description,
                 'type' => $product->type,
-                'photo_path' => $product->photo_path,
+                'photo_url' => ($url = $product->getFirstMediaUrl('photo')) ? parse_url($url, PHP_URL_PATH) : null,
                 'is_active' => (bool) $product->is_active,
                 'available_quantity_safe' => $availableQuantity,
                 'can_add_to_cart' => (bool) $product->is_active && $availableQuantity > 0,
@@ -113,7 +113,6 @@ class ProductIndex extends Component
                 'type',
                 'available_quantity',
                 'is_active',
-                'photo_path',
                 'external_link',
                 'asset_tag',
             ])
