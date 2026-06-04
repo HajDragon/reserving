@@ -12,7 +12,7 @@
             <div>
                 <h2 class="font-semibold mb-5 text-purple-800">Company</h2>
                 <ul class="text-sm space-y-2">
-                    <li><a href="#">Home</a></li>
+                    <li><a href="{{ route('dashboard') }}">Home</a></li>
                     <li><a href="#">About us</a></li>
                     <li><a href="#">Contact us</a></li>
                     <li><a href="#">Privacy policy</a></li>

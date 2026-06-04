@@ -62,7 +62,7 @@
 
                     <label class="block space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                         <span>{{ __('User') }}</span>
-                        <select name="user_id" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                        <select name="user_id" class="p-2 h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                             <option value="">{{ __('Select a user') }}</option>
                             @foreach ($users as $user)
                                 <option value="{{ $user->id }}" @selected(old('user_id') == $user->id)>
@@ -82,7 +82,7 @@
                             name="name"
                             value="{{ old('name') }}"
                             placeholder="{{ __('Integration Token') }}"
-                            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                            class="p-2 h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
                         >
                         @error('name')
                             <span class="text-xs text-red-600 dark:text-red-400">{{ $message }}</span>
@@ -136,13 +136,13 @@
                                 name="search"
                                 value="{{ $filters['search'] }}"
                                 placeholder="{{ __('Token name, user name, or email') }}"
-                                class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                                class="p-2 h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
                             >
                         </label>
 
                         <label class="block space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                             <span>{{ __('Ability') }}</span>
-                            <select name="ability" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                            <select name="ability" class="p-2 h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                                 <option value="">{{ __('All abilities') }}</option>
                                 @foreach ($ability_options as $abilityValue => $abilityLabel)
                                     <option value="{{ $abilityValue }}" @selected($filters['ability'] === $abilityValue)>{{ __($abilityLabel) }}</option>
