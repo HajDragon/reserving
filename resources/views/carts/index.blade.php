@@ -32,7 +32,7 @@
                     @if ($cart->items->isEmpty())
                         <p class="text-sm text-zinc-600 dark:text-zinc-400">{{ __('Your cart is empty. Add a product from the products page.') }}</p>
                     @else
-                        <div class="space-y-4">
+                        <div class="space-y-4 ">
                             @foreach ($cart->items as $item)
                                 @php($product = $item->product)
                                 <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
