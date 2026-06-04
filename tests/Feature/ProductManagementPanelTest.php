@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,14 +22,15 @@ test('non admin cannot access product cms management routes', function () {
 test('admin can create view edit and delete product from cms', function () {
     $admin = User::factory()->admin()->create();
 
+    $category = Category::factory()->create();
+
     $createPayload = [
+        'category_id' => $category->id,
         'asset_tag' => 'ASSET-ADMIN-01',
         'name' => 'CMS Product',
         'description' => 'Managed by CMS',
-        'type' => 'camera',
         'quantity' => 5,
         'is_active' => 1,
-        'photo_path' => 'https://example.com/cms-product.jpg',
     ];
 
     $this->actingAs($admin)
@@ -45,13 +47,12 @@ test('admin can create view edit and delete product from cms', function () {
 
     $this->actingAs($admin)
         ->put(route('cms.products.update', $product), [
+            'category_id' => $category->id,
             'asset_tag' => 'ASSET-ADMIN-01',
             'name' => 'CMS Product Updated',
             'description' => 'Managed by CMS updated',
-            'type' => 'camera',
             'quantity' => 8,
             'is_active' => 0,
-            'photo_path' => 'https://example.com/cms-product-updated.jpg',
         ])
         ->assertRedirect(route('cms.products.show', $product));
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ApiTokenAbility;
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -152,15 +153,16 @@ test('api product routes require matching token abilities', function () {
 
     Sanctum::actingAs($user, [ApiTokenAbility::ProductsWrite->value]);
 
+    $category = Category::factory()->create();
+
     post(route('api.products.store'), [
+        'category_id' => $category->id,
         'asset_tag' => 'ASSET-1001',
         'name' => 'Writable Product',
         'description' => null,
-        'type' => 'camera',
         'quantity' => 1,
         'available_quantity' => 1,
         'is_active' => true,
-        'photo_path' => null,
         'external_link' => null,
     ])->assertCreated();
 });

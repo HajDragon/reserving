@@ -141,7 +141,7 @@ test('checkout prevents double reservation on overlapping requests', function ()
         'requested_quantity' => 1,
     ]);
 
-    CartItem::factory()->create([
+    $secondUserCartItem = CartItem::factory()->create([
         'cart_id' => $secondCart->id,
         'product_id' => $product->id,
         'start_time' => $start,
@@ -155,7 +155,7 @@ test('checkout prevents double reservation on overlapping requests', function ()
 
     $secondResponse
         ->assertUnprocessable()
-        ->assertJsonValidationErrors('items.2');
+        ->assertJsonValidationErrors("items.{$secondUserCartItem->id}");
 
     expect(ReservationOrder::query()->count())->toBe(1)
         ->and(Reservation::query()->count())->toBe(1)

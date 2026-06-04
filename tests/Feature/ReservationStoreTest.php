@@ -74,7 +74,7 @@ test('reservation fails when overlapping a reserved reservation', function () {
 
 test('reservation can overlap a cancelled reservation', function () {
     $user = User::factory()->create();
-    $product = Product::factory()->create();
+    $product = Product::factory()->create(['quantity' => 10, 'available_quantity' => 10]);
 
     $existingStart = Carbon::now()->addDays(3)->startOfHour();
     $existingEnd = (clone $existingStart)->addHours(2);
