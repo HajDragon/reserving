@@ -25,17 +25,33 @@
         @error('name')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>
 
-    <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-        <span>{{ __('Type') }}</span>
-        <input
-            type="text"
-            name="type"
-            value="{{ old('type', $current?->type) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+    <div class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+        <div class="flex items-center justify-between">
+            <span>{{ __('Category') }}</span>
+            <flux:button
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-xs !p-0 underline hover:no-underline"
+                x-on:click="$flux.modal('add-category').show()"
+            >
+                {{ __('+ New Category') }}
+            </flux:button>
+        </div>
+        <select
+            name="category_id"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
-        @error('type')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-    </label>
+            <option value="">{{ __('Select Category') }}</option>
+            @foreach($categories as $category)
+                <option value="{{ $category->id }}" @selected(old('category_id', $current?->category_id) == $category->id)>
+                    {{ $category->name }}
+                </option>
+            @endforeach
+        </select>
+        @error('category_id')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+    </div>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
         <span>{{ __('Quantity') }}</span>
@@ -44,7 +60,7 @@
             min="1"
             name="quantity"
             value="{{ old('quantity', $current?->quantity ?? 1) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             required
         >
         @error('quantity')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -56,23 +72,10 @@
             type="file"
             name="photo"
             accept="image/*"
-            class="block w-full rounded-lg border border-zinc-300 bg-gray-200 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >
         <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('Use a small image for compact admin cards. Max size: 5MB.') }}</p>
         @error('photo')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
-    </label>
-
-    <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300 md:col-span-2">
-        <span>{{ __('Photo URL (Optional)') }}</span>
-        <input
-            type="text"
-            name="photo_path"
-            value="{{ old('photo_path', $current?->photo_path) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-            placeholder="https://example.com/image.jpg"
-        >
-        <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('If both are set, uploaded image is used.') }}</p>
-        @error('photo_path')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300 md:col-span-2">
@@ -81,7 +84,7 @@
             type="text"
             name="external_link"
             value="{{ old('external_link', $current?->external_link) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             placeholder="https://example.com/product-info"
         >
         @error('external_link')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
@@ -99,7 +102,7 @@
         <textarea
             name="description"
             rows="4"
-            class="w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >{{ old('description', $current?->description) }}</textarea>
         @error('description')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>

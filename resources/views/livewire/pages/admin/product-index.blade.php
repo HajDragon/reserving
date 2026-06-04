@@ -21,7 +21,7 @@
                 name="search"
                 type="search"
                 :label="__('Search products')"
-                :placeholder="__('Name, asset tag, type, or description...')"
+                :placeholder="__('Name, asset tag, category, or description...')"
             />
 
             @if ($search !== '')
@@ -38,7 +38,7 @@
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Photo') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Name') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Asset Tag') }}</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Type') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Category') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Qty') }}</th>
                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Active') }}</th>
                         <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Actions') }}</th>
@@ -62,7 +62,7 @@
                             </td>
                             <td class="px-4 py-3 text-sm text-zinc-800 dark:text-zinc-200">{{ $product['name'] }}</td>
                             <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $product['asset_tag'] }}</td>
-                            <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ strtoupper($product['type']) }}</td>
+                            <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $product['category'] }}</td>
                             <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">{{ $product['quantity'] }}</td>
                             <td class="px-4 py-3 text-sm">
                                 @if ($product['is_active'])

@@ -32,10 +32,9 @@ class UpdateManagedProductRequest extends FormRequest
             'asset_tag' => ['required', 'string', 'max:255', Rule::unique('products', 'asset_tag')->ignore($product)],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', 'string', 'max:100'],
+            'category_id' => ['required', 'exists:categories,id'],
             'quantity' => ['required', 'integer', 'min:1'],
             'is_active' => ['nullable', 'boolean'],
-            'photo_path' => ['nullable', 'string', 'max:2048'],
             'photo' => ['nullable', 'image', 'max:5120'],
             'external_link' => ['nullable', 'url', 'max:2048'],
         ];

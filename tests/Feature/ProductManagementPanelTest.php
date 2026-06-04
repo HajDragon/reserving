@@ -73,13 +73,14 @@ test('admin can upload product photo from cms', function () {
     Storage::fake('public');
 
     $admin = User::factory()->admin()->create();
+    $category = \App\Models\Category::factory()->create();
 
     $this->actingAs($admin)
         ->post(route('cms.products.store'), [
             'asset_tag' => 'ASSET-UPLOAD-01',
             'name' => 'Uploaded Photo Product',
             'description' => 'Managed by CMS with file upload',
-            'type' => 'camera',
+            'category_id' => $category->id,
             'quantity' => 3,
             'is_active' => 1,
             'photo' => UploadedFile::fake()->create('camera.jpg', 120, 'image/jpeg'),
@@ -88,9 +89,9 @@ test('admin can upload product photo from cms', function () {
 
     $product = Product::query()->where('asset_tag', 'ASSET-UPLOAD-01')->firstOrFail();
 
-    expect($product->photo_path)->toStartWith('/storage/products/');
+    expect($product->photo_path)->not->toBeNull();
 
-    $storedPath = substr($product->photo_path, strlen('/storage/'));
-
-    Storage::disk('public')->assertExists($storedPath);
+    // Spatie media library stores in numeric folders
+    $media = $product->getFirstMedia('photo');
+    Storage::disk('public')->assertExists($media->id . '/' . $media->file_name);
 });
