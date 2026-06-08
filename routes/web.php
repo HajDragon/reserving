@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('products', AdminProductIndex::class)->name('products.index');
         Route::resource('products', ProductManagementController::class)->except(['index']);
         Route::post('categories', [ProductManagementController::class, 'storeCategory'])->name('categories.store');
+        Route::delete('categories/{category}', [ProductManagementController::class, 'destroyCategory'])->name('categories.destroy');
         Route::get('reservation-logs', [ReservationLogController::class, 'index'])->name('reservation-logs.index');
         Route::get('api-tokens', [ApiTokenManagementController::class, 'index'])->name('api-tokens.index');
         Route::post('api-tokens', [ApiTokenManagementController::class, 'store'])->name('api-tokens.store');

@@ -106,6 +106,16 @@ class ProductManagementController extends Controller
     }
 
     /**
+     * Remove the specified category from storage.
+     */
+    public function destroyCategory(Category $category): RedirectResponse
+    {
+        $category->delete();
+
+        return redirect()->back()->with('status', 'Category deleted successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Product $product): RedirectResponse

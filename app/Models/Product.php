@@ -52,9 +52,13 @@ class Product extends Model implements HasMedia
 
     public function getPhotoPathAttribute(): ?string
     {
-        $url = $this->getFirstMediaUrl('photo');
+        $mediaUrl = $this->getFirstMediaUrl('photo');
 
-        return $url ? parse_url($url, PHP_URL_PATH) : null;
+        if ($mediaUrl) {
+            return parse_url($mediaUrl, PHP_URL_PATH);
+        }
+
+        return $this->attributes['photo_path'] ?? null;
     }
 
     /**

@@ -102,6 +102,7 @@ class ProductIndex extends Component
                 'is_active',
                 'description',
                 'created_at',
+                'photo_path',
             ])
             ->when($search !== '', function (Builder $query) use ($search) {
                 $query->where(function (Builder $searchQuery) use ($search) {

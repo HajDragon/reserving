@@ -83,8 +83,8 @@
                                 <tr>
                                     @if ($filters['show_photos'])
                                         <td class="px-4 py-3">
-                                            @if ($log->product?->getFirstMediaUrl('photo'))
-                                                <img src="{{ $log->product->getFirstMediaUrl('photo') }}" alt="{{ $log->product_name }}" class="h-10 w-10 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
+                                            @if ($log->product?->photo_path)
+                                                <img src="{{ $log->product->photo_path }}" alt="{{ $log->product_name }}" class="h-10 w-10 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
                                             @else
                                                 <div class="flex h-10 w-10 items-center justify-center rounded-md border border-dashed border-zinc-300 text-xs text-zinc-400 dark:border-zinc-700">-</div>
                                             @endif

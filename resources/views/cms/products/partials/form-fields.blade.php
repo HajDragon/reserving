@@ -25,7 +25,12 @@
         @error('name')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
     </label>
 
-    <div class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+    <div
+        class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300"
+        x-data
+        x-on:category-created.window="$wire.$refresh()"
+        x-on:category-deleted.window="$wire.$refresh()"
+    >
         <div class="flex items-center justify-between">
             <span>{{ __('Category') }}</span>
             <flux:button

@@ -81,7 +81,7 @@ class ProductIndex extends Component
                 'name' => $product->name,
                 'description' => $product->description,
                 'category' => $product->category?->name ?? __('N/A'),
-                'photo_url' => ($url = $product->getFirstMediaUrl('photo')) ? parse_url($url, PHP_URL_PATH) : null,
+                'photo_url' => $product->photo_path,
                 'is_active' => (bool) $product->is_active,
                 'available_quantity_safe' => $availableQuantity,
                 'can_add_to_cart' => (bool) $product->is_active && $availableQuantity > 0,
@@ -124,6 +124,7 @@ class ProductIndex extends Component
                 'is_active',
                 'external_link',
                 'asset_tag',
+                'photo_path',
             ])
             ->when($search !== '', function (Builder $query) use ($search) {
                 $query->where(function (Builder $searchQuery) use ($search) {

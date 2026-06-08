@@ -13,10 +13,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $categories = collect([
+            ['name' => 'Cameras'],
+            ['name' => 'Laptops'],
+            ['name' => 'Projectors'],
+            ['name' => 'Microphones'],
+            ['name' => 'Tablets'],
+            ['name' => 'Speakers'],
+            ['name' => 'Cables'],
+            ['name' => 'Accessories'],
+        ])->map(fn($category) => \App\Models\Category::firstOrCreate($category));
+
         $this->call([
             productSeeder::class,
         ]);
-        // User::factory(10)->create();
+        
+        // Ensure all products have one of the real categories
+        \App\Models\Product::whereNull('category_id')->get()->each(function ($product) use ($categories) {
+            $product->update(['category_id' => $categories->random()->id]);
+        });
 
         User::factory()->create([
             'name' => 'Test User',
