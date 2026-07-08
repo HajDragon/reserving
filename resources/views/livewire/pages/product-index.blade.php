@@ -53,11 +53,10 @@
                         ])>
                             <div class="relative">
                                 @if ($product['photo_url'] ?? false)
-                                    <img src="{{ $product['photo_url'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
+                                        <img src="{{ $product['photo_url'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
                                 @else
-                                    <div class="flex h-64 w-full items-center justify-center rounded-3xl bg-white/20 text-sm text-slate-600 dark:bg-white/5 dark:text-slate-300">
-                                        No image available
-                                    </div>
+                                    <img src="{{asset('storage/placeholders/noimage.jpg')}}" loading="lazy" decoding="async" width="640" height="640" class="object-fill scale-105 h-80 w-full rounded-3xl bg-white/20  transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" alt="kir" />
+
                                 @endif
 
                                 <div class="absolute right-0 top-0 m-3 rounded-full border border-white/20 bg-white/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-sm hover:scale-105 hover:text-red-500 dark:bg-white/10 dark:text-white">
