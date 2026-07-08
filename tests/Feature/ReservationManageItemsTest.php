@@ -1,14 +1,14 @@
 <?php
 
 use App\Enums\ReservationStatus;
+use App\Mail\ReservationRemovalRequestedMail;
 use App\Models\Product;
 use App\Models\Reservation;
 use App\Models\ReservationOrder;
 use App\Models\ReservationRemovalRequest;
 use App\Models\User;
-use App\Mail\ReservationRemovalRequestedMail;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
@@ -93,7 +93,7 @@ test('admin can update individual item status on manage items page', function ()
 
 test('user can edit a pending reservation', function () {
     $user = User::factory()->create();
-    $product = Product::factory()->create();
+    $product = Product::factory()->create(['quantity' => 10]);
 
     $reservation = Reservation::factory()->create([
         'user_id' => $user->id,
