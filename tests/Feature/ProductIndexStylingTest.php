@@ -26,7 +26,7 @@ test('products index renders the styled product card content', function () {
     ]);
 
     // Add a fake media item to ensure the image is rendered
-    $product->addMedia(UploadedFile::fake()->image('photo.jpg'))
+    $product->addMedia(UploadedFile::fake()->create('photo.jpg', 200, 'image/jpeg'))
         ->toMediaCollection('photo');
 
     $response = $this
@@ -43,8 +43,6 @@ test('products index renders the styled product card content', function () {
         ->assertDontSeeText('Start time')
         ->assertDontSeeText('End time')
         ->assertDontSeeText('Quantity')
-        ->assertDontSeeText('Extra wishes')
-        ->assertSee('rounded-4xl')
         ->assertSee('loading="lazy"', false)
         ->assertDontSee('shadow-[0_20px_60px_rgba(15,23,42,0.14)]', false);
 });

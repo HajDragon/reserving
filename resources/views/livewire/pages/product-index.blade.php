@@ -59,8 +59,10 @@
 
                                 @endif
 
-                                <div class="absolute right-0 top-0 m-3 rounded-full border border-white/20 bg-white/25 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-sm hover:scale-105 hover:text-red-500 dark:bg-white/10 dark:text-white">
-                                    {{ strtoupper($product['category']) }}
+                                {{-- Category tag: mix-blend-difference makes text auto-contrast against any image --}}
+                                {{-- White text renders black-on-light / white-on-dark, adapts to dark mode --}}
+                                <div class="absolute right-0 top-0 m-3 rounded-full border border-white/10 bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] shadow-sm backdrop-blur-sm hover:scale-105 mix-blend-difference">
+                                    <span class="text-white hover:text-red-600">{{ strtoupper($product['category']) }}</span>
                                 </div>
 
                                 @unless ($product['can_add_to_cart'])
