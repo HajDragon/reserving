@@ -32,8 +32,13 @@ jobs:
         run: |
           docker run -d --name ci_db -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=reserving -e MYSQL_USER=res_user -e MYSQL_PASSWORD=secret -p 3307:3306 mysql:8.0
 
-      - name: Run Composer install
+      - name: Install Dependencies
         run: docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/app:ci composer install --no-interaction --prefer-dist
+
+      - name: Setup Environment
+        run: |
+          cp .env.example .env
+          docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/app:ci php artisan key:generate
 
       - name: Run migrations
         env:
