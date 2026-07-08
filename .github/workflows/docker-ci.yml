@@ -23,6 +23,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
       - name: Build images
         run: |
           docker build -f docker/php/Dockerfile.prod -t reserving/app:ci .
@@ -32,8 +37,18 @@ jobs:
         run: |
           docker run -d --name ci_db -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=reserving -e MYSQL_USER=res_user -e MYSQL_PASSWORD=secret -p 3307:3306 mysql:8.0
 
-      - name: Run Composer install
+      - name: Install Dependencies
         run: docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/app:ci composer install --no-interaction --prefer-dist
+
+      - name: Setup Environment
+        run: |
+          cp .env.example .env
+          docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/app:ci php artisan key:generate
+
+      - name: Build Frontend Assets
+        run: |
+          npm ci
+          docker run --rm -v "$PWD":/var/www/html -w /var/www/html reserving/node:ci npm run build
 
       - name: Run migrations
         env:

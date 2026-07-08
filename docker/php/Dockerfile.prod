@@ -3,7 +3,7 @@
 FROM php:8.5-cli AS builder
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y git unzip zip libzip-dev libpng-dev libonig-dev libxml2-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y git unzip zip libzip-dev libpng-dev libonig-dev libxml2-dev && docker-php-ext-install exif && rm -rf /var/lib/apt/lists/*
 
 COPY composer.json composer.lock ./
 
@@ -22,8 +22,9 @@ RUN npm run build
 FROM php:8.5-fpm AS production
 WORKDIR /var/www/html
 
-# System deps
-RUN apt-get update && apt-get install -y libzip-dev libpng-dev libonig-dev libxml2-dev && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip && rm -rf /var/lib/apt/lists/*
+# System deps + composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN apt-get update && apt-get install -y libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd zip && rm -rf /var/lib/apt/lists/*
 
 # Copy application source
 COPY . .

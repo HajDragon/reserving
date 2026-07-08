@@ -13,7 +13,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class Product extends Model implements HasMedia
 {
     /** @use HasFactory<ProductFactory> */
-    use HasFactory, SoftDeletes, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, SoftDeletes;
 
     /**
      * @var list<string>
@@ -34,7 +34,6 @@ class Product extends Model implements HasMedia
      */
     protected $attributes = [
         'quantity' => 1,
-        'available_quantity' => 1,
         'is_active' => true,
     ];
 
