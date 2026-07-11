@@ -32,7 +32,10 @@
                     @if ($cart->items->isEmpty())
                         <p class="text-sm text-zinc-600 dark:text-zinc-400">{{ __('Your cart is empty. Add a product from the products page.') }}</p>
                     @else
-                        <div class="space-y-4 ">
+                        <div class="space-y-4" x-data="{ invalidItems: {} }" @cart-item-validity-changed.window="
+                            const { itemId, valid } = $event.detail;
+                            if (valid) { delete invalidItems[itemId]; } else { invalidItems[itemId] = true; }
+                        ">
                             @foreach ($cart->items as $item)
                                 @php($product = $item->product)
                                 <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
@@ -67,13 +70,13 @@
                                     @endif
                                 </div>
                             @endforeach
-                        </div>
 
-                        <div class="mt-6 flex justify-end">
-                            <form method="POST" action="{{ route('carts.checkout') }}">
-                                @csrf
-                                <flux:button type="submit" variant="primary">{{ __('Checkout Cart') }}</flux:button>
-                            </form>
+                            <div class="mt-6 flex justify-end">
+                                <form method="POST" action="{{ route('carts.checkout') }}">
+                                    @csrf
+                                    <flux:button type="submit" variant="primary" x-bind:disabled="Object.keys(invalidItems).length > 0" x-bind:class="Object.keys(invalidItems).length > 0 ? 'opacity-50 cursor-not-allowed' : ''">{{ __('Checkout Cart') }}</flux:button>
+                                </form>
+                            </div>
                         </div>
                     @endif
                 </div>

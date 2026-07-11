@@ -3,10 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\CartItem;
-use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class CartItemForm extends Component
@@ -24,15 +23,6 @@ class CartItemForm extends Component
     public $updateMessage = '';
 
     public $updateError = '';
-
-    #[Validate('required|date|after:now')]
-    public $startTimeValidation;
-
-    #[Validate('required|date|after:start_time')]
-    public $endTimeValidation;
-
-    #[Validate('required|integer|min:1')]
-    public $quantityValidation;
 
     public function mount()
     {
@@ -76,13 +66,29 @@ class CartItemForm extends Component
         $this->syncChanges();
     }
 
+    public function messages(): array
+    {
+        return [
+            'end_time.after' => __('Please select a valid start and end date, the end date comes before the start date.'),
+        ];
+    }
+
     protected function syncChanges()
     {
+        $startCarbon = Carbon::parse($this->start_time);
+        $endCarbon = Carbon::parse($this->end_time);
+
+        if ($endCarbon->lte($startCarbon)) {
+            $this->addError('end_time', __('Please select a valid start and end date, the end date comes before the start date.'));
+            $this->dispatch('cart-item-validity-changed', itemId: $this->cartItem->id, valid: false);
+
+            return;
+        }
+
         try {
-            // Validate the data before updating
             $validated = $this->validate([
-                'start_time' => 'required|date_format:Y-m-d\TH:i',
-                'end_time' => 'required|date_format:Y-m-d\TH:i|after:start_time',
+                'start_time' => 'required|date_format:Y-m-d\\TH:i',
+                'end_time' => 'required|date_format:Y-m-d\\TH:i',
                 'requested_quantity' => 'required|integer|min:1',
                 'extra_wishes' => 'nullable|string|max:2000',
             ]);
@@ -96,8 +102,7 @@ class CartItemForm extends Component
 
             $this->updateMessage = __('Cart item updated.');
             $this->dispatch('cart-updated');
-        } catch (ValidationException $e) {
-            $this->updateError = __('Please fix the errors and try again.');
+            $this->dispatch('cart-item-validity-changed', itemId: $this->cartItem->id, valid: true);
         } catch (\Exception $e) {
             $this->updateError = __('Failed to update cart item.');
         }
@@ -107,6 +112,7 @@ class CartItemForm extends Component
     {
         $this->updateMessage = '';
         $this->updateError = '';
+        $this->resetValidation();
     }
 
     public function render()
