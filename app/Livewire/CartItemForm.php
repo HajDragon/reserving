@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\CartItem;
-use Carbon\Carbon;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -75,20 +75,10 @@ class CartItemForm extends Component
 
     protected function syncChanges()
     {
-        $startCarbon = Carbon::parse($this->start_time);
-        $endCarbon = Carbon::parse($this->end_time);
-
-        if ($endCarbon->lte($startCarbon)) {
-            $this->addError('end_time', __('Please select a valid start and end date, the end date comes before the start date.'));
-            $this->dispatch('cart-item-validity-changed', itemId: $this->cartItem->id, valid: false);
-
-            return;
-        }
-
         try {
             $validated = $this->validate([
                 'start_time' => 'required|date_format:Y-m-d\\TH:i',
-                'end_time' => 'required|date_format:Y-m-d\\TH:i',
+                'end_time' => 'required|date_format:Y-m-d\\TH:i|after:start_time',
                 'requested_quantity' => 'required|integer|min:1',
                 'extra_wishes' => 'nullable|string|max:2000',
             ]);
@@ -103,6 +93,10 @@ class CartItemForm extends Component
             $this->updateMessage = __('Cart item updated.');
             $this->dispatch('cart-updated');
             $this->dispatch('cart-item-validity-changed', itemId: $this->cartItem->id, valid: true);
+        } catch (ValidationException $e) {
+            $this->dispatch('cart-item-validity-changed', itemId: $this->cartItem->id, valid: false);
+
+            throw $e;
         } catch (\Exception $e) {
             $this->updateError = __('Failed to update cart item.');
         }
