@@ -24,7 +24,9 @@
                     <h3 class="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Cart Items') }}</h3>
 
                     @if (session('status'))
-                        <div wire:transition class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                        <div wire:transition class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                            @if (session('status') === 'Checkout completed successfully.') data-checkout-success @endif
+                        >
                             {{ session('status') }}
                         </div>
                     @endif

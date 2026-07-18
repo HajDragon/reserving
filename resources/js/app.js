@@ -37,6 +37,71 @@ document.addEventListener('products-appended', () => {
 	refreshAos();
 });
 
+// ── Checkout confetti (school pride variant) ──────────────────────
+const fireSchoolPrideConfetti = async () => {
+	const { confetti } = await import("@tsparticles/confetti");
+
+	// Two bursts from the bottom corners — classic school pride effect
+	const defaults = {
+		spread: 360,
+		ticks: 100,
+		gravity: 0,
+		decay: 0.94,
+		startVelocity: 20,
+		shapes: ["square"],
+		colors: ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#ff922b"],
+	};
+
+	await Promise.all([
+		confetti({
+			...defaults,
+			particleCount: 40,
+			scalar: 1.2,
+			shapes: ["square"],
+			emitters: [
+				{
+					direction: "top-right",
+					position: { x: 0, y: 100 },
+					rate: { delay: 0, quantity: 2 },
+					particles: {
+						move: {
+							speed: 10,
+							angle: { min: -45, max: -30 },
+						},
+					},
+				},
+				{
+					direction: "top-left",
+					position: { x: 100, y: 100 },
+					rate: { delay: 0, quantity: 2 },
+					particles: {
+						move: {
+							speed: 10,
+							angle: { min: 210, max: 225 },
+						},
+					},
+				},
+			],
+		}),
+	]);
+};
+
+// Trigger confetti when the checkout success flash is visible
+const triggerCheckoutConfetti = () => {
+	const el = document.querySelector('[data-checkout-success]');
+	if (el) {
+		el.removeAttribute('data-checkout-success');
+		fireSchoolPrideConfetti().catch((err) => {
+			console.error('Confetti failed', err);
+		});
+	}
+};
+
+document.addEventListener('DOMContentLoaded', triggerCheckoutConfetti);
+document.addEventListener('livewire:navigated', () => {
+	setTimeout(triggerCheckoutConfetti, 200);
+});
+
 const loginParticlesElement = document.getElementById("login-tsparticles");
 
 if (loginParticlesElement) {
