@@ -69,7 +69,7 @@ class CartItemForm extends Component
     public function messages(): array
     {
         return [
-            'end_time.after' => __('Please select a valid start and end date, the end date comes before the start date.'),
+            'end_time.after' => __('The end time must be after the start time.'),
         ];
     }
 
