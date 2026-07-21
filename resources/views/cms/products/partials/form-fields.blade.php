@@ -7,10 +7,12 @@
             type="text"
             name="asset_tag"
             value="{{ old('asset_tag', $current?->asset_tag) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('asset_tag') border-red-500 @enderror"
+            aria-describedby="error-asset_tag"
+            aria-invalid="@error('asset_tag') true @enderror"
             required
         >
-        @error('asset_tag')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('asset_tag')<p id="error-asset_tag" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
@@ -19,10 +21,12 @@
             type="text"
             name="name"
             value="{{ old('name', $current?->name) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('name') border-red-500 @enderror"
+            aria-describedby="error-name"
+            aria-invalid="@error('name') true @enderror"
             required
         >
-        @error('name')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('name')<p id="error-name" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
     <div class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
@@ -40,7 +44,9 @@
         </div>
         <select
             name="category_id"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('category_id') border-red-500 @enderror"
+            aria-describedby="error-category_id"
+            aria-invalid="@error('category_id') true @enderror"
             required
         >
             <option value="">{{ __('Select Category') }}</option>
@@ -50,7 +56,7 @@
                 </option>
             @endforeach
         </select>
-        @error('category_id')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('category_id')<p id="error-category_id" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </div>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
@@ -60,10 +66,12 @@
             min="1"
             name="quantity"
             value="{{ old('quantity', $current?->quantity ?? 1) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('quantity') border-red-500 @enderror"
+            aria-describedby="error-quantity"
+            aria-invalid="@error('quantity') true @enderror"
             required
         >
-        @error('quantity')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('quantity')<p id="error-quantity" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300 md:col-span-2">
@@ -75,7 +83,7 @@
             class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >
         <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('Use a small image for compact admin cards. Max size: 5MB.') }}</p>
-        @error('photo')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('photo')<p id="error-photo" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300 md:col-span-2">
@@ -87,7 +95,7 @@
             class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             placeholder="https://example.com/product-info"
         >
-        @error('external_link')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('external_link')<p id="error-external_link" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
     @if ($current?->photo_path)
@@ -102,9 +110,11 @@
         <textarea
             name="description"
             rows="4"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('description') border-red-500 @enderror"
+            aria-describedby="error-description"
+            aria-invalid="@error('description') true @enderror"
         >{{ old('description', $current?->description) }}</textarea>
-        @error('description')<p class="text-xs text-red-600">{{ $message }}</p>@enderror
+        @error('description')<p id="error-description" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
     <label class="inline-flex items-center gap-2 text-sm text-zinc-900 dark:text-zinc-100 md:col-span-2">
@@ -117,5 +127,5 @@
         >
         <span>{{ __('Is Active to be reserved') }}</span>
     </label>
-    @error('is_active')<p class="text-xs text-red-600 md:col-span-2">{{ $message }}</p>@enderror
+    @error('is_active')<p class="text-xs text-red-600 md:col-span-2" role="alert">{{ $message }}</p>@enderror
 </div>

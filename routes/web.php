@@ -9,7 +9,16 @@ use App\Http\Controllers\ReservingController;
 use App\Livewire\Pages\Admin\ProductIndex as AdminProductIndex;
 use App\Livewire\Pages\ProductIndex;
 use Illuminate\Support\Facades\Route;
+
+// Public pages (no auth required)
+Route::get('privacy', fn () => view('pages.privacy'))->name('privacy');
+Route::get('voorwaarden', fn () => view('pages.terms'))->name('terms');
+
+// GDPR: data export (auth required)
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('gdpr/export', [\App\Http\Controllers\GdprController::class, 'exportData'])->name('gdpr.export');
+    Route::post('gdpr/export', [\App\Http\Controllers\GdprController::class, 'downloadExport'])->name('gdpr.export.download');
+
     Route::get('/', ProductIndex::class)->name('home');
     Route::get('dashboard', ProductIndex::class)->name('dashboard');
 

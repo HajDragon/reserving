@@ -1,5 +1,5 @@
 {{-- Category Creation Modal --}}
-<flux:modal name="add-category" :show="$errors->has('name')" class="w-full max-w-sm">
+<flux:modal name="add-category" :show="$errors->has('name')" focusable class="w-full max-w-sm">
     <form method="POST" action="{{ route('cms.categories.store') }}" class="space-y-6">
         @csrf
         <div>
