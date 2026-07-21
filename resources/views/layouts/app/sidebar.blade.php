@@ -6,6 +6,9 @@
         @include('partials.head')
     </head>
     <body class="flex min-h-screen flex-col bg-white antialiased dark:bg-zinc-800">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-zinc-900 focus:px-4 focus:py-2 focus:text-white focus:outline-none dark:focus:bg-zinc-100 dark:focus:text-zinc-900">
+            {{ __("Ga naar inhoud") }}
+        </a>
         <!-- Desktop Header -->
         <flux:header sticky class="hidden xl:flex border-b border-zinc-200 bg-zinc-50 px-0 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:navbar class="-mb-px flex w-full items-center gap-0">
@@ -164,7 +167,7 @@
             </flux:sidebar.nav>
         </flux:sidebar>
 
-        <main class="w-full flex-1">
+        <main id="main-content" class="w-full flex-1" tabindex="-1">
             {{ $slot }}
         </main>
 
@@ -174,6 +177,8 @@
                 @include('layouts.app.footer')
             </div>
         @endif
+        <x-cookie-consent />
+
         @persist('toast')
             <flux:toast.group>
                 <flux:toast />

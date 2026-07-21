@@ -153,7 +153,7 @@ new class extends Component {
 }; ?>
 
 <flux:modal
-    name="two-factor-setup-modal"
+    name="two-factor-setup-modal" focusable
     class="max-w-md md:min-w-md"
     @close="closeModal"
 >
