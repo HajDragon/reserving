@@ -32,15 +32,26 @@ class SecurityHeaders
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
         // Content Security Policy (restrictive default)
-        $response->headers->set('Content-Security-Policy', implode('; ', [
+        $cspSources = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",  // Vite/Livewire needs unsafe-inline+eval
-            "style-src 'self' 'unsafe-inline'",                 // Tailwind + FluxUI inline styles
             "img-src 'self' data: blob:",                       // Product images + placeholders
             "font-src 'self' https://fonts.bunny.net",          // Bunny Fonts
-            "connect-src 'self'",                               // Livewire AJAX
-            "frame-ancestors 'none'",
-        ]));
+            "frame-ancestors 'none'",                           // Additional clickjacking protection
+        ];
+
+        if (config('app.debug')) {
+            // Dev mode: allow Vite dev server (HMR + asset serving) + external font stylesheets
+            $viteDev = config('app.vite_dev_url', 'http://localhost:5173');
+            $cspSources[] = "style-src 'self' 'unsafe-inline' {$viteDev} https://fonts.bunny.net";
+            $cspSources[] = "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$viteDev}";
+            $cspSources[] = "connect-src 'self' ws: {$viteDev}";     // Livewire AJAX + Vite HMR WebSocket
+        } else {
+            $cspSources[] = "style-src 'self' 'unsafe-inline' https://fonts.bunny.net"; // Font stylesheets
+            $cspSources[] = "script-src 'self' 'unsafe-inline' 'unsafe-eval'";  // Livewire
+            $cspSources[] = "connect-src 'self'";                               // Livewire AJAX
+        }
+
+        $response->headers->set('Content-Security-Policy', implode('; ', $cspSources));
 
         // HSTS — only on HTTPS (won't hurt on HTTP)
         if ($request->secure()) {
