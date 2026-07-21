@@ -39,7 +39,7 @@ class SecurityHeaders
             "img-src 'self' data: blob:",                       // Product images + placeholders
             "font-src 'self' https://fonts.bunny.net",          // Bunny Fonts
             "connect-src 'self'",                               // Livewire AJAX
-            "frame-ancestors 'none'",                           // Additional clickjacking protection
+            "frame-ancestors 'none'",
         ]));
 
         // HSTS — only on HTTPS (won't hurt on HTTP)
