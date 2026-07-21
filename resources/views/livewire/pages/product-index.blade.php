@@ -34,11 +34,11 @@
         </div>
 
         @if (count($products) === 0)
-            <div class="relative z-10 rounded-2xl border border-white/20 bg-white/25 px-4 py-6 text-sm text-zinc-800 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/50 dark:text-zinc-200">
+            <div role="status" aria-live="polite" class="relative z-10 rounded-2xl border border-white/20 bg-white/25 px-4 py-6 text-sm text-zinc-800 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-900/50 dark:text-zinc-200">
                 No products match your current filters.
             </div>
         @else
-            <div class="relative z-10 grid auto-rows-min gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div aria-live="polite" class="relative z-10 grid auto-rows-min gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($products as $product)
                     <div
                         wire:key="product-card-{{ $product['id'] }}"
@@ -55,7 +55,7 @@
                                 @if ($product['photo_url'] ?? false)
                                         <img src="{{ $product['photo_url'] }}" alt="{{ $product['name'] }}" loading="lazy" decoding="async" width="640" height="640" class="scale-105 h-80 w-full rounded-3xl bg-white/20 object-contain transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" />
                                 @else
-                                    <img src="{{asset('storage/placeholders/noimage.jpg')}}" loading="lazy" decoding="async" width="640" height="640" class="object-fill scale-105 h-80 w-full rounded-3xl bg-white/20  transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" alt="kir" />
+                                    <img src="{{asset('storage/placeholders/noimage.jpg')}}" loading="lazy" decoding="async" width="640" height="640" class="object-fill scale-105 h-80 w-full rounded-3xl bg-white/20  transition-transform duration-150 with-ease-in-out hover:scale-110 dark:bg-zinc-900/40" alt="{{ __("Geen afbeelding beschikbaar") }}" />
 
                                 @endif
 

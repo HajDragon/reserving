@@ -3,31 +3,28 @@
         <div class="md:max-w-96">
             <x-app-logo class="size-12 mr-auto ml-12" />
             <p class="mt-6 text-sm">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                {{ config('app.name', 'Experience Lab Reserveringssysteem') }} — het reserveringssysteem
+                van het Experience Lab van Summa College.
             </p>
         </div>
         <div class="flex-1 flex items-start md:justify-end gap-20">
-            <div>
-                <h2 class="font-semibold mb-5 text-purple-800">Company</h2>
+            <nav aria-label="{{ __('Footer navigatie') }}">
+                <h2 class="font-semibold mb-5 text-purple-800">{{ __('Links') }}</h2>
                 <ul class="text-sm space-y-2">
-                    <li><a href="{{ route('dashboard') }}">Home</a></li>
-                    <li><a href="#">About us</a></li>
-                    <li><a href="#">Contact us</a></li>
-                    <li><a href="#">Privacy policy</a></li>
+                    <li><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
+                    <li><a href="{{ route('privacy') }}">{{ __('Privacyverklaring') }}</a></li>
+                    <li><a href="{{ route('terms') }}">{{ __('Terms of Use') }}</a></li>
                 </ul>
-            </div>
+            </nav>
             <div>
-                <h2 class="font-semibold mb-5 text-purple-800">Get in touch</h2>
+                <h2 class="font-semibold mb-5 text-purple-800">{{ __('Contact') }}</h2>
                 <div class="text-sm space-y-2">
-                    <p>+1-212-456-7890</p>
-                    <p>contact@example.com</p>
+                    <p>Experience Lab — Summa College</p>
                 </div>
             </div>
         </div>
     </div>
     <p class="pt-4 text-center text-xs md:text-sm pb-5">
-        Copyright 2026 ©Summa ExperienceLab. All Right Reserved.
+        &copy; {{ date('Y') }} {{ config('app.name', 'Summa ExperienceLab') }}. {{ __('Alle rechten voorbehouden.') }}
     </p>
 </footer>

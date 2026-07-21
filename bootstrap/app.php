@@ -28,6 +28,12 @@ return Application::configure(basePath: dirname(__DIR__))
             ->command('app:reconcile-product-inventory')
             ->dailyAt('02:00')
             ->withoutOverlapping();
+
+        // GDPR data retention: clean old sessions + logs weekly
+        $schedule
+            ->command('app:cleanup-old-data')
+            ->weeklyOn(1, '03:00') // Every Monday at 3 AM
+            ->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

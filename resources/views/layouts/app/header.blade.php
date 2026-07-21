@@ -50,6 +50,8 @@
 
         {{ $slot }}
 
+        <x-cookie-consent />
+
         @persist('toast')
             <flux:toast.group>
                 <flux:toast />
