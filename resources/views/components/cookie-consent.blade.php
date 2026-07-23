@@ -1,8 +1,3 @@
-@php
-    $consented = cookie('cookie_consent', null);
-@endphp
-
-@if(!$consented)
 <div
     x-data="{ show: true }"
     x-init="
@@ -55,4 +50,3 @@
         </div>
     </div>
 </div>
-@endif
