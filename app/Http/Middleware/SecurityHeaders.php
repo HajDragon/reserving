@@ -43,11 +43,11 @@ class SecurityHeaders
             // Dev mode: allow Vite dev server (HMR + asset serving) + external font stylesheets
             $viteDev = config('app.vite_dev_url', 'http://localhost:5173');
             $cspSources[] = "style-src 'self' 'unsafe-inline' {$viteDev} https://fonts.bunny.net";
-            $cspSources[] = "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$viteDev}";
+            $cspSources[] = "script-src 'self' 'unsafe-inline' 'unsafe-eval' {$viteDev} https://cdn.jsdelivr.net"; // Scalar API docs UI
             $cspSources[] = "connect-src 'self' ws: {$viteDev}";     // Livewire AJAX + Vite HMR WebSocket
         } else {
             $cspSources[] = "style-src 'self' 'unsafe-inline' https://fonts.bunny.net"; // Font stylesheets
-            $cspSources[] = "script-src 'self' 'unsafe-inline' 'unsafe-eval'";  // Livewire
+            $cspSources[] = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net";  // Livewire + Scalar API docs UI
             $cspSources[] = "connect-src 'self'";                               // Livewire AJAX
         }
 
