@@ -1,5 +1,5 @@
-name: Endpoints
-description: ''
+name: Products API
+description: 'RESTful API for managing Experience Lab equipment products. Supports filtering, sorting, and pagination. Requires a Sanctum personal access token with the appropriate ability.'
 endpoints:
   -
     custom: []
@@ -8,16 +8,16 @@ endpoints:
     uri: api/user
     metadata:
       custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
+      groupName: Authentication
+      groupDescription: 'Endpoints related to user authentication and identity.'
+      subgroup: ""
+      subgroupDescription: ""
+      title: Get authenticated user
+      description: "Returns the currently authenticated user. Useful for verifying that your token is valid and to obtain the user profile."
       authenticated: true
       deprecated: false
     headers:
-      Authorization: 'Bearer {YOUR_SANCTUM_TOKEN}'
+      Authorization: "Bearer {YOUR_SANCTUM_TOKEN}"
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
@@ -31,17 +31,20 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":1,"name":"Test User","email":"test@example.com","is_admin":false,"email_verified_at":"2026-04-24T12:56:34.000000Z","two_factor_confirmed_at":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        content: '{"id":1,"name":"Arshia","email":"arshia@summa.nl","email_verified_at":"2026-04-15T10:00:00.000000Z"}'
+        headers: []
+        description: "The authenticated user object."
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: "No valid token provided."
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer TNGiIyO8LcyrEHkvvAMQx1dyFasaXnLUJlaOPZZ15ff22a60'
+      - "Bearer {YOUR_SANCTUM_TOKEN}"
     controller: null
     method: null
     route: null
@@ -52,20 +55,161 @@ endpoints:
     uri: api/products
     metadata:
       custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display a listing of the resource.'
-      description: ''
+      groupName: Products API
+      groupDescription: "RESTful API for managing Experience Lab equipment products. Supports filtering, sorting, and pagination."
+      subgroup: ""
+      subgroupDescription: ""
+      title: List all products
+      description: "Returns a paginated list of products. Supports partial-match filtering on asset_tag, name, and type, exact filtering on is_active, and sorting by any field. Default sort is newest first. Requires the products.read ability."
       authenticated: true
       deprecated: false
     headers:
-      Authorization: 'Bearer {YOUR_SANCTUM_TOKEN}'
+      Authorization: "Bearer {YOUR_SANCTUM_TOKEN}"
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
+    queryParameters:
+      "filter[asset_tag]":
+        name: "filter[asset_tag]"
+        description: "Partial-match filter on the product asset tag."
+        required: false
+        example: "EL-CAM-"
+        type: string
+      "filter[name]":
+        name: "filter[name]"
+        description: "Partial-match filter on the product name."
+        required: false
+        example: "Canon"
+        type: string
+      "filter[type]":
+        name: "filter[type]"
+        description: "Partial-match filter on the product type/category."
+        required: false
+        example: "Camera"
+        type: string
+      "filter[is_active]":
+        name: "filter[is_active]"
+        description: "Exact filter on active status (true/false)."
+        required: false
+        example: "true"
+        type: boolean
+      sort:
+        name: sort
+        description: "Field to sort by. Prefix with - for descending. Allowed: id, asset_tag, name, type, quantity, available_quantity, created_at, updated_at."
+        required: false
+        example: "-created_at"
+        type: string
+      per_page:
+        name: per_page
+        description: "Number of results per page (default: 15)."
+        required: false
+        example: "20"
+        type: integer
+    cleanQueryParameters:
+      "filter[asset_tag]": "EL-CAM-"
+      "filter[name]": "Canon"
+      "filter[type]": "Camera"
+      "filter[is_active]": "true"
+      sort: "-created_at"
+      per_page: "20"
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":1,"asset_tag":"EL-CAM-001","name":"Canon EOS R50","description":"System camera","category":"Camera","quantity":5,"available_quantity":3,"is_active":true,"photo_url":"https://example.com/canon.jpg","external_link":null,"created_at":"2026-04-15T14:20:23.000000Z","updated_at":"2026-04-15T14:20:23.000000Z"}],"links":{"first":"http://localhost/api/products?page=1","last":"http://localhost/api/products?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"per_page":15,"total":1}}'
+        headers: []
+        description: "Paginated collection of products with metadata and links."
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: "No valid token provided."
+    responseFields:
+      data:
+        name: data
+        description: "Array of product objects."
+        type: array
+      data[].id:
+        name: "data[].id"
+        description: "Unique product identifier."
+        type: integer
+      data[].asset_tag:
+        name: "data[].asset_tag"
+        description: "Unique asset tag for physical inventory tracking."
+        type: string
+      data[].name:
+        name: "data[].name"
+        description: "Display name of the product."
+        type: string
+      data[].category:
+        name: "data[].category"
+        description: "Category name or N/A."
+        type: string
+      data[].quantity:
+        name: "data[].quantity"
+        description: "Total stock quantity."
+        type: integer
+      data[].available_quantity:
+        name: "data[].available_quantity"
+        description: "Currently available (not reserved) quantity."
+        type: integer
+      data[].is_active:
+        name: "data[].is_active"
+        description: "Whether the product is available for reservation."
+        type: boolean
+      data[].photo_url:
+        name: "data[].photo_url"
+        description: "URL of the product photo, or null."
+        type: string
+      meta:
+        name: meta
+        description: "Pagination metadata (current_page, per_page, total, etc.)."
+        type: object
+    auth:
+      - headers
+      - Authorization
+      - "Bearer {YOUR_SANCTUM_TOKEN}"
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: "api/products/{id}"
+    metadata:
+      custom: []
+      groupName: Products API
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: Get a single product
+      description: "Returns a single product by its ID. Includes full details such as photo URL and category. Requires the products.read ability."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: "Bearer {YOUR_SANCTUM_TOKEN}"
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: "The unique identifier of the product."
+        required: true
+        example: "1"
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: "1"
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -75,17 +219,26 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":132,"asset_tag":"ASSET-6120YZ","name":"nihil et porro","description":"Quis ab consectetur id perferendis.","type":"camera","quantity":6,"available_quantity":6,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=710","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":94,"asset_tag":"ASSET-0929CN","name":"vel reiciendis odit","description":"At aut optio libero sit odit.","type":"camera","quantity":13,"available_quantity":13,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=524","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":95,"asset_tag":"ASSET-9985NT","name":"aliquam eos numquam","description":"Non laborum est delectus.","type":"camera","quantity":17,"available_quantity":17,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=65","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":96,"asset_tag":"ASSET-1299PO","name":"dolore voluptatem occaecati","description":null,"type":"projector","quantity":18,"available_quantity":18,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=793","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":97,"asset_tag":"ASSET-7780CC","name":"reprehenderit aut dolorem","description":null,"type":"projector","quantity":10,"available_quantity":10,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=117","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":98,"asset_tag":"ASSET-4029BC","name":"sunt ut qui","description":null,"type":"laptop","quantity":2,"available_quantity":2,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=831","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":99,"asset_tag":"ASSET-3622LN","name":"doloremque cumque magnam","description":null,"type":"camera","quantity":16,"available_quantity":16,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=471","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":100,"asset_tag":"ASSET-9786HC","name":"magnam et praesentium","description":"Dolores nam similique alias exercitationem et et ut.","type":"laptop","quantity":7,"available_quantity":7,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=367","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":101,"asset_tag":"ASSET-8665WU","name":"architecto sapiente distinctio","description":"Officiis eum culpa perferendis sapiente et natus commodi aperiam.","type":"laptop","quantity":19,"available_quantity":19,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=722","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":102,"asset_tag":"ASSET-0777ZO","name":"amet saepe similique","description":null,"type":"laptop","quantity":20,"available_quantity":20,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=801","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":103,"asset_tag":"ASSET-6399BF","name":"quasi eius a","description":null,"type":"projector","quantity":17,"available_quantity":17,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=787","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":104,"asset_tag":"ASSET-4565LV","name":"voluptas nostrum illum","description":null,"type":"laptop","quantity":19,"available_quantity":19,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=980","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":105,"asset_tag":"ASSET-1520QJ","name":"distinctio neque veniam","description":"Ea non itaque culpa debitis est ut non accusamus.","type":"tablet","quantity":20,"available_quantity":20,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=713","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":106,"asset_tag":"ASSET-2145BJ","name":"facilis debitis qui","description":"Ut iure animi aliquam est rerum.","type":"camera","quantity":17,"available_quantity":17,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=789","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"},{"id":107,"asset_tag":"ASSET-7198CB","name":"omnis sint maxime","description":null,"type":"laptop","quantity":6,"available_quantity":6,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=649","external_link":null,"created_at":"2026-04-24T12:56:34.000000Z","updated_at":"2026-04-24T12:56:34.000000Z"}],"links":{"first":"http:\/\/localhost\/api\/products?page=1","last":"http:\/\/localhost\/api\/products?page=10","prev":null,"next":"http:\/\/localhost\/api\/products?page=2"},"meta":{"current_page":1,"from":1,"last_page":10,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"http:\/\/localhost\/api\/products?page=1","label":"1","page":1,"active":true},{"url":"http:\/\/localhost\/api\/products?page=2","label":"2","page":2,"active":false},{"url":"http:\/\/localhost\/api\/products?page=3","label":"3","page":3,"active":false},{"url":"http:\/\/localhost\/api\/products?page=4","label":"4","page":4,"active":false},{"url":"http:\/\/localhost\/api\/products?page=5","label":"5","page":5,"active":false},{"url":"http:\/\/localhost\/api\/products?page=6","label":"6","page":6,"active":false},{"url":"http:\/\/localhost\/api\/products?page=7","label":"7","page":7,"active":false},{"url":"http:\/\/localhost\/api\/products?page=8","label":"8","page":8,"active":false},{"url":"http:\/\/localhost\/api\/products?page=9","label":"9","page":9,"active":false},{"url":"http:\/\/localhost\/api\/products?page=10","label":"10","page":10,"active":false},{"url":"http:\/\/localhost\/api\/products?page=2","label":"Next &raquo;","page":2,"active":false}],"path":"http:\/\/localhost\/api\/products","per_page":15,"to":15,"total":150}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        content: '{"data":{"id":1,"asset_tag":"EL-CAM-001","name":"Canon EOS R50","description":"System camera","category":"Camera","quantity":5,"available_quantity":3,"is_active":true,"photo_url":"https://example.com/canon.jpg","external_link":null,"created_at":"2026-04-15T14:20:23.000000Z","updated_at":"2026-04-15T14:20:23.000000Z"}}'
+        headers: []
+        description: "The product object wrapped in a data key."
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: "No valid token provided."
+      -
+        custom: []
+        status: 404
+        content: '{"message":"No query results for model [App\Models\Product]."}'
+        headers: []
+        description: "Product not found."
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer TNGiIyO8LcyrEHkvvAMQx1dyFasaXnLUJlaOPZZ15ff22a60'
+      - "Bearer {YOUR_SANCTUM_TOKEN}"
     controller: null
     method: null
     route: null
@@ -96,87 +249,112 @@ endpoints:
     uri: api/products
     metadata:
       custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Store a newly created resource in storage.'
-      description: ''
+      groupName: Products API
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: Create a new product
+      description: "Creates a new product in the system. Requires the products.write ability. The asset_tag must be unique. Optionally provide a photo_path URL to attach a product image via Spatie MediaLibrary."
       authenticated: true
       deprecated: false
     headers:
-      Authorization: 'Bearer {YOUR_SANCTUM_TOKEN}'
+      Authorization: "Bearer {YOUR_SANCTUM_TOKEN}"
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer TNGiIyO8LcyrEHkvvAMQx1dyFasaXnLUJlaOPZZ15ff22a60'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/products/{id}'
-    metadata:
-      custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Display the specified resource.'
-      description: ''
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {YOUR_SANCTUM_TOKEN}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'The ID of the product.'
+    bodyParameters:
+      asset_tag:
+        name: asset_tag
+        description: "Unique asset tag for the product (e.g. EL-MIC-003)."
         required: true
-        example: 1
+        example: "EL-MIC-003"
+        type: string
+      name:
+        name: name
+        description: "Display name of the product."
+        required: true
+        example: "Rode Wireless GO II"
+        type: string
+      description:
+        name: description
+        description: "Optional product description."
+        required: false
+        example: "Draadloos microfoon systeem"
+        type: string
+      category_id:
+        name: category_id
+        description: "ID of an existing category."
+        required: true
+        example: "2"
         type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 1
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+      quantity:
+        name: quantity
+        description: "Total stock quantity."
+        required: true
+        example: "4"
+        type: integer
+      available_quantity:
+        name: available_quantity
+        description: "Available quantity (must be <= quantity)."
+        required: true
+        example: "4"
+        type: integer
+      is_active:
+        name: is_active
+        description: "Whether the product is available for reservation."
+        required: true
+        example: "true"
+        type: boolean
+      photo_path:
+        name: photo_path
+        description: "Optional URL to a product image."
+        required: false
+        example: "https://example.com/rode.jpg"
+        type: string
+      external_link:
+        name: external_link
+        description: "Optional external URL (e.g. manufacturer page)."
+        required: false
+        example: ""
+        type: string
+    cleanBodyParameters:
+      asset_tag: "EL-MIC-003"
+      name: "Rode Wireless GO II"
+      description: "Draadloos microfoon systeem"
+      category_id: "2"
+      quantity: "4"
+      available_quantity: "4"
+      is_active: "true"
+      photo_path: "https://example.com/rode.jpg"
+      external_link: ""
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: '{"data":{"id":1,"asset_tag":"ASSET-8955SC","name":"tenetur quibusdam dicta","description":null,"type":"laptop","quantity":19,"available_quantity":19,"is_active":true,"photo_path":"https:\/\/picsum.photos\/640\/480?random=462","external_link":null,"created_at":"2026-04-24T12:56:33.000000Z","updated_at":"2026-04-24T12:56:33.000000Z"}}'
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-        description: null
+        status: 201
+        content: '{"data":{"id":10,"asset_tag":"EL-MIC-003","name":"Rode Wireless GO II","description":"Draadloos microfoon systeem","category":"Audio","quantity":4,"available_quantity":4,"is_active":true,"photo_url":null,"external_link":null,"created_at":"2026-07-30T12:00:00.000000Z","updated_at":"2026-07-30T12:00:00.000000Z"}}'
+        headers: []
+        description: "The newly created product."
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: "No valid token provided."
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The asset tag has already been taken.","errors":{"asset_tag":["The asset tag has already been taken."]}}'
+        headers: []
+        description: "Validation error (e.g. duplicate asset_tag, missing required field)."
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer TNGiIyO8LcyrEHkvvAMQx1dyFasaXnLUJlaOPZZ15ff22a60'
+      - "Bearer {YOUR_SANCTUM_TOKEN}"
     controller: null
     method: null
     route: null
@@ -185,46 +363,105 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/products/{id}'
+    uri: "api/products/{id}"
     metadata:
       custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Update the specified resource in storage.'
-      description: ''
+      groupName: Products API
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: Update a product
+      description: "Updates an existing product by ID. All fields are optional, only send the fields you want to change. Requires the products.write ability. Providing a new photo_path replaces the existing photo."
       authenticated: true
       deprecated: false
     headers:
-      Authorization: 'Bearer {YOUR_SANCTUM_TOKEN}'
+      Authorization: "Bearer {YOUR_SANCTUM_TOKEN}"
       Content-Type: application/json
       Accept: application/json
     urlParameters:
       id:
         custom: []
         name: id
-        description: 'The ID of the product.'
+        description: "The unique identifier of the product to update."
         required: true
-        example: 1
+        example: "1"
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: "1"
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: "New display name."
+        required: false
+        example: "Canon EOS R50 Mark II"
+        type: string
+      description:
+        name: description
+        description: "Updated description."
+        required: false
+        example: "Vernieuwde versie"
+        type: string
+      quantity:
+        name: quantity
+        description: "Updated total stock quantity."
+        required: false
+        example: "6"
+        type: integer
+      available_quantity:
+        name: available_quantity
+        description: "Updated available quantity."
+        required: false
+        example: "6"
+        type: integer
+      is_active:
+        name: is_active
+        description: "Toggle product availability."
+        required: false
+        example: "false"
+        type: boolean
+    cleanBodyParameters:
+      name: "Canon EOS R50 Mark II"
+      description: "Vernieuwde versie"
+      quantity: "6"
+      available_quantity: "6"
+      is_active: "false"
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":{"id":1,"asset_tag":"EL-CAM-001","name":"Canon EOS R50 Mark II","description":"Vernieuwde versie","category":"Camera","quantity":6,"available_quantity":6,"is_active":false,"photo_url":null,"external_link":null,"created_at":"2026-04-15T14:20:23.000000Z","updated_at":"2026-07-30T12:00:00.000000Z"}}'
+        headers: []
+        description: "The updated product object."
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: "No valid token provided."
+      -
+        custom: []
+        status: 404
+        content: '{"message":"No query results for model [App\Models\Product]."}'
+        headers: []
+        description: "Product not found."
+      -
+        custom: []
+        status: 422
+        content: '{"message":"The asset tag has already been taken.","errors":{"asset_tag":["The asset tag has already been taken."]}}'
+        headers: []
+        description: "Validation error."
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer TNGiIyO8LcyrEHkvvAMQx1dyFasaXnLUJlaOPZZ15ff22a60'
+      - "Bearer {YOUR_SANCTUM_TOKEN}"
     controller: null
     method: null
     route: null
@@ -232,46 +469,64 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/products/{id}'
+    uri: "api/products/{id}"
     metadata:
       custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Remove the specified resource from storage.'
-      description: ''
+      groupName: Products API
+      groupDescription: ""
+      subgroup: ""
+      subgroupDescription: ""
+      title: Delete a product
+      description: "Soft-deletes a product by ID. The product is marked as deleted in the database but can be restored. Requires the products.write ability. Returns 204 No Content on success."
       authenticated: true
       deprecated: false
     headers:
-      Authorization: 'Bearer {YOUR_SANCTUM_TOKEN}'
+      Authorization: "Bearer {YOUR_SANCTUM_TOKEN}"
       Content-Type: application/json
       Accept: application/json
     urlParameters:
       id:
         custom: []
         name: id
-        description: 'The ID of the product.'
+        description: "The unique identifier of the product to delete."
         required: true
-        example: 1
+        example: "1"
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 1
+      id: "1"
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
-    responses: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ""
+        headers: []
+        description: "Product deleted successfully. No content returned."
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers: []
+        description: "No valid token provided."
+      -
+        custom: []
+        status: 404
+        content: '{"message":"No query results for model [App\Models\Product]."}'
+        headers: []
+        description: "Product not found."
     responseFields: []
     auth:
       - headers
       - Authorization
-      - 'Bearer TNGiIyO8LcyrEHkvvAMQx1dyFasaXnLUJlaOPZZ15ff22a60'
+      - "Bearer {YOUR_SANCTUM_TOKEN}"
     controller: null
     method: null
     route: null
