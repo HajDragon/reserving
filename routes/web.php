@@ -68,4 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('reservation-removal-requests.update-status');
 });
 
+// API Documentation (Scribe)
+Route::view('docs', 'scribe.index')->name('docs');
+
 require __DIR__.'/settings.php';
