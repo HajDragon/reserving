@@ -52,3 +52,30 @@ The `external_link` field has already been wired through the project:
 - form partial includes an `external_link` input
 
 If you add another field, use the same checklist above so it is saved consistently.
+
+## Eloquent Observers
+
+The project uses Eloquent Observers to decouple model lifecycle events from the models themselves.
+
+### ReservationObserver (`app/Observers/ReservationObserver.php`)
+
+- **`created`** — Deducts product inventory via `AdjustProductInventoryAction::deductForReservation()` when a new reservation is saved.
+
+### ProductObserver (`app/Observers/ProductObserver.php`)
+
+- **`updating`** — Clamps `available_quantity` so it never exceeds the product's `quantity`. Fires before the database write to avoid recursive saves.
+
+### Registration
+
+Both observers are registered in `AppServiceProvider::configureDefaults()`:
+
+```php
+Reservation::observe(ReservationObserver::class);
+Product::observe(ProductObserver::class);
+```
+
+### Why observers instead of inline `booted()` hooks?
+
+- Observers keep models focused on data/relationships.
+- Observer classes are testable in isolation.
+- Adding new event hooks (e.g. `deleted`, `updated`) doesn't bloat the model.

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Actions\Reservations\AdjustProductInventoryAction;
 use App\Enums\ReservationStatus;
 use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,13 +48,6 @@ class Reservation extends Model
             'reviewed_at' => 'datetime',
             'reserved_quantity' => 'integer',
         ];
-    }
-
-    protected static function booted(): void
-    {
-        static::created(function (Reservation $reservation): void {
-            app(AdjustProductInventoryAction::class)->deductForReservation($reservation);
-        });
     }
 
     public function user(): BelongsTo

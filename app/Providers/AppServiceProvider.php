@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Product;
+use App\Models\Reservation;
+use App\Observers\ProductObserver;
+use App\Observers\ReservationObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,6 +58,9 @@ class AppServiceProvider extends ServiceProvider
     protected function configureDefaults(): void
     {
         Date::use(CarbonImmutable::class);
+
+        Reservation::observe(ReservationObserver::class);
+        Product::observe(ProductObserver::class);
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
