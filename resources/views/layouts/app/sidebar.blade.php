@@ -86,6 +86,10 @@
                     <flux:sidebar.item icon="shopping-cart" :href="route('carts.index')" :current="request()->routeIs('carts.*')" wire:navigate.hover>
                         {{ __('Carts') }}
                     </flux:sidebar.item>
+
+                    <flux:sidebar.item icon="calendar-days" :href="route('reservations.index')" :current="request()->routeIs('reservations.index.*')" wire:navigate.hover>
+                        {{ __('My Reservations') }}
+                    </flux:sidebar.item>
                     @can('access-reserving-dashboard')
                             <flux:navlist position="top" align="start">
 

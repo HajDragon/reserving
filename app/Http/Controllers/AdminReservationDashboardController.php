@@ -15,7 +15,17 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
-class ReservingController extends Controller
+/**
+ * ADMIN DASHBOARD — the "reserving" panel that lists/overviews ALL reservations.
+ * Provides filtered list views (table + calendar), manages ReservationOrder items,
+ * and handles removal-request approval/rejection.
+ *
+ * NOT to be confused with ReservationController which handles the individual
+ * reservation CRUD lifecycle (create, edit, cancel, approve, return, etc.).
+ *
+ * Views: reserving.*  |  Routes: /reserving/*
+ */
+class AdminReservationDashboardController extends Controller
 {
     public function index(Request $request): View
     {

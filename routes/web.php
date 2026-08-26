@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\ReservationLogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\ReservingController;
+use App\Http\Controllers\AdminReservationDashboardController;
 use App\Livewire\Pages\Admin\ProductIndex as AdminProductIndex;
 use App\Livewire\Pages\ProductIndex;
 use Illuminate\Support\Facades\Route;
@@ -45,11 +45,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('reservation-orders/{reservationOrder}/confirm-returned', [ReservationController::class, 'confirmOrderReturned'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reservation-orders.confirm-returned');
-    Route::get('reservation-orders/{reservationOrder}/manage-items', [ReservingController::class, 'manageItems'])
+    Route::get('reservation-orders/{reservationOrder}/manage-items', [AdminReservationDashboardController::class, 'manageItems'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reservation-orders.manage-items');
 
-    Route::get('reserving-admin', [ReservingController::class, 'index'])
+    Route::get('reserving-admin', [AdminReservationDashboardController::class, 'index'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reserving.index');
 
@@ -63,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('api-tokens/{token}', [ApiTokenManagementController::class, 'destroy'])->name('api-tokens.destroy');
     });
 
-    Route::patch('reservation-removal-requests/{removalRequest}/status', [ReservingController::class, 'updateRemovalRequestStatus'])
+    Route::patch('reservation-removal-requests/{removalRequest}/status', [AdminReservationDashboardController::class, 'updateRemovalRequestStatus'])
         ->middleware('can:access-reserving-dashboard')
         ->name('reservation-removal-requests.update-status');
 });
