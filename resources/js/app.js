@@ -39,6 +39,8 @@ document.addEventListener('products-appended', () => {
 
 // ── Checkout confetti (school pride variant) ──────────────────────
 const fireSchoolPrideConfetti = async () => {
+	// ponytail: skip confetti for users who prefer reduced motion
+	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 	const { confetti } = await import("@tsparticles/confetti");
 
 	// Two bursts from the bottom corners — classic school pride effect

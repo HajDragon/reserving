@@ -25,6 +25,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * RESERVATION CRUD + LIFECYCLE — the per-reservation actions.
+ * Users: create (store), edit (update), cancel (destroy), request removal.
+ * Admins: approve/reject pending reservations, mark as returned, confirm order returns.
+ *
+ * NOT to be confused with AdminReservationDashboardController which is the admin overview/dashboard
+ * that lists all reservations with filters, calendar, and removal-request review.
+ *
+ * Views: reservations.*  |  Routes: /reservations/*
+ */
 class ReservationController extends Controller
 {
     public function __construct(private readonly AvailabilityService $availabilityService) {}
