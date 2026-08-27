@@ -1,81 +1,69 @@
-# Reserving
+# Reserveringssysteem
 
-This project is a Laravel application for managing reservations and products.
+A reservation management system built with Laravel and Livewire. Users can browse products, reserve them for specific date ranges, and admins can manage the full reservation lifecycle through a dashboard.
 
-## Adding a New Product Field
+**Live:** [app.hanger18.online](https://app.hanger18.online)
 
-When you add a new field to `products`, update every layer that participates in validation, mass assignment, and UI rendering.
+## Features
 
-### 1. Database
+- **Product catalog** with search, filtering, and infinite scroll
+- **Reservation system** with date-range selection and availability checking
+- **Cart & checkout** with capacity validation and conflict detection
+- **Admin dashboard** with status management, calendar view, and filtering
+- **Reservation lifecycle** — pending → reserved → awaiting return → returned
+- **Product inventory** with automatic quantity reconciliation
+- **API endpoints** with Sanctum token authentication
+- **Email notifications** for pickup reminders and status changes
+- **Two-factor authentication** via Fortify
+- **GDPR data export**
 
-- Add the column to the `products` table with a new migration.
-- Follow the existing schema style in the product table migration.
+## Tech Stack
 
-### 2. Model
+| Layer | Technology |
+|-------|-----------|
+| Backend | Laravel 13, PHP 8.3+ |
+| Frontend | Livewire 4, Flux UI, Alpine.js, Vite |
+| Database | SQLite |
+| Auth | Fortify (register, login, 2FA, password reset) |
+| API | Sanctum token auth, Spatie Query Builder |
+| Media | Spatie Media Library |
+| Testing | Pest / PHPUnit (35 test files, 190+ tests) |
+| Deployment | Docker, GitHub Actions CI/CD, auto-deploy to VPS |
 
-- Add the new column name to `App\Models\Product::$fillable`.
-- If the field needs type conversion, add a cast in `casts()`.
+## Getting Started
 
-### 3. Validation
-
-- Add the field to `App\Http\Requests\StoreManagedProductRequest`.
-- Add the field to `App\Http\Requests\UpdateManagedProductRequest`.
-- Use the right validation rule for the data type, such as `string`, `integer`, `boolean`, or `url`.
-
-### 4. Form UI
-
-- Add the input to `resources/views/cms/products/partials/form-fields.blade.php`.
-- Make sure the input `name` matches the database column and validation key exactly.
-- For checkboxes, keep the label text visible and wrap the checkbox markup correctly.
-
-### 5. Controller
-
-- The admin product controller already uses `$request->validated()`, so new validated fields are saved automatically.
-- If the field needs special handling, transform it before calling `create()` or `update()`.
-
-### 6. Display
-
-- If the field should be visible in the product list, detail page, or admin panel, update the relevant Blade views.
-
-### 7. Tests
-
-- Add or update feature tests to confirm the field is saved on create and update.
-- Add UI assertions if the field should appear in rendered views.
-
-## Current Status
-
-The `external_link` field has already been wired through the project:
-
-- database column exists
-- model fillable includes `external_link`
-- store and update requests validate `external_link`
-- form partial includes an `external_link` input
-
-If you add another field, use the same checklist above so it is saved consistently.
-
-## Eloquent Observers
-
-The project uses Eloquent Observers to decouple model lifecycle events from the models themselves.
-
-### ReservationObserver (`app/Observers/ReservationObserver.php`)
-
-- **`created`** — Deducts product inventory via `AdjustProductInventoryAction::deductForReservation()` when a new reservation is saved.
-
-### ProductObserver (`app/Observers/ProductObserver.php`)
-
-- **`updating`** — Clamps `available_quantity` so it never exceeds the product's `quantity`. Fires before the database write to avoid recursive saves.
-
-### Registration
-
-Both observers are registered in `AppServiceProvider::configureDefaults()`:
-
-```php
-Reservation::observe(ReservationObserver::class);
-Product::observe(ProductObserver::class);
+```bash
+git clone https://github.com/HajDragon/reserving.git
+cd reserving
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate
+npm install && npm run build
+php artisan serve
 ```
 
-### Why observers instead of inline `booted()` hooks?
+## Testing
 
-- Observers keep models focused on data/relationships.
-- Observer classes are testable in isolation.
-- Adding new event hooks (e.g. `deleted`, `updated`) doesn't bloat the model.
+```bash
+php artisan test
+```
+
+Tests run against an in-memory SQLite database with all infrastructure services (cache, session, queue, mail) stubbed for isolation.
+
+## Project Structure
+
+```
+app/
+├── Actions/          # Business logic (Fortify, Reservations)
+├── Enums/            # ReservationStatus, AdminReservationStatus, ApiTokenAbility
+├── Http/Controllers/ # Web + API controllers
+├── Livewire/         # Cart form, admin pages
+├── Models/           # Product, Reservation, Cart, User, etc.
+├── Observers/        # Eloquent observers for Reservation and Product
+└── Services/         # AvailabilityService (capacity calculations)
+```
+
+## License
+
+This is a student project for Summa College — not open source.
