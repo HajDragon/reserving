@@ -1,4 +1,5 @@
 <x-layouts::app :title="__('My Reservations')">
+    <h1>If you see this the deployment from master works</h1>
     <div class="space-y-6">
         <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
             <h1 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{{ __('My Reservations') }}</h1>
