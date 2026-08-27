@@ -4,7 +4,7 @@
                 <h1 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Product CMS Management') }}</h1>
                 <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{{ __('Create, view, edit, and delete products.') }}</p>
             </div>
-            <a href="{{ route('cms.products.create') }}" wire:navigate.hover class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+            <a href="{{ route('cms.products.create') }}" wire:navigate.hover class="btn rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
                 {{ __('Add Product') }}
             </a>
         </div>

@@ -68,8 +68,27 @@ select:focus[data-flux-control] {
 
 @layer components {
 
+    /* Consistent focus-visible + active states for all native buttons.
+       Excludes Flux buttons which handle their own focus styling. */
+    button:not([data-flux-button]):not(.btn-spotlight),
+    [type="submit"]:not([data-flux-button]):not(.btn-spotlight),
+    a.btn {
+        @apply transition-all duration-100;
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+        @apply active:scale-[0.98];
+    }
+    .dark button:not([data-flux-button]):not(.btn-spotlight),
+    .dark [type="submit"]:not([data-flux-button]):not(.btn-spotlight),
+    .dark a.btn {
+        @apply focus-visible:ring-zinc-500 focus-visible:ring-offset-zinc-900;
+    }
+
     .btn-spotlight {
         @apply relative overflow-hidden rounded-2xl bg-neutral-900 px-4 py-3 text-lg font-medium text-white transition-transform active:scale-[0.985];
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    }
+    .dark .btn-spotlight {
+        @apply focus-visible:ring-zinc-500 focus-visible:ring-offset-zinc-900;
     }
 
     /* The text layer (uses mix-blend to invert colors over the spotlight) */
