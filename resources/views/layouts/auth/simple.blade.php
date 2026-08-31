@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="nl" class="dark">
     <head>
         @include('partials.head')
         <div id="login-tsparticles" class="pointer-events-none fixed inset-0 z-10"></div>

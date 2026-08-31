@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('privacy', fn () => view('pages.privacy'))->name('privacy');
 Route::get('voorwaarden', fn () => view('pages.terms'))->name('terms');
 
+// SEO: sitemap voor zoekmachines
+Route::get('sitemap.xml', fn () => response()
+    ->view('seo.sitemap', [], 200)
+    ->header('Content-Type', 'application/xml'))
+    ->name('sitemap');
+
 // GDPR: data export (auth required)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('gdpr/export', [\App\Http\Controllers\GdprController::class, 'exportData'])->name('gdpr.export');

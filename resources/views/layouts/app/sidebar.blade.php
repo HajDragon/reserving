@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 @props(['title' => null, 'showFooter' => true])
 
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="nl" class="dark">
     <head>
         @include('partials.head')
     </head>
@@ -60,7 +60,7 @@
 
             <flux:spacer />
 
-            <x-desktop-user-menu class="hidden xl:block" :name="auth()->user()->name" />
+            <x-desktop-user-menu class="hidden xl:block" :name="auth()->user()?->name" />
         </flux:header>
 
         <!-- Mobile / Tablet Top Bar -->
@@ -123,8 +123,8 @@
             <flux:sidebar.nav>
                 <flux:dropdown position="top" align="end">
                     <flux:sidebar.profile
-                        :name="auth()->user()->name"
-                        :initials="auth()->user()->initials()"
+                        :name="auth()->user()?->name"
+                        :initials="auth()->user()?->initials()"
                     />
 
                     <flux:menu>
@@ -132,13 +132,13 @@
                             <div class="p-0 text-sm font-normal">
                                 <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                     <flux:avatar
-                                        :name="auth()->user()->name"
-                                        :initials="auth()->user()->initials()"
+                                        :name="auth()->user()?->name"
+                                        :initials="auth()->user()?->initials()"
                                     />
 
                                     <div class="grid flex-1 text-start text-sm leading-tight">
-                                        <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>
-                                        <flux:text class="truncate">{{ auth()->user()->email }}</flux:text>
+                                        <flux:heading class="truncate">{{ auth()->user()?->name }}</flux:heading>
+                                        <flux:text class="truncate">{{ auth()->user()?->email }}</flux:text>
                                     </div>
                                 </div>
                             </div>
