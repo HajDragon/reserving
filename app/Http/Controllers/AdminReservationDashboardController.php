@@ -53,12 +53,16 @@ class AdminReservationDashboardController extends Controller
 
         $view = $view === 'calendar' ? 'calendar' : 'cards';
 
+        // ponytail: '!' resets unset format fields (day/time) to epoch instead of
+        // bleeding today's day-of-month in — without it '2026-04' parsed on the 31st
+        // overflows April 31 -> May 1 and the calendar shows the wrong month.
+        // Upgrade path: Laravel 11+ has CarbonImmutable::parse('2026-04')->startOfMonth().
         $monthReference = preg_match('/^\d{4}-\d{2}$/', $calendarMonth) === 1
-            ? CarbonImmutable::createFromFormat('Y-m', $calendarMonth)->startOfMonth()
+            ? CarbonImmutable::createFromFormat('!Y-m', $calendarMonth)->startOfMonth()
             : (preg_match('/^\d{4}-\d{2}-\d{2}$/', $startFrom) === 1
-                ? CarbonImmutable::createFromFormat('Y-m-d', $startFrom)->startOfMonth()
+                ? CarbonImmutable::createFromFormat('!Y-m-d', $startFrom)->startOfMonth()
                 : (preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDay) === 1
-                    ? CarbonImmutable::createFromFormat('Y-m-d', $selectedDay)->startOfMonth()
+                    ? CarbonImmutable::createFromFormat('!Y-m-d', $selectedDay)->startOfMonth()
                     : CarbonImmutable::now()->startOfMonth()));
 
         $selectedDayReference = preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDay) === 1
