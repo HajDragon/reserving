@@ -121,7 +121,7 @@
                 </form>
             </div>
 
-            <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900" x-data="{ revokeUrl: '', revokeName: '' }">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{{ __('Existing Tokens') }}</h2>
@@ -171,6 +171,7 @@
                                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Token Name') }}</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Abilities') }}</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Last Used') }}</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Expires') }}</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Created') }}</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-zinc-500">{{ __('Action') }}</th>
                                     </tr>
@@ -190,21 +191,19 @@
                                                 {{ $token->last_used_at?->format('Y-m-d H:i') ?? __('Never') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">
+                                                {{ $token->expires_at?->format('Y-m-d H:i') ?? __('Never') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">
                                                 {{ $token->created_at?->format('Y-m-d H:i') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-300">
-                                                <form method="POST" action="{{ route('cms.api-tokens.destroy', $token) }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <flux:button
-                                                        type="submit"
-                                                        variant="danger"
-                                                        size="sm"
-                                                        onclick="return confirm('{{ __('Revoke this token? This action cannot be undone.') }}');"
-                                                    >
-                                                        {{ __('Revoke') }}
-                                                    </flux:button>
-                                                </form>
+                                                <flux:button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    x-on:click="revokeUrl = '{{ route('cms.api-tokens.destroy', $token) }}'; revokeName = '{{ e($token->name) }}'; $flux.modal('confirm-revoke-token').show()"
+                                                >
+                                                    {{ __('Revoke') }}
+                                                </flux:button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -217,6 +216,29 @@
                         </div>
                     </div>
                 @endif
+
+                <flux:modal name="confirm-revoke-token" focusable class="max-w-md">
+                    <div class="space-y-6">
+                        <div>
+                            <flux:heading size="lg">{{ __('Revoke API Token?') }}</flux:heading>
+                            <flux:text>
+                                {{ __('This will immediately invalidate the token') }}
+                                <span x-text="revokeName" class="font-medium"></span>.
+                                {{ __('This action cannot be undone.') }}
+                            </flux:text>
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <flux:modal.close>
+                                <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
+                            </flux:modal.close>
+                            <form method="POST" :action="revokeUrl" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <flux:button variant="danger" type="submit">{{ __('Revoke Token') }}</flux:button>
+                            </form>
+                        </div>
+                    </div>
+                </flux:modal>
             </div>
         </div>
     </div>
