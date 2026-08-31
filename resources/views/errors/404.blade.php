@@ -14,7 +14,7 @@
         <p class="mb-8 text-zinc-500 dark:text-zinc-400">
             {{ __("De pagina die je zoekt bestaat niet of is verplaatst. Misschien kun je het via de navigatie bovenaan proberen.") }}
         </p>
-        <a href="{{ route('dashboard') }}" class="inline-flex items-center rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300">
+        <a href="{{ route('dashboard') }}" class="btn inline-flex items-center rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300">
             {{ __("Terug naar dashboard") }}
         </a>
     </div>

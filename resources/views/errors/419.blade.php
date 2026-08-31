@@ -14,7 +14,7 @@
         <p class="mb-8 text-zinc-500 dark:text-zinc-400">
             {{ __("Je sessie is verlopen. Log opnieuw in om verder te gaan.") }}
         </p>
-        <a href="{{ route('login') }}" class="inline-flex items-center rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300">
+        <a href="{{ route('login') }}" class="btn inline-flex items-center rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300">
             {{ __("Inloggen") }}
         </a>
     </div>

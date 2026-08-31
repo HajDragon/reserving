@@ -16,7 +16,7 @@
                     <img src="{{ $product->photo_path }}" alt="{{ $product->name }}" class="h-16 w-16 rounded-md border border-zinc-200 object-cover dark:border-zinc-700">
                 @endif
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('cms.products.edit', $product) }}" wire:navigate class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">{{ __('Edit') }}</a>
+                    <a href="{{ route('cms.products.edit', $product) }}" wire:navigate class="btn rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">{{ __('Edit') }}</a>
                     <a href="{{ route('cms.products.index') }}" wire:navigate.hover class="text-sm text-zinc-600 underline dark:text-zinc-300">{{ __('Back') }}</a>
                 </div>
             </div>
