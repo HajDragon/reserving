@@ -10,7 +10,7 @@
             {{ __("Ga naar inhoud") }}
         </a>
         <!-- Desktop Header -->
-        <flux:header sticky class="hidden xl:flex border-b border-zinc-200 bg-zinc-50 px-0 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:header sticky class="!hidden xl:!flex border-b border-zinc-200 bg-zinc-50 !px-0 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:navbar class="-mb-px flex w-full items-center gap-0">
             <x-app-logo href="{{ route('dashboard') }}" wire:navigate.hover class="mr-4 sm:hidden lg:block" />
 
@@ -66,12 +66,12 @@
         <!-- Mobile / Tablet Top Bar -->
         <flux:header class="xl:hidden border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="me-2" icon="bars-2" inset="left" />
-            <x-app-logo href="{{ route('dashboard') }}" wire:navigate.hover class="scale-90 lg:hidden sm:block" />
+            <x-app-logo href="{{ route('dashboard') }}" wire:navigate.hover class="scale-90 xl:hidden sm:block" />
             <flux:spacer />
         </flux:header>
 
         <!-- Mobile Sidebar -->
-        <flux:sidebar collapsible="mobile" sticky class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar collapsible="mobile" sticky class="xl:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.header>
                 <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate.hover />
                 <flux:sidebar.collapse class="xl:hidden" />
