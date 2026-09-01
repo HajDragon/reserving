@@ -25,3 +25,4 @@ yarn-error.log
 # Temporary test DBs and accidental SQLite files
 /reserving
 /reserving_test*
+/storage/app/scribe/
