@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Product;
+use App\Models\Reservation;
+use App\Observers\ProductObserver;
+use App\Observers\ReservationObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -9,12 +13,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use App\Models\Product;
-use App\Models\Reservation;
-use App\Observers\ProductObserver;
-use App\Observers\ReservationObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (! app()->environment('local')) {
+            URL::forceScheme('https');
+        }
         $this->configureDefaults();
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {

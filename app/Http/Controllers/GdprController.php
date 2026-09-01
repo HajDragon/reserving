@@ -22,7 +22,7 @@ class GdprController extends Controller
                 'e_mail' => $user->email,
                 'account_aangemaakt' => $user->created_at?->format('d-m-Y H:i'),
                 'laatst_bijgewerkt' => $user->updated_at?->format('d-m-Y H:i'),
-                'tweefactoractiveren' => $user->hasTwoFactorEnabled() ? 'Ja' : 'Nee',
+                'tweefactoractiveren' => $user->hasEnabledTwoFactorAuthentication() ? 'Ja' : 'Nee',
             ],
             'reserveringen' => $user->reservations()->with('reservationOrder')->get()->map(fn($r) => [
                 'id' => $r->id,
@@ -54,7 +54,7 @@ class GdprController extends Controller
                 'e_mail' => $user->email,
                 'account_aangemaakt' => $user->created_at?->format('d-m-Y H:i'),
                 'laatst_bijgewerkt' => $user->updated_at?->format('d-m-Y H:i'),
-                'tweefactorauthenticatie' => $user->hasTwoFactorEnabled(),
+                'tweefactorauthenticatie' => $user->hasEnabledTwoFactorAuthentication(),
             ],
             'reserveringen' => $user->reservations()->get()->map(fn($r) => [
                 'id' => $r->id,

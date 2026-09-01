@@ -21,7 +21,7 @@ test('every page has a meta description, canonical and Open Graph tags', functio
 test('the page title includes the page name and app name', function () {
     $this->get('/privacy')
         ->assertOk()
-        ->assertSee('<title>Privacyverklaring - ', false);
+        ->assertSee('<title>Privacyverklaring | ', false);
 });
 
 test('the html lang attribute matches the app locale', function () {

@@ -11,8 +11,17 @@ use App\Livewire\Pages\ProductIndex;
 use Illuminate\Support\Facades\Route;
 
 // Public pages (no auth required)
-Route::get('privacy', fn () => view('pages.privacy'))->name('privacy');
-Route::get('voorwaarden', fn () => view('pages.terms'))->name('terms');
+Route::get('privacy', function () {
+    \SEO::setTitle('Privacyverklaring');
+    \SEO::setDescription('Lees hoe het Experience Lab Reserveringssysteem van Summa College omgaat met je persoonsgegevens. Privacyverklaring conform AVG/GDPR.');
+    return view('pages.privacy');
+})->name('privacy');
+
+Route::get('voorwaarden', function () {
+    \SEO::setTitle('Gebruiksvoorwaarden');
+    \SEO::setDescription('De gebruiksvoorwaarden van het Experience Lab Reserveringssysteem van Summa College. Lees de voorwaarden voor het reserveren van materialen.');
+    return view('pages.terms');
+})->name('terms');
 
 // SEO: sitemap voor zoekmachines
 Route::get('sitemap.xml', fn () => response()
