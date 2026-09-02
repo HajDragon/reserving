@@ -16,14 +16,18 @@ uses(RefreshDatabase::class);
  */
 
 test('calculatedAvailableQuantity returns full quantity when no active reservations', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 5]);
 
+    // Act
     $service = app(AvailabilityService::class);
 
+    // Assert
     expect($service->calculatedAvailableQuantity($product))->toBe(5);
 });
 
 test('calculatedAvailableQuantity subtracts reserved and pending quantities', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 10]);
 
     Reservation::factory()->create([
@@ -44,6 +48,7 @@ test('calculatedAvailableQuantity subtracts reserved and pending quantities', fu
 });
 
 test('calculatedAvailableQuantity ignores returned and cancelled reservations', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 5]);
 
     Reservation::factory()->returned()->create([
@@ -57,12 +62,15 @@ test('calculatedAvailableQuantity ignores returned and cancelled reservations', 
         'reserved_quantity' => 2,
     ]);
 
+    // Act
     $service = app(AvailabilityService::class);
 
+    // Assert
     expect($service->calculatedAvailableQuantity($product))->toBe(5);
 });
 
 test('calculatedAvailableQuantity never returns negative', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 2]);
 
     Reservation::factory()->create([
@@ -71,12 +79,15 @@ test('calculatedAvailableQuantity never returns negative', function () {
         'reserved_quantity' => 5,
     ]);
 
+    // Act
     $service = app(AvailabilityService::class);
 
+    // Assert
     expect($service->calculatedAvailableQuantity($product))->toBe(0);
 });
 
 test('reconcileProducts updates available_quantity and is_active on product', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 3]);
 
     Reservation::factory()->create([
@@ -85,9 +96,11 @@ test('reconcileProducts updates available_quantity and is_active on product', fu
         'reserved_quantity' => 3,
     ]);
 
+    // Act
     $service = app(AvailabilityService::class);
     $service->reconcileProducts([$product]);
 
+    // Assert
     $product->refresh();
 
     expect($product->available_quantity)->toBe(0);
@@ -95,6 +108,7 @@ test('reconcileProducts updates available_quantity and is_active on product', fu
 });
 
 test('remainingCapacity only counts overlapping time windows', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 3]);
 
     // This reservation overlaps the query window
@@ -115,22 +129,28 @@ test('remainingCapacity only counts overlapping time windows', function () {
         'reserved_quantity' => 2,
     ]);
 
+    // Act
     $service = app(AvailabilityService::class);
 
+    // Assert
     expect($service->remainingCapacity($product, '2026-06-01 09:00', '2026-06-01 11:00'))->toBe(2);
 });
 
 test('checkAvailability returns false when requested quantity exceeds capacity', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 2]);
 
+    // Assert
     $service = app(AvailabilityService::class);
 
     expect($service->checkAvailability($product, now()->addDay(), now()->addDay()->addHours(2), 3))->toBeFalse();
 });
 
 test('checkAvailability returns false for quantity less than 1', function () {
+    // Arrange
     $product = Product::factory()->create(['quantity' => 5]);
 
+    // Assert
     $service = app(AvailabilityService::class);
 
     expect($service->checkAvailability($product, now()->addDay(), now()->addDay()->addHours(2), 0))->toBeFalse();

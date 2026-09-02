@@ -18,6 +18,7 @@ beforeEach(function (): void {
 });
 
 test('admin can confirm single reservation as returned', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $product = Product::factory()->create([
         'quantity' => 1,
@@ -30,10 +31,12 @@ test('admin can confirm single reservation as returned', function () {
         'reserved_quantity' => 1,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->postJson(route('reservations.confirm-returned', $reservation));
 
+    // Assert
     $response
         ->assertOk()
         ->assertJsonPath('reservation.status', ReservationStatus::Returned->value);
@@ -49,34 +52,41 @@ test('admin can confirm single reservation as returned', function () {
 });
 
 test('non admin cannot confirm single reservation as returned', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $reservation = Reservation::factory()->create([
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('reservations.confirm-returned', $reservation));
 
+    // Assert
     $response->assertForbidden();
 });
 
 test('confirm single return fails for non reserved reservation', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
 
     $reservation = Reservation::factory()->returned()->create();
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->postJson(route('reservations.confirm-returned', $reservation));
 
+    // Assert
     $response
         ->assertUnprocessable()
         ->assertJsonValidationErrors('reservation');
 });
 
 test('admin can confirm all reservations in an order as returned', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $orderOwner = User::factory()->create();
 
@@ -101,10 +111,12 @@ test('admin can confirm all reservations in an order as returned', function () {
         'reserved_quantity' => 1,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->postJson(route('reservation-orders.confirm-returned', $reservationOrder));
 
+    // Assert
     $response
         ->assertOk()
         ->assertJsonPath('reservation_order.returned_count', 2);
@@ -116,10 +128,12 @@ test('admin can confirm all reservations in an order as returned', function () {
         ->and($productA->refresh()->is_active)->toBeTrue()
         ->and($productB->refresh()->is_active)->toBeTrue();
 
+    // Act
     $historyResponse = $this
         ->actingAs($orderOwner)
         ->get(route('reservations.index'));
 
+    // Assert
     $historyResponse
         ->assertOk()
         ->assertDontSeeText((string) $productA->name)
@@ -127,6 +141,7 @@ test('admin can confirm all reservations in an order as returned', function () {
 });
 
 test('marking full order returned re-enables product with quantity one', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $orderOwner = User::factory()->create();
 
@@ -146,10 +161,12 @@ test('marking full order returned re-enables product with quantity one', functio
         'reserved_quantity' => 1,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->post(route('reservation-orders.confirm-returned', $reservationOrder));
 
+    // Assert
     $response
         ->assertRedirect()
         ->assertSessionHas('status', 'Reservation order return confirmed successfully.');
@@ -161,6 +178,7 @@ test('marking full order returned re-enables product with quantity one', functio
 });
 
 test('non admin cannot confirm order return', function () {
+    // Arrange
     $user = User::factory()->create();
     $reservationOrder = ReservationOrder::factory()->create();
 
@@ -169,14 +187,17 @@ test('non admin cannot confirm order return', function () {
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('reservation-orders.confirm-returned', $reservationOrder));
 
+    // Assert
     $response->assertForbidden();
 });
 
 test('confirm order return processes mixed statuses and archives the order', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $reservationOrder = ReservationOrder::factory()->create();
     $product = Product::factory()->create([
@@ -197,10 +218,12 @@ test('confirm order return processes mixed statuses and archives the order', fun
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->postJson(route('reservation-orders.confirm-returned', $reservationOrder));
 
+    // Assert
     $response
         ->assertOk()
         ->assertJsonPath('reservation_order.returned_count', 2);
@@ -211,6 +234,7 @@ test('confirm order return processes mixed statuses and archives the order', fun
 });
 
 test('admin can update reservation status from dashboard flow', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $product = Product::factory()->create();
 
@@ -219,6 +243,7 @@ test('admin can update reservation status from dashboard flow', function () {
         'status' => ReservationStatus::Pending,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->patchJson(route('reservations.update-status', $reservation), [
@@ -226,6 +251,7 @@ test('admin can update reservation status from dashboard flow', function () {
             'rejection_reason' => 'Item currently unavailable for selected period.',
         ]);
 
+    // Assert
     $response
         ->assertOk()
         ->assertJsonPath('reservation.status', ReservationStatus::Cancelled->value);
@@ -238,6 +264,7 @@ test('admin can update reservation status from dashboard flow', function () {
 });
 
 test('admin can approve pending reservation from web form and edit reservation details', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $product = Product::factory()->create(['quantity' => 5]);
     $start = now()->addDays(2)->startOfHour();
@@ -254,6 +281,7 @@ test('admin can approve pending reservation from web form and edit reservation d
     $nextStart = $start->copy()->addDay();
     $nextEnd = $nextStart->copy()->addHours(3);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->patch(route('reservations.update-status', $reservation), [
@@ -264,6 +292,7 @@ test('admin can approve pending reservation from web form and edit reservation d
             'extra_wishes' => 'Updated by admin',
         ]);
 
+    // Assert
     $response
         ->assertRedirect()
         ->assertSessionHas('status', 'Reservation status updated successfully.');
@@ -277,21 +306,25 @@ test('admin can approve pending reservation from web form and edit reservation d
 });
 
 test('status update rejects unknown status value', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $reservation = Reservation::factory()->returned()->create();
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->patchJson(route('reservations.update-status', $reservation), [
             'status' => 'invalid-status',
         ]);
 
+    // Assert
     $response
         ->assertUnprocessable()
         ->assertJsonValidationErrors('status');
 });
 
 test('confirming return keeps cached product inventory aligned with active reservations', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
 
     $product = Product::factory()->create([
@@ -306,8 +339,10 @@ test('confirming return keeps cached product inventory aligned with active reser
         'reserved_quantity' => 2,
     ]);
 
+    // Act
     $this->actingAs($admin)
         ->postJson(route('reservations.confirm-returned', $reservation))
+    // Assert
         ->assertOk();
 
     $activeReservedQuantity = Reservation::query()

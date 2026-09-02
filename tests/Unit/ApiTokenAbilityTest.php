@@ -9,6 +9,7 @@ use App\Enums\ApiTokenAbility;
  */
 
 test('options returns value-label pairs for all abilities', function () {
+    // Assert
     $options = ApiTokenAbility::options();
 
     expect($options)->toHaveKeys(['products.read', 'products.write']);
@@ -17,6 +18,7 @@ test('options returns value-label pairs for all abilities', function () {
 });
 
 test('values returns string values for all abilities', function () {
+    // Assert
     $values = ApiTokenAbility::values();
 
     expect($values)->toContain('products.read');
@@ -25,6 +27,7 @@ test('values returns string values for all abilities', function () {
 });
 
 test('labelsFor translates ability strings to readable labels', function () {
+    // Assert
     $labels = ApiTokenAbility::labelsFor(['products.read', 'products.write']);
 
     expect($labels)->toContain('Read products');
@@ -32,12 +35,14 @@ test('labelsFor translates ability strings to readable labels', function () {
 });
 
 test('labelsFor gracefully handles unknown ability strings', function () {
+    // Assert
     $labels = ApiTokenAbility::labelsFor(['unknown.ability']);
 
     expect($labels)->toContain('unknown.ability');
 });
 
 test('each enum case has a matching label', function () {
+    // Assert
     foreach (ApiTokenAbility::cases() as $ability) {
         expect($ability->label())->not->toBeEmpty();
     }

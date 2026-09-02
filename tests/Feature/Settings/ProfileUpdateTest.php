@@ -4,21 +4,26 @@ use App\Models\User;
 use Livewire\Livewire;
 
 test('profile page is displayed', function () {
+    // Arrange
     $this->actingAs($user = User::factory()->create());
 
+    // Act & Assert
     $this->get(route('profile.edit'))->assertOk();
 });
 
 test('profile information can be updated', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    // Act
     $response = Livewire::test('pages::settings.profile')
         ->set('name', 'Test User')
         ->set('email', 'test@example.com')
         ->call('updateProfileInformation');
 
+    // Assert
     $response->assertHasNoErrors();
 
     $user->refresh();
@@ -29,29 +34,35 @@ test('profile information can be updated', function () {
 });
 
 test('email verification status is unchanged when email address is unchanged', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    // Act
     $response = Livewire::test('pages::settings.profile')
         ->set('name', 'Test User')
         ->set('email', $user->email)
         ->call('updateProfileInformation');
 
+    // Assert
     $response->assertHasNoErrors();
 
     expect($user->refresh()->email_verified_at)->not->toBeNull();
 });
 
 test('user can delete their account', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    // Act
     $response = Livewire::test('pages::settings.delete-user-modal')
         ->set('password', 'password')
         ->call('deleteUser');
 
+    // Assert
     $response
         ->assertHasNoErrors()
         ->assertRedirect('/');
@@ -61,14 +72,17 @@ test('user can delete their account', function () {
 });
 
 test('correct password must be provided to delete account', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
+    // Act
     $response = Livewire::test('pages::settings.delete-user-modal')
         ->set('password', 'wrong-password')
         ->call('deleteUser');
 
+    // Assert
     $response->assertHasErrors(['password']);
 
     expect($user->fresh())->not->toBeNull();

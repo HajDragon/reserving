@@ -12,13 +12,16 @@ class CartIndexTest extends TestCase
 
     public function test_guest_is_redirected_when_accessing_carts_index(): void
     {
+        // Act
         $response = $this->get(route('carts.index'));
 
+        // Assert
         $response->assertRedirect(route('login'));
     }
 
     public function test_user_sees_only_their_own_cart_card_on_index_page(): void
     {
+        // Arrange
         /** @var User $currentUser */
         $currentUser = User::factory()->create([
             'name' => 'Current User',
@@ -40,10 +43,12 @@ class CartIndexTest extends TestCase
             'requested_quantity' => 1,
         ]);
 
+        // Act
         $response = $this
             ->actingAs($currentUser)
             ->get(route('carts.index'));
 
+        // Assert
         $response
             ->assertOk()
             ->assertSeeText('My Cart')
@@ -56,6 +61,7 @@ class CartIndexTest extends TestCase
 
     public function test_user_can_open_cart_index_when_cart_contains_soft_deleted_product(): void
     {
+        // Arrange
         /** @var User $user */
         $user = User::factory()->create();
 
@@ -70,10 +76,12 @@ class CartIndexTest extends TestCase
 
         $product->delete();
 
+        // Act
         $response = $this
             ->actingAs($user)
             ->get(route('carts.index'));
 
+        // Assert
         $response
             ->assertOk()
             ->assertSeeText('Unavailable product')
