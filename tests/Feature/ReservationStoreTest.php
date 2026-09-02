@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 uses(RefreshDatabase::class);
 
 test('authenticated user can create a reserved reservation', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create([
         'quantity' => 5,
@@ -19,6 +20,7 @@ test('authenticated user can create a reserved reservation', function () {
     $start = Carbon::now()->addDay()->startOfHour();
     $end = (clone $start)->addHours(2);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('reservations.store'), [
@@ -27,6 +29,7 @@ test('authenticated user can create a reserved reservation', function () {
             'end_time' => $end->toDateTimeString(),
         ]);
 
+    // Assert
     $response
         ->assertCreated()
         ->assertJsonPath('reservation.status', ReservationStatus::Reserved->value)
@@ -38,6 +41,7 @@ test('authenticated user can create a reserved reservation', function () {
 });
 
 test('reservation fails when overlapping a reserved reservation', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create([
         'quantity' => 1,
@@ -54,9 +58,11 @@ test('reservation fails when overlapping a reserved reservation', function () {
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Arrange continued
     $overlapStart = (clone $existingStart)->addHour();
     $overlapEnd = (clone $existingEnd)->addHour();
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('reservations.store'), [
@@ -65,6 +71,7 @@ test('reservation fails when overlapping a reserved reservation', function () {
             'end_time' => $overlapEnd->toDateTimeString(),
         ]);
 
+    // Assert
     $response
         ->assertUnprocessable()
         ->assertJsonValidationErrors('reserved_quantity');
@@ -73,6 +80,7 @@ test('reservation fails when overlapping a reserved reservation', function () {
 });
 
 test('reservation can overlap a cancelled reservation', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create(['quantity' => 10, 'available_quantity' => 10]);
 
@@ -87,6 +95,7 @@ test('reservation can overlap a cancelled reservation', function () {
         'status' => ReservationStatus::Cancelled,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('reservations.store'), [
@@ -95,18 +104,21 @@ test('reservation can overlap a cancelled reservation', function () {
             'end_time' => (clone $existingEnd)->subMinutes(30)->toDateTimeString(),
         ]);
 
+    // Assert
     $response->assertCreated();
 
     expect(Reservation::count())->toBe(2);
 });
 
 test('reservation validation requires a future start and end after start', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
     $start = Carbon::now()->subHour();
     $end = (clone $start)->subMinutes(30);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('reservations.store'), [
@@ -115,6 +127,7 @@ test('reservation validation requires a future start and end after start', funct
             'end_time' => $end->toDateTimeString(),
         ]);
 
+    // Assert
     $response
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['start_time', 'end_time']);

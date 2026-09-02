@@ -1,5 +1,9 @@
 <?php
 
 test('api docs page is available', function () {
-    $this->get('/docs')->assertOk();
+    // Act
+    $response = $this->get('/docs');
+
+    // Assert
+    $response->assertOk();
 });

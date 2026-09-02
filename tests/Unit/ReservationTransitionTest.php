@@ -1,9 +1,7 @@
 <?php
 
 use App\Enums\ReservationStatus;
-use App\Models\Product;
 use App\Models\Reservation;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -14,32 +12,40 @@ uses(RefreshDatabase::class);
  */
 
 test('transitionTo changes status when transition is valid', function () {
+    // Arrange
     $reservation = Reservation::factory()->create([
         'status' => ReservationStatus::Pending,
     ]);
 
+    // Act
     $result = $reservation->transitionTo(ReservationStatus::Reserved);
 
+    // Assert
     expect($result)->toBeTrue();
     expect($reservation->status)->toBe(ReservationStatus::Reserved);
 });
 
 test('transitionTo returns false and does not change status when transition is invalid', function () {
+    // Arrange
     $reservation = Reservation::factory()->create([
         'status' => ReservationStatus::Pending,
     ]);
 
+    // Act
     $result = $reservation->transitionTo(ReservationStatus::Returned);
 
+    // Assert
     expect($result)->toBeFalse();
     expect($reservation->status)->toBe(ReservationStatus::Pending);
 });
 
 test('transitionTo works for the full lifecycle from pending to returned', function () {
+    // Arrange
     $reservation = Reservation::factory()->create([
         'status' => ReservationStatus::Pending,
     ]);
 
+    // Act & Assert
     // Pending → Reserved
     expect($reservation->transitionTo(ReservationStatus::Reserved))->toBeTrue();
     expect($reservation->status)->toBe(ReservationStatus::Reserved);
@@ -57,10 +63,12 @@ test('transitionTo works for the full lifecycle from pending to returned', funct
 });
 
 test('transitionTo cannot move from cancelled to any status', function () {
+    // Arrange
     $reservation = Reservation::factory()->create([
         'status' => ReservationStatus::Cancelled,
     ]);
 
+    // Assert
     expect($reservation->transitionTo(ReservationStatus::Pending))->toBeFalse();
     expect($reservation->transitionTo(ReservationStatus::Reserved))->toBeFalse();
     expect($reservation->transitionTo(ReservationStatus::Returned))->toBeFalse();
