@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Database\Factories\ProductFactory;
@@ -56,6 +58,11 @@ class Product extends Model implements HasMedia
         return $url ? parse_url($url, PHP_URL_PATH) : null;
     }
 
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
     /**
      * @return array<string, string>
      */
@@ -67,10 +74,5 @@ class Product extends Model implements HasMedia
             'is_active' => 'boolean',
             'deleted_at' => 'datetime',
         ];
-    }
-
-    public function reservations(): HasMany
-    {
-        return $this->hasMany(Reservation::class);
     }
 }

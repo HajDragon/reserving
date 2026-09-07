@@ -123,7 +123,7 @@
 
                                             <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                                                 <span>{{ __('Reason (optional)') }}</span>
-                                                <textarea name="reason" rows="4" class="w-full rounded-lg border-zinc-300 bg-white text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"></textarea>
+                                                <textarea name="reason" rows="4" class="w-full rounded-lg border-zinc-300 bg-gray-200 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"></textarea>
                                             </label>
 
                                             <div class="flex justify-end gap-2">

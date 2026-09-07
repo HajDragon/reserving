@@ -78,8 +78,11 @@ class CartController extends Controller
 
     public function update(UpdateCartItemRequest $request, CartItem $cartItem): JsonResponse|RedirectResponse
     {
+        $cart = $this->currentUserCart($request->user());
+        $this->authorize('update', $cart);
+
         $validated = $request->validated();
-        $ownedCartItem = $this->currentUserCart($request->user())->items()->findOrFail($cartItem->getKey());
+        $ownedCartItem = $cart->items()->findOrFail($cartItem->getKey());
 
         $ownedCartItem->update([
             'product_id' => $validated['product_id'],
