@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ReservationStatus;
 use App\Http\Requests\StoreCartItemRequest;
 use App\Http\Requests\UpdateCartItemRequest;
 use App\Mail\ReservationOrderSubmittedToAdminMail;
@@ -10,10 +9,10 @@ use App\Mail\ReservationPendingReviewMail;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\Reservation;
 use App\Models\ReservationOrder;
 use App\Models\User;
 use App\Services\AvailabilityService;
+use App\Services\CheckoutValidationService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +24,10 @@ use Illuminate\Validation\ValidationException;
 
 class CartController extends Controller
 {
-    public function __construct(private readonly AvailabilityService $availabilityService) {}
+    public function __construct(
+        private readonly AvailabilityService $availabilityService,
+        private readonly CheckoutValidationService $checkoutValidationService,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -153,51 +155,12 @@ class CartController extends Controller
                 'user_id' => $request->user()->id,
             ]);
 
-            foreach ($cartItems as $cartItem) {
-                $product = $lockedProducts->get($cartItem->product_id);
-
-                if (! $product instanceof Product) {
-                    throw ValidationException::withMessages([
-                        "items.{$cartItem->id}" => ['A selected product is no longer available.'],
-                    ]);
-                }
-
-                if ($cartItem->requested_quantity > $product->quantity) {
-                    throw ValidationException::withMessages([
-                        "items.{$cartItem->id}" => ['The requested quantity exceeds available product quantity.'],
-                    ]);
-                }
-
-                if ($cartItem->requested_quantity > $product->available_quantity) {
-                    throw ValidationException::withMessages([
-                        "items.{$cartItem->id}" => ['The requested quantity exceeds current available inventory.'],
-                    ]);
-                }
-
-                $isAvailable = $this->availabilityService->checkAvailability(
-                    product: $product,
-                    startTime: $cartItem->start_time,
-                    endTime: $cartItem->end_time,
-                    requestedQuantity: $cartItem->requested_quantity,
-                );
-
-                if (! $isAvailable) {
-                    throw ValidationException::withMessages([
-                        "items.{$cartItem->id}" => ['The selected time window does not have enough available units for this product.'],
-                    ]);
-                }
-
-                Reservation::query()->create([
-                    'user_id' => $request->user()->id,
-                    'product_id' => $product->id,
-                    'reservation_order_id' => $reservationOrder->id,
-                    'start_time' => $cartItem->start_time,
-                    'end_time' => $cartItem->end_time,
-                    'status' => ReservationStatus::Pending,
-                    'reserved_quantity' => $cartItem->requested_quantity,
-                    'extra_wishes' => $cartItem->extra_wishes,
-                ]);
-            }
+            $this->checkoutValidationService->validateAndCreateReservations(
+                $cartItems,
+                $lockedProducts,
+                $request->user(),
+                $reservationOrder,
+            );
 
             // Reconcile touched products once per checkout order.
             $this->availabilityService->reconcileProducts($lockedProducts);
