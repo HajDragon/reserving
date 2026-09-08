@@ -9,7 +9,7 @@
         </div>
         <div class="flex-1 flex items-start md:justify-end gap-20">
             <nav aria-label="{{ __('Footer navigatie') }}">
-                <h2 class="font-semibold mb-5 text-purple-800">{{ __('Links') }}</h2>
+                <h2 class="font-semibold mb-5 text-purple-900">{{ __('Links') }}</h2>
                 <ul class="text-sm space-y-2">
                     <li><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li><a href="{{ route('privacy') }}">{{ __('Privacyverklaring') }}</a></li>
@@ -17,7 +17,7 @@
                 </ul>
             </nav>
             <div>
-                <h2 class="font-semibold mb-5 text-purple-800">{{ __('Contact') }}</h2>
+                <h2 class="font-semibold mb-5 text-purple-900">{{ __('Contact') }}</h2>
                 <div class="text-sm space-y-2">
                     <p>Experience Lab — Summa College</p>
                 </div>
