@@ -81,10 +81,6 @@ Model access is enforced by Laravel Policies in `app/Policies/` (auto-discovered
 
 Admin is a boolean `users.is_admin` flag, also exposed as the route-level gate `access-reserving-dashboard` (defined in `AppServiceProvider`) which protects all `/cms` routes and the admin dashboard endpoints. Policies guard the per-model actions inside user-facing controllers; the gate guards the admin area at the route level.
 
-## Conventions
-
-**CMS forms** (`resources/views/cms/products/partials/form-fields.blade.php`): every field is a `<label class="space-y-1 ...">` wrapping a `<span>` label + input, laid out in a `grid gap-4 md:grid-cols-2`. Auxiliary actions in a label row (e.g. the "+ New Category" button) must be positioned out of flow (`absolute` with `!` overrides, since Flux components ship their own `relative` and fixed heights) — otherwise they inflate the label row and break vertical alignment with sibling fields.
-
 ## License
 
 This is a student project for Summa College — not open source.
