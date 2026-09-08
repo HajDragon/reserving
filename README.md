@@ -61,8 +61,25 @@ app/
 ├── Livewire/         # Cart form, admin pages
 ├── Models/           # Product, Reservation, Cart, User, etc.
 ├── Observers/        # Eloquent observers for Reservation and Product
+├── Policies/         # Model authorization (see Authorization below)
 └── Services/         # AvailabilityService (capacity calculations)
 ```
+
+## Authorization
+
+Model access is enforced by Laravel Policies in `app/Policies/` (auto-discovered by convention). Controllers call `$this->authorize('<ability>', $model)`, which returns HTTP 403 on failure.
+
+| Model | Ability | Rule |
+|-------|---------|------|
+| Reservation | `view` | Owner or admin |
+| Reservation | `update` / `delete` | Owner + status Pending |
+| Reservation | `requestRemoval` | Owner + status Reserved |
+| Reservation | `confirmReturn` | Admin only |
+| Product | `viewAny` / `view` | Public (catalog is browsable by any authed user) |
+| Product | `create` / `update` / `delete` | Admin only |
+| Cart | `view` / `update` / `delete` | Cart owner only |
+
+Admin is a boolean `users.is_admin` flag, also exposed as the route-level gate `access-reserving-dashboard` (defined in `AppServiceProvider`) which protects all `/cms` routes and the admin dashboard endpoints. Policies guard the per-model actions inside user-facing controllers; the gate guards the admin area at the route level.
 
 ## License
 

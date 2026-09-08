@@ -16,13 +16,13 @@
                         name="search"
                         value="{{ $filters['search'] }}"
                         placeholder="{{ __('Search product name...') }}"
-                        class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                        class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
                     >
                 </label>
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Date Sort') }}</span>
-                    <select name="date_sort" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="date_sort" class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="desc" @selected($filters['date_sort'] === 'desc')>{{ __('Newest First') }}</option>
                         <option value="asc" @selected($filters['date_sort'] === 'asc')>{{ __('Oldest First') }}</option>
                     </select>
@@ -30,7 +30,7 @@
 
                 <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-300">
                     <span>{{ __('Return Weekday') }}</span>
-                    <select name="returned_weekday" class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
+                    <select name="returned_weekday" class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
                         <option value="">{{ __('All') }}</option>
                         @foreach ($weekdays as $weekdayValue => $weekdayLabel)
                             <option value="{{ $weekdayValue }}" @selected((int) $filters['returned_weekday'] === $weekdayValue)>{{ __($weekdayLabel) }}</option>

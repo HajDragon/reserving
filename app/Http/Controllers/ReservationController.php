@@ -101,6 +101,8 @@ class ReservationController extends Controller
 
     public function confirmReturned(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
     {
+        $this->authorize('confirmReturn', $reservation);
+
         $updatedReservation = DB::transaction(function () use ($request, $reservation) {
             $lockedReservation = Reservation::query()
                 ->with('product')
@@ -322,9 +324,7 @@ class ReservationController extends Controller
 
     public function update(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
     {
-        if ($request->user()->id !== $reservation->user_id) {
-            abort(403);
-        }
+        $this->authorize('update', $reservation);
 
         if ($reservation->status !== ReservationStatus::Pending) {
             throw ValidationException::withMessages([
@@ -399,9 +399,7 @@ class ReservationController extends Controller
 
     public function destroy(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
     {
-        if ($request->user()->id !== $reservation->user_id) {
-            abort(403);
-        }
+        $this->authorize('delete', $reservation);
 
         if ($reservation->status !== ReservationStatus::Pending) {
             throw ValidationException::withMessages([
@@ -437,9 +435,7 @@ class ReservationController extends Controller
 
     public function requestRemoval(Request $request, Reservation $reservation): JsonResponse|RedirectResponse
     {
-        if ($request->user()->id !== $reservation->user_id) {
-            abort(403);
-        }
+        $this->authorize('requestRemoval', $reservation);
 
         if ($reservation->status !== ReservationStatus::Reserved) {
             throw ValidationException::withMessages([

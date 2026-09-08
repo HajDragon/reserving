@@ -29,22 +29,20 @@
         @error('name')<p id="error-name" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
     </label>
 
-    <div class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-        <div class="flex items-center justify-between">
-            <span>{{ __('Category') }}</span>
-            <flux:button
-                type="button"
-                variant="ghost"
-                size="sm"
-                class="text-xs !p-0 underline hover:no-underline"
-                x-on:click="$flux.modal('add-category').show()"
-            >
-                {{ __('+ New Category') }}
-            </flux:button>
-        </div>
+    <label class="relative space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+        <span>{{ __('Category') }}</span>
+        <flux:button
+            type="button"
+            variant="ghost"
+            size="sm"
+            class="!absolute !top-0 !right-0 !h-auto !min-h-0 text-xs !p-0 underline hover:no-underline"
+            x-on:click="$flux.modal('add-category').show()"
+        >
+            {{ __('+ New Category') }}
+        </flux:button>
         <select
             name="category_id"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('category_id') border-red-500 @enderror"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('category_id') border-red-500 @enderror"
             aria-describedby="error-category_id"
             aria-invalid="@error('category_id') true @enderror"
             required
@@ -57,7 +55,7 @@
             @endforeach
         </select>
         @error('category_id')<p id="error-category_id" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
-    </div>
+    </label>
 
     <label class="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
         <span>{{ __('Quantity') }}</span>
@@ -66,7 +64,7 @@
             min="1"
             name="quantity"
             value="{{ old('quantity', $current?->quantity ?? 1) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('quantity') border-red-500 @enderror"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('quantity') border-red-500 @enderror"
             aria-describedby="error-quantity"
             aria-invalid="@error('quantity') true @enderror"
             required
@@ -80,7 +78,7 @@
             type="file"
             name="photo"
             accept="image/*"
-            class="block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="block w-full rounded-lg border border-zinc-300 bg-gray-200 px-3 py-2 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
         >
         <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ __('Use a small image for compact admin cards. Max size: 5MB.') }}</p>
         @error('photo')<p id="error-photo" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
@@ -92,7 +90,7 @@
             type="text"
             name="external_link"
             value="{{ old('external_link', $current?->external_link) }}"
-            class="h-10 w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            class="h-10 w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             placeholder="https://example.com/product-info"
         >
         @error('external_link')<p id="error-external_link" class="text-xs text-red-600" role="alert">{{ $message }}</p>@enderror
@@ -110,7 +108,7 @@
         <textarea
             name="description"
             rows="4"
-            class="w-full rounded-lg border-zinc-300 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('description') border-red-500 @enderror"
+            class="w-full rounded-lg border-zinc-300 bg-gray-200 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 @error('description') border-red-500 @enderror"
             aria-describedby="error-description"
             aria-invalid="@error('description') true @enderror"
         >{{ old('description', $current?->description) }}</textarea>
