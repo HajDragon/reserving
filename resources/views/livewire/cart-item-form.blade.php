@@ -5,10 +5,13 @@
 
         <input type="hidden" name="product_id" value="{{ $this->cartItem->product_id }}">
 
+        @php $now = \Carbon\Carbon::now()->format('Y-m-d\TH:i'); @endphp
+
         <label class="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
             <span>{{ __('Start time') }}</span>
             <input
                 type="datetime-local"
+                min="{{ $now }}"
                 wire:model.live.debounce-500ms="start_time"
                 wire:change="updateStartTime"
                 class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
@@ -19,6 +22,7 @@
             <span>{{ __('End time') }}</span>
             <input
                 type="datetime-local"
+                min="{{ $now }}"
                 wire:model.live.debounce-500ms="end_time"
                 wire:change="updateEndTime"
                 class="w-full rounded-lg border-zinc-300 bg-neutral-100 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
