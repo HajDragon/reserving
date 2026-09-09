@@ -69,6 +69,7 @@ class CartItemForm extends Component
     public function messages(): array
     {
         return [
+            'start_time.after' => __('The start time must be in the future.'),
             'end_time.after' => __('The end time must be after the start time.'),
         ];
     }
@@ -77,7 +78,7 @@ class CartItemForm extends Component
     {
         try {
             $validated = $this->validate([
-                'start_time' => 'required|date_format:Y-m-d\\TH:i',
+                'start_time' => 'required|date_format:Y-m-d\\TH:i|after:now',
                 'end_time' => 'required|date_format:Y-m-d\\TH:i|after:start_time',
                 'requested_quantity' => 'required|integer|min:1',
                 'extra_wishes' => 'nullable|string|max:2000',
