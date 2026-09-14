@@ -38,6 +38,11 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+
+    /**
+     * trigger tests on deployment
+     */
+
     public function down(): void
     {
         Schema::dropIfExists('reservations');
