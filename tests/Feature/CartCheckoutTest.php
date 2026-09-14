@@ -19,6 +19,7 @@ beforeEach(function (): void {
 });
 
 test('checkout creates reservation order from cart items and clears cart', function () {
+    // Arrange
     $user = User::factory()->create();
     User::factory()->admin()->count(2)->create();
 
@@ -45,10 +46,12 @@ test('checkout creates reservation order from cart items and clears cart', funct
         'extra_wishes' => null,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('carts.checkout'));
 
+    // Assert
     $response
         ->assertCreated()
         ->assertJsonPath('reservation_order.user_id', $user->id);
@@ -71,13 +74,16 @@ test('checkout creates reservation order from cart items and clears cart', funct
 });
 
 test('checkout fails for an empty cart', function () {
+    // Arrange
     $user = User::factory()->create();
     $user->cart()->create();
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('carts.checkout'));
 
+    // Assert
     $response
         ->assertUnprocessable()
         ->assertJsonValidationErrors('cart');
@@ -87,6 +93,7 @@ test('checkout fails for an empty cart', function () {
 });
 
 test('checkout rolls back when capacity is no longer available', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create(['quantity' => 1]);
 
@@ -111,10 +118,12 @@ test('checkout rolls back when capacity is no longer available', function () {
         'reserved_quantity' => 1,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->postJson(route('carts.checkout'));
 
+    // Assert
     $response->assertUnprocessable();
 
     expect(ReservationOrder::query()->count())->toBe(0)
@@ -123,6 +132,7 @@ test('checkout rolls back when capacity is no longer available', function () {
 });
 
 test('checkout prevents double reservation on overlapping requests', function () {
+    // Arrange
     $firstUser = User::factory()->create();
     $secondUser = User::factory()->create();
     $product = Product::factory()->create(['quantity' => 1]);
@@ -149,10 +159,12 @@ test('checkout prevents double reservation on overlapping requests', function ()
         'requested_quantity' => 1,
     ]);
 
+    // Act
     $this->actingAs($firstUser)->postJson(route('carts.checkout'))->assertCreated();
 
     $secondResponse = $this->actingAs($secondUser)->postJson(route('carts.checkout'));
 
+    // Assert
     $secondResponse
         ->assertUnprocessable()
         ->assertJsonValidationErrors("items.{$secondUserCartItem->id}");
@@ -164,6 +176,7 @@ test('checkout prevents double reservation on overlapping requests', function ()
 });
 
 test('checkout keeps cached product inventory aligned with active reservations', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create([
         'quantity' => 4,
@@ -184,8 +197,10 @@ test('checkout keeps cached product inventory aligned with active reservations',
         'requested_quantity' => 3,
     ]);
 
+    // Act
     $this->actingAs($user)->postJson(route('carts.checkout'))->assertCreated();
 
+    // Assert
     $activeReservedQuantity = Reservation::query()
         ->where('product_id', $product->id)
         ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])
@@ -199,6 +214,7 @@ test('checkout keeps cached product inventory aligned with active reservations',
 });
 
 test('checkout reconciles all touched products in the order', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $productA = Product::factory()->create([
@@ -236,8 +252,10 @@ test('checkout reconciles all touched products in the order', function () {
         'requested_quantity' => 1,
     ]);
 
+    // Act
     $this->actingAs($user)->postJson(route('carts.checkout'))->assertCreated();
 
+    // Assert
     $productAReserved = Reservation::query()
         ->where('product_id', $productA->id)
         ->whereIn('status', [ReservationStatus::Reserved->value, ReservationStatus::Pending->value])

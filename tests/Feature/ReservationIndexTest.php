@@ -10,12 +10,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('guest is redirected when accessing reservations index', function () {
+    // Act
     $response = $this->get(route('reservations.index'));
 
+    // Assert
     $response->assertRedirect(route('login'));
 });
 
 test('user sees only their own reservations on index page', function () {
+    // Arrange
     $currentUser = User::factory()->create();
     $otherUser = User::factory()->create();
 
@@ -41,10 +44,12 @@ test('user sees only their own reservations on index page', function () {
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($currentUser)
         ->get(route('reservations.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Current User Laptop')
@@ -54,6 +59,7 @@ test('user sees only their own reservations on index page', function () {
 });
 
 test('user sees returned date and status for returned reservation', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create([
         'name' => 'Returned Camera',
@@ -71,10 +77,12 @@ test('user sees returned date and status for returned reservation', function () 
         'returned_by' => User::factory()->create()->id,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('reservations.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Returned Camera')
@@ -84,6 +92,7 @@ test('user sees returned date and status for returned reservation', function () 
 });
 
 test('user sees color coded statuses in my reservations list', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
@@ -105,10 +114,12 @@ test('user sees color coded statuses in my reservations list', function () {
         'status' => ReservationStatus::Cancelled,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('reservations.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSee('bg-yellow-100', false)

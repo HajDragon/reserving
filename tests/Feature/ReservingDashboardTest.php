@@ -11,16 +11,20 @@ use Illuminate\Support\Carbon;
 uses(RefreshDatabase::class);
 
 test('non admin user cannot access reserving dashboard', function () {
+    // Arrange
     $user = User::factory()->create();
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('reserving.index'));
 
+    // Assert
     $response->assertForbidden();
 });
 
 test('admin can access reserving dashboard and view reservation cards', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $reservingUser = User::factory()->create([
         'name' => 'Reserving User',
@@ -38,10 +42,12 @@ test('admin can access reserving dashboard and view reservation cards', function
         'extra_wishes' => 'Tripod needed',
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Reserving Admin Dashboard')
@@ -53,6 +59,7 @@ test('admin can access reserving dashboard and view reservation cards', function
 });
 
 test('admin can filter reserving dashboard by status and date range', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -75,6 +82,7 @@ test('admin can filter reserving dashboard by status and date range', function (
         'end_time' => Carbon::parse('2026-04-16 10:00:00'),
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
@@ -83,6 +91,7 @@ test('admin can filter reserving dashboard by status and date range', function (
             'start_to' => '2026-04-21',
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Status Match Product')
@@ -90,6 +99,7 @@ test('admin can filter reserving dashboard by status and date range', function (
 });
 
 test('admin can filter reserving dashboard by start and return weekdays', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -112,6 +122,7 @@ test('admin can filter reserving dashboard by start and return weekdays', functi
         'end_time' => Carbon::parse('2026-04-25 10:00:00'), // Saturday
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
@@ -119,6 +130,7 @@ test('admin can filter reserving dashboard by start and return weekdays', functi
             'return_weekday' => 5,
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Monday Start Product')
@@ -126,6 +138,7 @@ test('admin can filter reserving dashboard by start and return weekdays', functi
 });
 
 test('admin can sort reserving dashboard by start weekday', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -148,12 +161,14 @@ test('admin can sort reserving dashboard by start weekday', function () {
         'end_time' => Carbon::parse('2026-04-21 10:00:00'),
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
             'start_weekday_sort' => 'asc',
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeInOrder([
@@ -163,6 +178,7 @@ test('admin can sort reserving dashboard by start weekday', function () {
 });
 
 test('admin can sort reserving dashboard by return weekday', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -185,12 +201,14 @@ test('admin can sort reserving dashboard by return weekday', function () {
         'end_time' => Carbon::parse('2026-04-24 16:00:00'),
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
             'return_weekday_sort' => 'desc',
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeInOrder([
@@ -200,6 +218,7 @@ test('admin can sort reserving dashboard by return weekday', function () {
 });
 
 test('calendar view uses weekday filters as well', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -224,6 +243,7 @@ test('calendar view uses weekday filters as well', function () {
         'end_time' => Carbon::parse('2026-04-21 12:00:00'),
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
@@ -232,6 +252,7 @@ test('calendar view uses weekday filters as well', function () {
             'start_weekday' => 1,
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Calendar View')
@@ -241,6 +262,7 @@ test('calendar view uses weekday filters as well', function () {
 });
 
 test('calendar view month follows the start from filter when no month is supplied', function () {
+    // Arrange
     Carbon::setTestNow(Carbon::parse('2026-05-15 12:00:00'));
 
     $admin = User::factory()->admin()->create();
@@ -255,6 +277,7 @@ test('calendar view month follows the start from filter when no month is supplie
         'end_time' => Carbon::parse('2026-06-03 11:00:00'),
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
@@ -262,6 +285,7 @@ test('calendar view month follows the start from filter when no month is supplie
             'start_from' => '2026-06-01',
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Calendar View')
@@ -272,6 +296,7 @@ test('calendar view month follows the start from filter when no month is supplie
 });
 
 test('calendar view shows grouped orders for the selected day', function () {
+    // Arrange
     Carbon::setTestNow(Carbon::parse('2026-05-15 12:00:00'));
 
     $admin = User::factory()->admin()->create();
@@ -313,6 +338,7 @@ test('calendar view shows grouped orders for the selected day', function () {
         'end_time' => Carbon::parse('2026-06-03 14:00:00'),
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reserving.index', [
@@ -321,6 +347,7 @@ test('calendar view shows grouped orders for the selected day', function () {
             'selected_day' => '2026-06-03',
         ]));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Orders on June 3, 2026')

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Mail;
 uses(RefreshDatabase::class);
 
 test('admin can access manage items page for an order', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $order = ReservationOrder::factory()->create();
     $product = Product::factory()->create();
@@ -23,10 +24,12 @@ test('admin can access manage items page for an order', function () {
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reservation-orders.manage-items', $order));
 
+    // Assert
     $response
         ->assertOk()
         ->assertViewHas('order', $order)
@@ -34,17 +37,21 @@ test('admin can access manage items page for an order', function () {
 });
 
 test('non admin cannot access manage items page', function () {
+    // Arrange
     $user = User::factory()->create();
     $order = ReservationOrder::factory()->create();
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('reservation-orders.manage-items', $order));
 
+    // Assert
     $response->assertForbidden();
 });
 
 test('manage items page displays all items in order', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $order = ReservationOrder::factory()->create();
     $products = Product::factory(3)->create();
@@ -57,10 +64,12 @@ test('manage items page displays all items in order', function () {
         ]);
     });
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reservation-orders.manage-items', $order));
 
+    // Assert
     $response->assertOk();
 
     $viewReservations = $response->viewData('reservations');
@@ -70,6 +79,7 @@ test('manage items page displays all items in order', function () {
 });
 
 test('admin can update individual item status on manage items page', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $order = ReservationOrder::factory()->create();
     $product = Product::factory()->create(['quantity' => 5, 'available_quantity' => 5]);
@@ -80,27 +90,30 @@ test('admin can update individual item status on manage items page', function ()
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->patchJson(route('reservations.update-status', $reservation), [
             'status' => 'still_waiting_for_return',
         ]);
 
+    // Assert
     $response->assertOk();
 
     expect($reservation->refresh()->status)->toBe(ReservationStatus::StillWaitingForReturn);
 });
 
 test('user can edit a pending reservation', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create(['quantity' => 10]);
-
     $reservation = Reservation::factory()->create([
         'user_id' => $user->id,
         'product_id' => $product->id,
         'status' => ReservationStatus::Pending,
     ]);
 
+    // Act
     $this->actingAs($user)
         ->patch(route('reservations.update', $reservation), [
             'start_time' => now()->addDays(3)->format('Y-m-d\TH:i'),
@@ -108,6 +121,7 @@ test('user can edit a pending reservation', function () {
             'reserved_quantity' => 2,
             'extra_wishes' => 'Please prepare the item',
         ])
+    // Assert
         ->assertRedirect();
 
     $reservation->refresh();
@@ -118,6 +132,7 @@ test('user can edit a pending reservation', function () {
 });
 
 test('manage items page shows correct status dropdown options based on current status', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $order = ReservationOrder::factory()->create();
     $product = Product::factory()->create();
@@ -128,16 +143,19 @@ test('manage items page shows correct status dropdown options based on current s
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($admin)
         ->get(route('reservation-orders.manage-items', $order));
 
+    // Assert
     $response->assertOk()
         ->assertSee('Still Waiting for Return')
         ->assertSee('Returned');
 });
 
 test('user can request removal for a reserved reservation and admins receive mail', function () {
+    // Arrange
     Mail::fake();
 
     $user = User::factory()->create();
@@ -151,10 +169,12 @@ test('user can request removal for a reserved reservation and admins receive mai
         'status' => ReservationStatus::Reserved,
     ]);
 
+    // Act
     $this->actingAs($user)
         ->post(route('reservations.request-removal', $reservation), [
             'reason' => 'Need to cancel this order',
         ])
+    // Assert
         ->assertRedirect();
 
     expect($reservation->refresh()->status)->toBe(ReservationStatus::RemovalRequest);
@@ -164,6 +184,7 @@ test('user can request removal for a reserved reservation and admins receive mai
 });
 
 test('admin can approve a removal request and the reservation is cancelled', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
     $product = Product::factory()->create(['quantity' => 3, 'available_quantity' => 3]);
@@ -182,10 +203,12 @@ test('admin can approve a removal request and the reservation is cancelled', fun
         'status' => ReservationStatus::RemovalRequest->value,
     ]);
 
+    // Act
     $this->actingAs($admin)
         ->patch(route('reservation-removal-requests.update-status', $removalRequest), [
             'status' => 'approved',
         ])
+    // Assert
         ->assertRedirect();
 
     expect($reservation->refresh()->status)->toBe(ReservationStatus::Cancelled)

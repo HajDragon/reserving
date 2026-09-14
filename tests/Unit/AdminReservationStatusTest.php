@@ -10,6 +10,7 @@ use App\Enums\ReservationStatus;
  */
 
 test('toReservationStatus maps every admin status correctly', function () {
+    // Assert
     expect(AdminReservationStatus::Pending->toReservationStatus())->toBe(ReservationStatus::Pending);
     expect(AdminReservationStatus::Approved->toReservationStatus())->toBe(ReservationStatus::Reserved);
     expect(AdminReservationStatus::StillWaitingForReturn->toReservationStatus())->toBe(ReservationStatus::StillWaitingForReturn);
@@ -18,6 +19,7 @@ test('toReservationStatus maps every admin status correctly', function () {
 });
 
 test('fromReservationStatus maps every reservation status correctly', function () {
+    // Assert
     expect(AdminReservationStatus::fromReservationStatus(ReservationStatus::Pending))->toBe(AdminReservationStatus::Pending);
     expect(AdminReservationStatus::fromReservationStatus(ReservationStatus::Reserved))->toBe(AdminReservationStatus::Approved);
     expect(AdminReservationStatus::fromReservationStatus(ReservationStatus::StillWaitingForReturn))->toBe(AdminReservationStatus::StillWaitingForReturn);
@@ -26,6 +28,7 @@ test('fromReservationStatus maps every reservation status correctly', function (
 });
 
 test('mapping is bidirectional — round-trip preserves identity for applicable statuses', function () {
+    // Arrange
     $adminStatuses = [
         AdminReservationStatus::Pending,
         AdminReservationStatus::Approved,
@@ -34,6 +37,7 @@ test('mapping is bidirectional — round-trip preserves identity for applicable 
         AdminReservationStatus::Returned,
     ];
 
+    // Assert
     foreach ($adminStatuses as $adminStatus) {
         $reservationStatus = $adminStatus->toReservationStatus();
         $roundTrip = AdminReservationStatus::fromReservationStatus($reservationStatus);

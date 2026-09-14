@@ -18,6 +18,7 @@ class SendPickupRemindersTest extends TestCase
 
     public function test_command_sends_reminders_and_marks_sent()
     {
+        // Arrange
         Mail::fake();
 
         $user = User::factory()->create(['email' => 'test@example.com']);
@@ -32,8 +33,10 @@ class SendPickupRemindersTest extends TestCase
 
         $this->assertNull($reservation->reminder_sent_at);
 
+        // Act
         Artisan::call('send:pickup-reminders');
 
+        // Assert
         Mail::assertQueued(PickupReminderMail::class, function ($mail) {
             return $mail->hasTo('test@example.com');
         });
@@ -44,6 +47,7 @@ class SendPickupRemindersTest extends TestCase
 
     public function test_dry_run_does_not_mark_sent()
     {
+        // Arrange
         Mail::fake();
 
         $user = User::factory()->create(['email' => 'dry@example.com']);
@@ -56,8 +60,10 @@ class SendPickupRemindersTest extends TestCase
             'status' => ReservationStatus::Reserved->value,
         ]);
 
+        // Act
         Artisan::call('send:pickup-reminders', ['--dry-run' => true]);
 
+        // Assert
         Mail::assertNothingQueued();
 
         $reservation->refresh();

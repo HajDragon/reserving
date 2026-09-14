@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 uses(RefreshDatabase::class);
 
 test('availability service calculates remaining capacity from overlapping reservations', function () {
+    // Arrange
     $product = Product::factory()->create([
         'quantity' => 5,
     ]);
@@ -42,12 +43,14 @@ test('availability service calculates remaining capacity from overlapping reserv
 
     $availabilityService = app(AvailabilityService::class);
 
+    // Act & Assert
     expect($availabilityService->remainingCapacity($product, $startTime, $endTime))->toBe(2)
         ->and($availabilityService->checkAvailability($product, $startTime, $endTime, 2))->toBeTrue()
         ->and($availabilityService->checkAvailability($product, $startTime, $endTime, 3))->toBeFalse();
 });
 
 test('availability service syncs product activity from remaining capacity', function () {
+    // Arrange
     $product = Product::factory()->create([
         'quantity' => 2,
         'is_active' => true,
@@ -73,10 +76,14 @@ test('availability service syncs product activity from remaining capacity', func
     ]);
 
     $availabilityService = app(AvailabilityService::class);
+
+    // Act
     $availabilityService->syncProductAvailability($product, $startTime, $endTime);
 
+    // Assert
     expect($product->refresh()->is_active)->toBeFalse();
 
+    // Act
     Reservation::query()
         ->where('product_id', $product->id)
         ->first()
@@ -86,5 +93,6 @@ test('availability service syncs product activity from remaining capacity', func
 
     $availabilityService->syncProductAvailability($product, $startTime, $endTime);
 
+    // Assert
     expect($product->refresh()->is_active)->toBeTrue();
 });

@@ -14,15 +14,19 @@ use function Pest\Laravel\post;
 uses(RefreshDatabase::class);
 
 test('non admin cannot access api token management routes', function () {
+    // Arrange
     /** @var User $user */
     $user = User::factory()->create();
 
+    // Act
     actingAs($user)
         ->get(route('cms.api-tokens.index'))
+        // Assert
         ->assertForbidden();
 });
 
 test('admin can create api tokens for existing users', function () {
+    // Arrange
     /** @var User $admin */
     $admin = User::factory()->admin()->create();
     /** @var User $user */
@@ -31,6 +35,7 @@ test('admin can create api tokens for existing users', function () {
         'email' => 'token.user@example.com',
     ]);
 
+    // Act
     $response = actingAs($admin)->post(route('cms.api-tokens.store'), [
         'user_id' => $user->id,
         'name' => 'Integration Token',
@@ -40,6 +45,7 @@ test('admin can create api tokens for existing users', function () {
         ],
     ]);
 
+    // Assert
     $response->assertRedirect(route('cms.api-tokens.index'));
     $response->assertSessionHas('generated_token');
     $response->assertSessionHas('generated_token_name', 'Integration Token');
@@ -62,6 +68,7 @@ test('admin can create api tokens for existing users', function () {
 });
 
 test('admin can search and filter api tokens', function () {
+    // Arrange
     /** @var User $admin */
     $admin = User::factory()->admin()->create();
     /** @var User $alphaUser */
@@ -78,25 +85,30 @@ test('admin can search and filter api tokens', function () {
     $alphaUser->createToken('Alpha Sync', [ApiTokenAbility::ProductsWrite->value]);
     $betaUser->createToken('Beta Sync', [ApiTokenAbility::ProductsRead->value]);
 
+    // Act
     actingAs($admin)
         ->get(route('cms.api-tokens.index', [
             'search' => 'Alpha',
         ]))
+        // Assert
         ->assertOk()
         ->assertSeeText('Alpha Sync')
         ->assertSeeText('Alpha User')
         ->assertDontSeeText('Beta Sync');
 
+    // Act
     actingAs($admin)
         ->get(route('cms.api-tokens.index', [
             'ability' => ApiTokenAbility::ProductsRead->value,
         ]))
+        // Assert
         ->assertOk()
         ->assertSeeText('Beta Sync')
         ->assertDontSeeText('Alpha Sync');
 });
 
 test('admin can copy generated token from the page', function () {
+    // Arrange
     /** @var User $admin */
     $admin = User::factory()->admin()->create();
     /** @var User $user */
@@ -108,14 +120,17 @@ test('admin can copy generated token from the page', function () {
         'abilities' => [ApiTokenAbility::ProductsRead->value],
     ]);
 
+    // Act
     actingAs($admin)
         ->get(route('cms.api-tokens.index'))
+        // Assert
         ->assertOk()
         ->assertSeeText('Copy token')
         ->assertSeeText('Clipboard Token');
 });
 
 test('admin can revoke api tokens', function () {
+    // Arrange
     /** @var User $admin */
     $admin = User::factory()->admin()->create();
     /** @var User $user */
@@ -123,22 +138,28 @@ test('admin can revoke api tokens', function () {
 
     $accessToken = $user->createToken('Revoke Me');
 
+    // Act
     actingAs($admin)
         ->delete(route('cms.api-tokens.destroy', $accessToken->accessToken))
+        // Assert
         ->assertRedirect(route('cms.api-tokens.index'));
 
     expect(DB::table('personal_access_tokens')->where('id', $accessToken->accessToken->id)->exists())->toBeFalse();
 });
 
 test('api product routes require matching token abilities', function () {
+    // Arrange
     /** @var User $user */
     $user = User::factory()->create();
 
     Sanctum::actingAs($user, [ApiTokenAbility::ProductsRead->value]);
 
+    // Act
     get(route('api.products.index'))
+        // Assert
         ->assertOk();
 
+    // Act
     post(route('api.products.store'), [
         'asset_tag' => 'ASSET-1000',
         'name' => 'Permission Test Product',
@@ -149,12 +170,16 @@ test('api product routes require matching token abilities', function () {
         'is_active' => true,
         'photo_path' => null,
         'external_link' => null,
-    ])->assertForbidden();
+    ])
+        // Assert
+        ->assertForbidden();
 
+    // Arrange
     Sanctum::actingAs($user, [ApiTokenAbility::ProductsWrite->value]);
 
     $category = Category::factory()->create();
 
+    // Act
     post(route('api.products.store'), [
         'category_id' => $category->id,
         'asset_tag' => 'ASSET-1001',
@@ -164,15 +189,20 @@ test('api product routes require matching token abilities', function () {
         'available_quantity' => 1,
         'is_active' => true,
         'external_link' => null,
-    ])->assertCreated();
+    ])
+        // Assert
+        ->assertCreated();
 });
 
 test('admin sees the reserving admin dropdown links', function () {
+    // Arrange
     /** @var User $admin */
     $admin = User::factory()->admin()->create();
 
+    // Act
     actingAs($admin)
         ->get(route('reserving.index'))
+        // Assert
         ->assertOk()
         ->assertSeeText('Reserving Admin')
         ->assertSeeText('Order Management')

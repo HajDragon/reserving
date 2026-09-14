@@ -11,6 +11,7 @@ use Livewire\Livewire;
 uses(RefreshDatabase::class);
 
 test('user product livewire page appends products when load more is called', function () {
+    // Arrange
     $user = User::factory()->create();
 
     Collection::times(20, function (int $index) {
@@ -24,6 +25,8 @@ test('user product livewire page appends products when load more is called', fun
 
     $this->actingAs($user);
 
+    // Act
+    // Assert
     Livewire::test(ProductIndex::class)
         ->assertCount('products', 9)
         ->assertSet('hasMore', true)
@@ -36,6 +39,7 @@ test('user product livewire page appends products when load more is called', fun
 });
 
 test('user product livewire page resets loaded products when search changes', function () {
+    // Arrange
     $user = User::factory()->create();
 
     Product::factory()->create([
@@ -56,6 +60,8 @@ test('user product livewire page resets loaded products when search changes', fu
 
     $this->actingAs($user);
 
+    // Act
+    // Assert
     Livewire::test(ProductIndex::class)
         ->assertCount('products', 9)
         ->call('loadMore')
@@ -67,6 +73,7 @@ test('user product livewire page resets loaded products when search changes', fu
 });
 
 test('admin product livewire page appends products when load more is called', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
 
     Collection::times(16, function (int $index) {
@@ -80,6 +87,8 @@ test('admin product livewire page appends products when load more is called', fu
 
     $this->actingAs($admin);
 
+    // Act
+    // Assert
     Livewire::test(AdminProductIndex::class)
         ->assertCount('products', 12)
         ->assertSet('hasMore', true)

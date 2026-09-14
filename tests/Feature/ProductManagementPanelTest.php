@@ -10,16 +10,20 @@ use Illuminate\Support\Facades\Storage;
 uses(RefreshDatabase::class);
 
 test('non admin cannot access product cms management routes', function () {
+    // Arrange
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
+    // Act
     $this->actingAs($user)->get(route('cms.products.index'))->assertForbidden();
+    // Assert
     $this->actingAs($user)->get(route('cms.products.create'))->assertForbidden();
     $this->actingAs($user)->get(route('cms.products.show', $product))->assertForbidden();
     $this->actingAs($user)->get(route('cms.products.edit', $product))->assertForbidden();
 });
 
 test('admin can create view edit and delete product from cms', function () {
+    // Arrange
     $admin = User::factory()->admin()->create();
 
     $category = Category::factory()->create();
@@ -33,18 +37,24 @@ test('admin can create view edit and delete product from cms', function () {
         'is_active' => 1,
     ];
 
+    // Act
     $this->actingAs($admin)
         ->post(route('cms.products.store'), $createPayload)
+    // Assert
         ->assertRedirect(route('cms.products.index'));
 
+    // Arrange
     $product = Product::query()->where('asset_tag', 'ASSET-ADMIN-01')->firstOrFail();
 
+    // Act
     $this->actingAs($admin)
         ->get(route('cms.products.show', $product))
+    // Assert
         ->assertOk()
         ->assertSeeText('CMS Product')
         ->assertSeeText('ASSET-ADMIN-01');
 
+    // Act
     $this->actingAs($admin)
         ->put(route('cms.products.update', $product), [
             'category_id' => $category->id,
@@ -54,6 +64,7 @@ test('admin can create view edit and delete product from cms', function () {
             'quantity' => 8,
             'is_active' => 0,
         ])
+    // Assert
         ->assertRedirect(route('cms.products.show', $product));
 
     $product->refresh();
@@ -62,8 +73,10 @@ test('admin can create view edit and delete product from cms', function () {
         ->and($product->quantity)->toBe(8)
         ->and($product->is_active)->toBeFalse();
 
+    // Act
     $this->actingAs($admin)
         ->delete(route('cms.products.destroy', $product))
+    // Assert
         ->assertRedirect(route('cms.products.index'));
 
     expect(Product::query()->whereKey($product->id)->exists())->toBeFalse();
@@ -71,11 +84,13 @@ test('admin can create view edit and delete product from cms', function () {
 });
 
 test('admin can upload product photo from cms', function () {
+    // Arrange
     Storage::fake('public');
 
     $admin = User::factory()->admin()->create();
-    $category = \App\Models\Category::factory()->create();
+    $category = Category::factory()->create();
 
+    // Act
     $this->actingAs($admin)
         ->post(route('cms.products.store'), [
             'asset_tag' => 'ASSET-UPLOAD-01',
@@ -86,6 +101,7 @@ test('admin can upload product photo from cms', function () {
             'is_active' => 1,
             'photo' => UploadedFile::fake()->create('camera.jpg', 120, 'image/jpeg'),
         ])
+    // Assert
         ->assertRedirect(route('cms.products.index'));
 
     $product = Product::query()->where('asset_tag', 'ASSET-UPLOAD-01')->firstOrFail();
@@ -94,5 +110,5 @@ test('admin can upload product photo from cms', function () {
 
     // Spatie media library stores in numeric folders
     $media = $product->getFirstMedia('photo');
-    Storage::disk('public')->assertExists($media->id . '/' . $media->file_name);
+    Storage::disk('public')->assertExists($media->id.'/'.$media->file_name);
 });

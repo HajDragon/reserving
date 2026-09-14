@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,17 +10,20 @@ use Illuminate\Support\Collection;
 uses(RefreshDatabase::class);
 
 test('guest is redirected when accessing products index', function () {
+    // Act
     $response = $this->get(route('products.index'));
 
+    // Assert
     $response->assertRedirect(route('login'));
 });
 
 test('products index renders the styled product card content', function () {
+    // Arrange
     $user = User::factory()->create();
 
     $product = Product::factory()->create([
         'name' => 'Studio Headphones',
-        'category_id' => \App\Models\Category::factory()->create(['name' => 'camera'])->id,
+        'category_id' => Category::factory()->create(['name' => 'camera'])->id,
         'quantity' => 7,
         'available_quantity' => 7,
         'description' => null,
@@ -29,10 +33,12 @@ test('products index renders the styled product card content', function () {
     $product->addMedia(UploadedFile::fake()->create('photo.jpg', 200, 'image/jpeg'))
         ->toMediaCollection('photo');
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('products.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText($product->name)
@@ -48,6 +54,7 @@ test('products index renders the styled product card content', function () {
 });
 
 test('products index sorts unavailable products to the end', function () {
+    // Arrange
     $user = User::factory()->create();
 
     Product::factory()->create([
@@ -62,16 +69,19 @@ test('products index sorts unavailable products to the end', function () {
         'available_quantity' => 0,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('products.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeInOrder(['Active Product', 'Inactive Product']);
 });
 
 test('products index shows unavailable label and disables add to cart when product is unavailable', function () {
+    // Arrange
     $user = User::factory()->create();
 
     Product::factory()->create([
@@ -81,10 +91,12 @@ test('products index shows unavailable label and disables add to cart when produ
         'is_active' => false,
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('products.index'));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Unavailable Camera')
@@ -94,6 +106,7 @@ test('products index shows unavailable label and disables add to cart when produ
 });
 
 test('products index can filter products by search query', function () {
+    // Arrange
     $user = User::factory()->create();
 
     Product::factory()->create([
@@ -106,10 +119,12 @@ test('products index can filter products by search query', function () {
         'asset_tag' => 'AUD-200',
     ]);
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('products.index', ['search' => 'Cinema']));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSeeText('Cinema Camera Kit')
@@ -119,6 +134,7 @@ test('products index can filter products by search query', function () {
 });
 
 test('products index renders first infinite-scroll chunk for search results', function () {
+    // Arrange
     $user = User::factory()->create();
 
     Collection::times(20, function (int $index) {
@@ -129,10 +145,12 @@ test('products index renders first infinite-scroll chunk for search results', fu
         ]);
     });
 
+    // Act
     $response = $this
         ->actingAs($user)
         ->get(route('products.index', ['search' => 'Camera']));
 
+    // Assert
     $response
         ->assertOk()
         ->assertSee('wire:model.live.debounce.400ms="search"', false)

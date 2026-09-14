@@ -26,60 +26,75 @@ function createCartItemForUser(?User $user = null): CartItem
 }
 
 test('cart item form mounts with correct values', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
+        // Assert
         ->assertSet('start_time', $cartItem->start_time->format('Y-m-d\TH:i'))
         ->assertSet('end_time', $cartItem->end_time->format('Y-m-d\TH:i'))
         ->assertSet('requested_quantity', 1);
 });
 
 test('validation fails when end time is before start time', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $start = $cartItem->start_time->format('Y-m-d\TH:i');
     $end = $cartItem->start_time->subHour()->format('Y-m-d\TH:i');
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $start)
         ->set('end_time', $end)
         ->call('updateEndTime')
+        // Assert
         ->assertHasErrors(['end_time' => 'after']);
 });
 
 test('validation fails when end time equals start time', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $same = $cartItem->start_time->format('Y-m-d\TH:i');
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $same)
         ->set('end_time', $same)
         ->call('updateEndTime')
+        // Assert
         ->assertHasErrors(['end_time' => 'after']);
 });
 
 test('custom validation message is returned for end time before start time', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $start = $cartItem->start_time->format('Y-m-d\TH:i');
     $end = $cartItem->start_time->subHour()->format('Y-m-d\TH:i');
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $start)
         ->set('end_time', $end)
         ->call('updateEndTime')
+        // Assert
         ->assertHasErrors(['end_time' => 'after'])
         ->assertSee('The end time must be after the start time.');
 });
 
 test('valid update saves to database and dispatches cart-updated', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $newStart = $cartItem->start_time->addDays(3)->format('Y-m-d\TH:i');
     $newEnd = $cartItem->start_time->addDays(3)->addHours(3)->format('Y-m-d\TH:i');
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $newStart)
         ->set('end_time', $newEnd)
         ->set('requested_quantity', 2)
         ->call('updateEndTime')
+        // Assert
         ->assertHasNoErrors()
         ->assertSet('updateMessage', 'Cart item updated.')
         ->assertDispatched('cart-updated')
@@ -90,39 +105,48 @@ test('valid update saves to database and dispatches cart-updated', function () {
 });
 
 test('valid update dispatches cart-item-validity-changed with valid true', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $newStart = $cartItem->start_time->addDays(3)->format('Y-m-d\TH:i');
     $newEnd = $cartItem->start_time->addDays(3)->addHours(3)->format('Y-m-d\TH:i');
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $newStart)
         ->set('end_time', $newEnd)
         ->set('requested_quantity', 2)
         ->call('updateEndTime')
+        // Assert
         ->assertDispatched('cart-item-validity-changed', fn (string $name, array $params) => $params['valid'] === true);
 });
 
 test('invalid dates do not persist to database', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $originalEnd = $cartItem->end_time->copy();
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $cartItem->start_time->format('Y-m-d\TH:i'))
         ->set('end_time', $cartItem->start_time->subHour()->format('Y-m-d\TH:i'))
         ->call('updateEndTime');
 
+    // Assert
     $cartItem->refresh();
     expect($cartItem->end_time->format('Y-m-d\TH:i'))->toBe($originalEnd->format('Y-m-d\TH:i'));
 });
 
 test('resetMessages clears previous messages and validation errors', function () {
+    // Arrange
     $cartItem = createCartItemForUser();
     $badEnd = $cartItem->start_time->subHour()->format('Y-m-d\TH:i');
 
+    // Act
     Livewire::test(CartItemForm::class, ['cartItem' => $cartItem])
         ->set('start_time', $cartItem->start_time->format('Y-m-d\TH:i'))
         ->set('end_time', $badEnd)
         ->call('updateEndTime')
+        // Assert
         ->assertHasErrors(['end_time'])
         ->set('end_time', $cartItem->end_time->format('Y-m-d\TH:i'))
         ->call('updateEndTime')

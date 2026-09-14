@@ -21,6 +21,8 @@ test('two users cannot both reserve the last item (second checkout is rejected)'
     // ponytail: in-memory SQLite serializes writes, so true row-level contention is
     // exercised by the production MySQL lockForUpdate(); this test pins the business
     // outcome (one succeeds, one fails) that the lock guarantees.
+
+    // Arrange
     $product = Product::factory()->create([
         'quantity' => 1,
         'available_quantity' => 1,
@@ -49,14 +51,18 @@ test('two users cannot both reserve the last item (second checkout is rejected)'
         'requested_quantity' => 1,
     ]);
 
+    // Act
     // First user checks out and takes the only unit.
     $firstResponse = actingAs($first)->postJson(route('carts.checkout'));
+    // Assert
     $firstResponse->assertCreated();
     expect(Reservation::query()->where('user_id', $first->id)->count())->toBe(1);
 
+    // Act
     // Second user requests an overlapping window: only failure is acceptable.
     $secondResponse = actingAs($second)->postJson(route('carts.checkout'));
 
+    // Assert
     $secondResponse
         ->assertUnprocessable()
         ->assertJsonValidationErrors("items.{$secondItem->id}");
@@ -70,6 +76,7 @@ test('two users cannot both reserve the last item (second checkout is rejected)'
 });
 
 test('reservation store enforces date boundaries and normalizes timezone input', function () {
+    // Arrange
     $user = User::factory()->create();
     // ponytail: 4 units so the observer's per-reservation deduction (factory + boundary 2)
     // never starves boundary 3; this test exercises date/timezone rules, not inventory.
@@ -78,6 +85,7 @@ test('reservation store enforces date boundaries and normalizes timezone input',
         'available_quantity' => 4,
     ]);
 
+    // Act
     // Boundary 1: start_time exactly "now" is rejected (after:now is strict).
     $now = Carbon::now();
     actingAs($user)
@@ -86,11 +94,13 @@ test('reservation store enforces date boundaries and normalizes timezone input',
             'start_time' => $now->toDateTimeString(),
             'end_time' => (clone $now)->addHour()->toDateTimeString(),
         ])
+    // Assert
         ->assertUnprocessable()
         ->assertJsonValidationErrors('start_time');
     expect(Reservation::count())->toBe(0);
 
     // Boundary 2: back-to-back reservations (end == next start) do NOT overlap.
+    // Arrange
     $dayStart = Carbon::now()->addDay()->startOfHour();
     Reservation::factory()->create([
         'user_id' => $user->id,
@@ -101,25 +111,30 @@ test('reservation store enforces date boundaries and normalizes timezone input',
         'reserved_quantity' => 1,
     ]);
 
+    // Act
     actingAs($user)
         ->postJson(route('reservations.store'), [
             'product_id' => $product->id,
             'start_time' => (clone $dayStart)->addHours(2)->toDateTimeString(),
             'end_time' => (clone $dayStart)->addHours(4)->toDateTimeString(),
         ])
+    // Assert
         ->assertCreated();
     expect(Reservation::count())->toBe(2);
 
     // Boundary 3: a +02:00 timezone-offset input is normalized to the app timezone.
+    // Arrange
     $offsetStart = Carbon::now()->addDays(3)->startOfHour()->tz('Europe/Amsterdam');
     $offsetEnd = (clone $offsetStart)->addHour();
 
+    // Act
     actingAs($user)
         ->postJson(route('reservations.store'), [
             'product_id' => $product->id,
             'start_time' => $offsetStart->toIso8601String(),
             'end_time' => $offsetEnd->toIso8601String(),
         ])
+    // Assert
         ->assertCreated();
 
     $stored = Reservation::query()->latest('id')->first();
