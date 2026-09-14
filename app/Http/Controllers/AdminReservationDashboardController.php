@@ -71,7 +71,7 @@ class AdminReservationDashboardController extends Controller
 
         $filteredQuery = Reservation::query()
             ->with(['user', 'product', 'removalRequests'])
-            ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ReservationStatus::RemovalRequest->value])
+            ->orderByRaw('CASE WHEN status IN (?, ?) THEN 0 WHEN status = ? THEN 1 ELSE 2 END', [ReservationStatus::Pending->value, ReservationStatus::RemovalRequest->value, ReservationStatus::Reserved->value])
             ->when($status !== '', fn (Builder $query) => $query->where('status', $status))
             ->when($startFrom !== '', fn (Builder $query) => $query->whereDate('start_time', '>=', $startFrom))
             ->when($startTo !== '', fn (Builder $query) => $query->whereDate('start_time', '<=', $startTo))
@@ -119,7 +119,7 @@ class AdminReservationDashboardController extends Controller
                 ->with(['user', 'product'])
                 ->whereDate('start_time', '<=', $selectedDayReference->toDateString())
                 ->whereDate('end_time', '>=', $selectedDayReference->toDateString())
-                ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ReservationStatus::RemovalRequest->value])
+                ->orderByRaw('CASE WHEN status IN (?, ?) THEN 0 WHEN status = ? THEN 1 ELSE 2 END', [ReservationStatus::Pending->value, ReservationStatus::RemovalRequest->value, ReservationStatus::Reserved->value])
                 ->orderBy('reservation_order_id')
                 ->orderBy('start_time')
                 ->get();
@@ -181,7 +181,7 @@ class AdminReservationDashboardController extends Controller
         $order = ReservationOrder::findOrFail($reservationOrder);
         $reservations = $order->reservations()
             ->with(['product', 'user', 'removalRequests'])
-            ->orderByRaw('CASE WHEN status = ? THEN 0 ELSE 1 END', [ReservationStatus::RemovalRequest->value])
+            ->orderByRaw('CASE WHEN status IN (?, ?) THEN 0 WHEN status = ? THEN 1 ELSE 2 END', [ReservationStatus::Pending->value, ReservationStatus::RemovalRequest->value, ReservationStatus::Reserved->value])
             ->orderBy('start_time')
             ->get();
 
