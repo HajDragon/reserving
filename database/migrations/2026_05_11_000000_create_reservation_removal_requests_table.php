@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->foreignId('reviewed_by')->nullable()->constrained('users');
             $table->timestamp('reviewed_at')->nullable();
+            $table->text('review_reason')->nullable();
             $table->timestamps();
         });
     }
