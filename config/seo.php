@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Centrale SEO-instellingen (standaardwaarden voor meta tags op elke pagina).
 // Pagina's kunnen deze overschrijven via props (:description op het layout-component).
 

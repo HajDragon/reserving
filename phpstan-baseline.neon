@@ -1,0 +1,913 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Actions/Fortify/CreateNewUser.php
+
+		-
+			message: '#^Method App\\Actions\\Fortify\\CreateNewUser\:\:emailRules\(\) should return array\<int, array\<mixed\>\|Illuminate\\Contracts\\Validation\\ValidationRule\|string\> but returns array\<int, Illuminate\\Validation\\Rules\\Unique\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Actions/Fortify/CreateNewUser.php
+
+		-
+			message: '#^Method App\\Actions\\Fortify\\CreateNewUser\:\:passwordRules\(\) should return array\<int, array\<mixed\>\|Illuminate\\Contracts\\Validation\\ValidationRule\|string\> but returns array\<int, Illuminate\\Validation\\Rules\\Password\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Actions/Fortify/CreateNewUser.php
+
+		-
+			message: '#^Method App\\Actions\\Fortify\\ResetUserPassword\:\:passwordRules\(\) should return array\<int, array\<mixed\>\|Illuminate\\Contracts\\Validation\\ValidationRule\|string\> but returns array\<int, Illuminate\\Validation\\Rules\\Password\|string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Actions/Fortify/ResetUserPassword.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$product_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Actions/Reservations/AdjustProductInventoryAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reserved_quantity\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Actions/Reservations/AdjustProductInventoryAction.php
+
+		-
+			message: '#^Instanceof between stdClass\|null and App\\Models\\Product will always evaluate to false\.$#'
+			identifier: instanceof.alwaysFalse
+			count: 2
+			path: app/Actions/Reservations/AdjustProductInventoryAction.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 2
+			path: app/Actions/Reservations/AdjustProductInventoryAction.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Product\:\:whereNotNull\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Console/Commands/MigrateProductPhotos.php
+
+		-
+			message: '#^Cannot call method forceFill\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Console/Commands/ReconcileProductInventory.php
+
+		-
+			message: '#^Cannot call method save\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Console/Commands/SendPickupReminders.php
+
+		-
+			message: '#^Parameter \#1 \$reservation of class App\\Mail\\PickupReminderMail constructor expects App\\Models\\Reservation, stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/SendPickupReminders.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: App\\Enums\\ReservationStatus\:\:RemovalRequest$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Enums/AdminReservationStatus.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\User\>\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/ApiTokenManagementController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\User\>\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/ApiTokenManagementController.php
+
+		-
+			message: '#^Anonymous function should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/Admin/ApiTokenManagementController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Category\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/ProductManagementController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\ReturnedReservationLog\>\:\:searchProductName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/ReservationLogController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$end_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reservation_order_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$start_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ReservationOrder\:\:findOrFail\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Cannot call method fresh\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Cannot call method save\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$groupBy of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:groupBy\(\) expects array\|\(callable\(stdClass, int\)\: non\-falsy\-string\)\|string, Closure\(App\\Models\\Reservation\)\: non\-falsy\-string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$reservation of method App\\Actions\\Reservations\\AdjustProductInventoryAction\:\:restoreForReservation\(\) expects App\\Models\\Reservation, stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Query\\Builder\:\:when\(\) expects \(callable\(Illuminate\\Database\\Query\\Builder, bool\)\: Illuminate\\Database\\Eloquent\\Builder\)\|null, Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: Illuminate\\Database\\Eloquent\\Builder given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/AdminReservationDashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Product\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ProductController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Cart\:\:\$items\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/CartController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\CartController\:\:currentUserCart\(\) should return App\\Models\\Cart but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/CartController.php
+
+		-
+			message: '#^Parameter \#1 \$cartItems of method App\\Services\\CheckoutValidationService\:\:validateAndCreateReservations\(\) expects iterable\<App\\Models\\CartItem\>, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/CartController.php
+
+		-
+			message: '#^Parameter \#1 \$products of method App\\Services\\AvailabilityService\:\:reconcileProducts\(\) expects iterable\<App\\Models\\Product\>, Illuminate\\Support\\Collection\<\(int\|string\), stdClass\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/CartController.php
+
+		-
+			message: '#^Parameter \#2 \$lockedProducts of method App\\Services\\CheckoutValidationService\:\:validateAndCreateReservations\(\) expects Illuminate\\Support\\Collection\<int, App\\Models\\Product\>, Illuminate\\Support\\Collection\<\(int\|string\), stdClass\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/CartController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$cart\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable\:\:hasTwoFactorEnabled\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable\:\:reservations\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Method App\\Http\\Controllers\\GdprController\:\:exportData\(\) should return Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 3
+			path: app/Http/Controllers/GdprController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$available_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$external_link\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Query\\Builder\:\:when\(\) expects \(callable\(Illuminate\\Database\\Query\\Builder, bool\)\: void\)\|null, Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/ProductController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Product\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Reservation\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ReservationRemovalRequest\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Cannot call method forceFill\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 9
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Cannot call method fresh\(\) on stdClass\.$#'
+			identifier: method.nonObject
+			count: 5
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Parameter \#1 \$reservation of class App\\Events\\ReservationReturned constructor expects App\\Models\\Reservation, stdClass given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Parameter \#1 \$reservation of method App\\Actions\\Reservations\\AdjustProductInventoryAction\:\:restoreForReservation\(\) expects App\\Models\\Reservation, stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Parameter \$product of method App\\Services\\AvailabilityService\:\:syncProductAvailability\(\) expects App\\Models\\Product, stdClass given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Http/Controllers/ReservationController.php
+
+		-
+			message: '#^Cannot call method tokenCan\(\) on class\-string\|object\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Middleware/CheckSanctumAbilityOrSession.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Requests/UpdateCartItemRequest.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$asset_tag\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$available_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$external_link\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Http\\Resources\\ProductResource\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Call to an undefined method App\\Http\\Resources\\ProductResource\:\:getFirstMediaUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$end_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$extra_wishes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$product_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reservation_order_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reserved_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$start_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Listeners/ArchiveReturnedReservation.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Guard\:\:logout\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Livewire/Actions/Logout.php
+
+		-
+			message: '#^Access to an undefined property App\\Livewire\\CartItemForm\:\:\$product\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$end_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$extra_wishes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$product\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$requested_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$start_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/CartItemForm.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$asset_tag\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$photo_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Method App\\Livewire\\Pages\\Admin\\ProductIndex\:\:productsQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: array\{id\: mixed, name\: mixed, asset_tag\: mixed, category\: mixed, quantity\: int, is_active\: bool, photo_path\: mixed\}, Closure\(App\\Models\\Product\)\: array\{id\: mixed, name\: mixed, asset_tag\: mixed, category\: mixed, quantity\: int, is_active\: bool, photo_path\: mixed\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Query\\Builder\:\:when\(\) expects \(callable\(Illuminate\\Database\\Query\\Builder, bool\)\: void\)\|null, Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Livewire/Pages/Admin/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$available_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$external_link\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Method App\\Livewire\\Pages\\ProductIndex\:\:productsQuery\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) expects callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: array\{id\: mixed, name\: mixed, description\: mixed, category\: mixed, photo_url\: string\|false\|null, is_active\: bool, available_quantity_safe\: int\<0, max\>, can_add_to_cart\: bool, external_link_url\: non\-empty\-string\|null\}, Closure\(App\\Models\\Product\)\: array\{id\: mixed, name\: mixed, description\: mixed, category\: mixed, photo_url\: string\|false\|null, is_active\: bool, available_quantity_safe\: int\<0, max\>, can_add_to_cart\: bool, external_link_url\: non\-empty\-string\|null\} given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Parameter \#2 \$callback of method Illuminate\\Database\\Query\\Builder\:\:when\(\) expects \(callable\(Illuminate\\Database\\Query\\Builder, bool\)\: void\)\|null, Closure\(Illuminate\\Database\\Eloquent\\Builder\)\: void given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Livewire/Pages/ProductIndex.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$product\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationApprovedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reservationOrder\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationApprovedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationApprovedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationOrderSubmittedToAdminMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$reservations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationOrderSubmittedToAdminMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationOrderSubmittedToAdminMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationPendingReviewMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$reservations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationPendingReviewMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationPendingReviewMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$product\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationRejectedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reservationOrder\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationRejectedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationRejectedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationRemovalRequestedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$reservationOrder\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationRemovalRequestedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Mail/ReservationRemovalRequestedMail.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/Reservation.php
+
+		-
+			message: '#^Method App\\Models\\ReturnedReservationLog\:\:scopeFilterByReturnedWeekday\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/ReturnedReservationLog.php
+
+		-
+			message: '#^Method App\\Models\\ReturnedReservationLog\:\:scopeSortByReturnedDate\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/ReturnedReservationLog.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$available_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Observers/ProductObserver.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Observers/ProductObserver.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Observers/ProductObserver.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Cart\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Policies/CartPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Policies/CartPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_admin\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Policies/ProductPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Policies/ReservationPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Reservation\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Policies/ReservationPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Policies/ReservationPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$is_admin\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Policies/ReservationPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AvailabilityService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/AvailabilityService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$end_time\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$extra_wishes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$product_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$requested_quantity\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CartItem\:\:\$start_time\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$available_quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Product\:\:\$quantity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ReservationOrder\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/CheckoutValidationService.php
