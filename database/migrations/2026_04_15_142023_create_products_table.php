@@ -16,13 +16,15 @@ return new class extends Migration
             $table->string('asset_tag')->unique();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('type');
             $table->unsignedInteger('quantity')->default(1);
+            $table->unsignedInteger('available_quantity')->default(0);
             $table->boolean('is_active')->default(true);
-            $table->string('photo_path')->nullable();
             $table->string('external_link')->nullable();
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('available_quantity');
         });
     }
 
