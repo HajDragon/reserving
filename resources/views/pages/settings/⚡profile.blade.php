@@ -3,6 +3,7 @@
 use App\Concerns\ProfileValidationRules;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Flux\Flux;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
@@ -13,6 +14,7 @@ new #[Title('Profile settings')] class extends Component {
 
     public string $name = '';
     public string $email = '';
+    public string $locale = 'nl';
 
     /**
      * Mount the component.
@@ -21,6 +23,7 @@ new #[Title('Profile settings')] class extends Component {
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->locale = Auth::user()->locale ?? 'nl';
     }
 
     /**
@@ -41,6 +44,21 @@ new #[Title('Profile settings')] class extends Component {
         $user->save();
 
         Flux::toast(variant: 'success', text: __('Profile updated.'));
+    }
+
+    /**
+     * Update the user's language preference.
+     */
+    public function updateLocale(): void
+    {
+        $user = Auth::user();
+        $user->locale = $this->locale;
+        $user->save();
+
+        App::setLocale($this->locale);
+        session(['locale' => $this->locale]);
+
+        Flux::toast(variant: 'success', text: __('Taalinstellingen bijgewerkt.'));
     }
 
     /**
@@ -107,6 +125,25 @@ new #[Title('Profile settings')] class extends Component {
                 </flux:button>
             </div>
         </form>
+
+        <!-- Language Settings -->
+        <div class="mt-10 border-t border-zinc-200 pt-8 dark:border-zinc-700">
+            <flux:heading>{{ __('Taal') }}</flux:heading>
+            <flux:subheading>{{ __('Kies de taal voor je account') }}</flux:subheading>
+
+            <form wire:submit="updateLocale" class="mt-6 w-full space-y-6">
+                <flux:select wire:model="locale" :label="__('Taal')">
+                    <option value="nl">Nederlands</option>
+                    <option value="en">English</option>
+                </flux:select>
+
+                <div class="flex items-center gap-4">
+                    <flux:button variant="primary" type="submit">
+                        {{ __('Save') }}
+                    </flux:button>
+                </div>
+            </form>
+        </div>
 
         @if ($this->showDeleteUser)
             <livewire:pages::settings.delete-user-form />
