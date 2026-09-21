@@ -8791,16 +8791,16 @@
         },
         {
             "name": "knuckleswtf/scribe",
-            "version": "5.10.0",
+            "version": "5.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/knuckleswtf/scribe.git",
-                "reference": "d4da86e57e49dac4694b200354cfa962bfae3168"
+                "reference": "71c8c4acac495401ab8af1a68a46f09d45aff426"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/knuckleswtf/scribe/zipball/d4da86e57e49dac4694b200354cfa962bfae3168",
-                "reference": "d4da86e57e49dac4694b200354cfa962bfae3168",
+                "url": "https://api.github.com/repos/knuckleswtf/scribe/zipball/71c8c4acac495401ab8af1a68a46f09d45aff426",
+                "reference": "71c8c4acac495401ab8af1a68a46f09d45aff426",
                 "shasum": ""
             },
             "require": {
@@ -8871,7 +8871,7 @@
             ],
             "support": {
                 "issues": "https://github.com/knuckleswtf/scribe/issues",
-                "source": "https://github.com/knuckleswtf/scribe/tree/5.10.0"
+                "source": "https://github.com/knuckleswtf/scribe/tree/5.11.0"
             },
             "funding": [
                 {
@@ -8879,7 +8879,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2026-05-09T21:49:49+00:00"
+            "time": "2026-06-08T15:39:10+00:00"
         },
         {
             "name": "laravel/boost",
