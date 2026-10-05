@@ -22,7 +22,7 @@ class MigrateProductPhotos extends Command
     {
         $products = Product::whereNotNull('photo_path')->get();
 
-        $this->info('Found ' . $products->count() . ' products with a photo_path.');
+        $this->info('Found '.$products->count().' products with a photo_path.');
 
         foreach ($products as $product) {
             $path = $product->photo_path;
@@ -39,7 +39,7 @@ class MigrateProductPhotos extends Command
                 if (file_exists($fullPath)) {
                     $product->addMedia($fullPath)
                             // Not preserving original since we want to clear old storage
-                            ->toMediaCollection('photo');
+                        ->toMediaCollection('photo');
                     $this->line("Migrated via Storage: {$path}");
                 } else {
                     $this->error("File not found for product {$product->id}: {$fullPath}");

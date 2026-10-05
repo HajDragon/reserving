@@ -41,11 +41,11 @@ return [
         ],
 
         'private' => [
-                'driver' => 'local',
-                'root' => storage_path('app/private'),
-                'visibility' => 'private',
-                'throw' => true,
-            ],
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
 
         'public' => [
             'driver' => 'local',
@@ -85,6 +85,5 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],
-
 
 ];

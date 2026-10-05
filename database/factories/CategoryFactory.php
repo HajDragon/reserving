@@ -29,7 +29,7 @@ class CategoryFactory extends Factory
             'Speaker',
             'Cables',
             'Accessories',
-        ]) . ' ' . $this->faker->unique()->word() . ' ' . $this->faker->numberBetween(1, 10000);
+        ]).' '.$this->faker->unique()->word().' '.$this->faker->numberBetween(1, 10000);
 
         return [
             'name' => $name,

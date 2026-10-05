@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class ProductManagementController extends Controller
 {
@@ -96,7 +97,7 @@ class ProductManagementController extends Controller
     /**
      * Store a newly created category in storage.
      */
-    public function storeCategory(\Illuminate\Http\Request $request): RedirectResponse
+    public function storeCategory(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:categories,name'],

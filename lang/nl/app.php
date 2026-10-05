@@ -346,6 +346,7 @@ return [
     'Reservation pickup reminder' => 'Reservering ophaalherinnering',
     'Clear' => 'Wissen',
     'External link' => 'Externe link',
+    'Experience Lab Website' => 'Experience Lab Website',
     'Danger zone' => 'Gevarenzone',
     'Danger Zone' => 'Gevarenzone',
 ];

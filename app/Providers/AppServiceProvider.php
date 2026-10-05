@@ -12,8 +12,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -40,7 +38,6 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        $this->configureLocale();
         $this->configureDefaults();
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {
@@ -60,18 +57,6 @@ class AppServiceProvider extends ServiceProvider
                 ->action('Reset Password', $url)
                 ->line('If you did not request a password reset, no further action is required.');
         });
-    }
-
-    /**
-     * Set the application locale based on the authenticated user's preference.
-     */
-    protected function configureLocale(): void
-    {
-        $locale = Auth::check()
-            ? Auth::user()->locale
-            : session('locale', config('app.locale'));
-
-        App::setLocale($locale);
     }
 
     /**

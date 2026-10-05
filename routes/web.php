@@ -5,23 +5,26 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\ApiTokenManagementController;
 use App\Http\Controllers\Admin\ProductManagementController;
 use App\Http\Controllers\Admin\ReservationLogController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AdminReservationDashboardController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\GdprController;
+use App\Http\Controllers\ReservationController;
 use App\Livewire\Pages\Admin\ProductIndex as AdminProductIndex;
 use App\Livewire\Pages\ProductIndex;
 use Illuminate\Support\Facades\Route;
 
 // Public pages (no auth required)
 Route::get('privacy', function () {
-    \SEO::setTitle('Privacyverklaring');
-    \SEO::setDescription('Lees hoe het Experience Lab Reserveringssysteem van Summa College omgaat met je persoonsgegevens. Privacyverklaring conform AVG/GDPR.');
+    SEO::setTitle('Privacyverklaring');
+    SEO::setDescription('Lees hoe het Experience Lab Reserveringssysteem van Summa College omgaat met je persoonsgegevens. Privacyverklaring conform AVG/GDPR.');
+
     return view('pages.privacy');
 })->name('privacy');
 
 Route::get('voorwaarden', function () {
-    \SEO::setTitle('Gebruiksvoorwaarden');
-    \SEO::setDescription('De gebruiksvoorwaarden van het Experience Lab Reserveringssysteem van Summa College. Lees de voorwaarden voor het reserveren van materialen.');
+    SEO::setTitle('Gebruiksvoorwaarden');
+    SEO::setDescription('De gebruiksvoorwaarden van het Experience Lab Reserveringssysteem van Summa College. Lees de voorwaarden voor het reserveren van materialen.');
+
     return view('pages.terms');
 })->name('terms');
 
@@ -33,12 +36,11 @@ Route::get('sitemap.xml', fn () => response()
 
 // GDPR: data export (auth required)
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('gdpr/export', [\App\Http\Controllers\GdprController::class, 'exportData'])->name('gdpr.export');
-    Route::post('gdpr/export', [\App\Http\Controllers\GdprController::class, 'downloadExport'])->name('gdpr.export.download');
+    Route::get('gdpr/export', [GdprController::class, 'exportData'])->name('gdpr.export');
+    Route::post('gdpr/export', [GdprController::class, 'downloadExport'])->name('gdpr.export.download');
 
     Route::get('/', ProductIndex::class)->name('home');
     Route::get('dashboard', ProductIndex::class)->name('dashboard');
-
 
     Route::get('products', ProductIndex::class)->name('products.index');
 
