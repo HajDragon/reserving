@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class CleanupOldData extends Command
 {
@@ -45,7 +45,8 @@ class CleanupOldData extends Command
         }
         $this->info("Oude reservation logs verwijderd (>2 jaar): {$deletedLogs}");
 
-        $this->info("Dataverwijdering voltooid — AVG data-retentiebeleid uitgevoerd.");
+        $this->info('Dataverwijdering voltooid — AVG data-retentiebeleid uitgevoerd.');
+
         return Command::SUCCESS;
     }
 }

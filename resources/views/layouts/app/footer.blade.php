@@ -3,8 +3,7 @@
         <div class="md:max-w-96">
             <x-app-logo class="size-12 mr-auto ml-12" />
             <p class="mt-6 text-sm">
-                {{ config('app.name', 'Experience Lab Reserveringssysteem') }} — het reserveringssysteem
-                van het Experience Lab van Summa College.
+                {{ config('app.name', 'Experience Lab Reserveringssysteem') }} — {{ __('the reservation system of the Experience Lab of Summa College.') }}
             </p>
         </div>
         <div class="flex-1 flex items-start md:justify-end gap-20">
@@ -14,6 +13,7 @@
                     <li><a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a></li>
                     <li><a href="{{ route('privacy') }}">{{ __('Privacyverklaring') }}</a></li>
                     <li><a href="{{ route('terms') }}">{{ __('Terms of Use') }}</a></li>
+                    <li><a href="https://experiencelab-wdr.summacollege.nl/" target="_blank" rel="noopener noreferrer">{{ __('Experience Lab Website') }} ↗</a></li>
                 </ul>
             </nav>
             <div>

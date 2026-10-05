@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class GdprController extends Controller
 {
     /**
      * Show the GDPR data export page.
      */
-    public function exportData(): \Illuminate\View\View
+    public function exportData(): View
     {
         $user = Auth::user();
 
@@ -26,7 +26,7 @@ class GdprController extends Controller
                 'laatst_bijgewerkt' => $user->updated_at?->format('d-m-Y H:i'),
                 'tweefactoractiveren' => $user->hasEnabledTwoFactorAuthentication() ? 'Ja' : 'Nee',
             ],
-            'reserveringen' => $user->reservations()->with('reservationOrder')->get()->map(fn($r) => [
+            'reserveringen' => $user->reservations()->with('reservationOrder')->get()->map(fn ($r) => [
                 'id' => $r->id,
                 'product' => $r->product?->name ?? 'Onbekend',
                 'start' => $r->start_time?->format('d-m-Y H:i'),
@@ -58,7 +58,7 @@ class GdprController extends Controller
                 'laatst_bijgewerkt' => $user->updated_at?->format('d-m-Y H:i'),
                 'tweefactorauthenticatie' => $user->hasEnabledTwoFactorAuthentication(),
             ],
-            'reserveringen' => $user->reservations()->get()->map(fn($r) => [
+            'reserveringen' => $user->reservations()->get()->map(fn ($r) => [
                 'id' => $r->id,
                 'product' => $r->product?->name ?? 'Onbekend',
                 'starttijd' => $r->start_time?->format('d-m-Y H:i'),
@@ -68,7 +68,7 @@ class GdprController extends Controller
                 'extra_wensen' => $r->extra_wishes,
                 'aangemaakt' => $r->created_at?->format('d-m-Y H:i'),
             ])->toArray(),
-            'cart_items' => $user->cart?->items()->get()->map(fn($item) => [
+            'cart_items' => $user->cart?->items()->get()->map(fn ($item) => [
                 'product' => $item->product?->name ?? 'Onbekend',
                 'hoeveelheid' => $item->requested_quantity,
             ])->toArray() ?? [],
@@ -78,7 +78,7 @@ class GdprController extends Controller
 
         return response($json, 200, [
             'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="gegevensexport-' . $user->name . '-' . now()->format('Y-m-d') . '.json"',
+            'Content-Disposition' => 'attachment; filename="gegevensexport-'.$user->name.'-'.now()->format('Y-m-d').'.json"',
         ]);
     }
 }

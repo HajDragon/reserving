@@ -363,6 +363,7 @@ return [
     'Reservation pickup reminder' => 'Reservation pickup reminder',
     'Clear' => 'Clear',
     'External link' => 'External link',
+    'Experience Lab Website' => 'Experience Lab Website',
     'Danger zone' => 'Danger zone',
     'Danger Zone' => 'Danger zone',
 ];

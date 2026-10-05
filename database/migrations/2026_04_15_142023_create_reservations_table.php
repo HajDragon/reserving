@@ -42,7 +42,6 @@ return new class extends Migration
     /**
      * trigger tests on deployment
      */
-
     public function down(): void
     {
         Schema::dropIfExists('reservations');

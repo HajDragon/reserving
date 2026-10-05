@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Middleware\CheckSanctumAbilityOrSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\Http\Middleware\CheckAbilities;
-use App\Http\Middleware\CheckSanctumAbilityOrSession;
 
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
     Route::get('/user', function (Request $request) {
